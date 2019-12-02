@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>MSVC.Redist.vcperf</id>
+    <version>$version$</version>
+    <title>vcperf</title>
+    <authors>Microsoft</authors>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Microsoft (R) Visual C++ (R) Performance Analyzer</description>
+    <copyright>© Microsoft Corporation. All rights reserved.</copyright>
+    <tags>msvc,vcperf,native</tags>
+  </metadata>
+  <files>
+    <file src="out\Release\x64\*.dll" target="x64\" />
+    <file src="out\Release\x64\*.exe" target="x64\" />
+    <file src="out\Release\x64\*.pdb" target="x64\" />
+    <file src="out\Release\x86\*.dll" target="x86\" />
+    <file src="out\Release\x86\*.exe" target="x86\" />
+    <file src="out\Release\x86\*.pdb" target="x86\" />
+    <file src="out\Release\x64\*.xml" target="" />
+  </files>
+</package>

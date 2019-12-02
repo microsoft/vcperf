@@ -1,0 +1,44 @@
+#include "TemplateInstantiationsView.h"
+#include "CppBuildInsightsEtw.h"
+#include "PayloadBuilder.h"
+
+
+void TemplateInstantiationsView::OnTemplateInstantiationStart( 
+    TemplateInstantiation ti, const void* relogSession)
+{
+    using std::chrono::duration_cast;
+    using std::chrono::microseconds;
+
+    PCEVENT_DESCRIPTOR desc = &CppBuildInsightsTemplateInstantiationActivity;
+
+    auto tiInfo = tiCache_->GetTemplateInstantiationInfo(ti);
+
+    bool isInfoAvailable = std::get<0>(tiInfo);
+
+    if (!isInfoAvailable) {
+        return;
+    }
+
+    auto* context = contextBuilder_->GetContextData();
+
+    auto& td = timingDataCache_->GetTimingData(ti);
+
+    const char* primaryTemplateName = std::get<1>(tiInfo);
+    const char* specializationName = std::get<2>(tiInfo);
+
+    Payload p = PayloadBuilder <uint16_t, const char*, const char*, uint32_t, const wchar_t*, const char*,
+        const char*, uint32_t>::Build(
+            context->TimelineId,
+            context->TimelineDescription,
+            context->Tool,
+            context->InvocationId,
+            context->Component,
+            primaryTemplateName,
+            specializationName,
+            (uint32_t)duration_cast<microseconds>(td.Duration).count()
+        );
+
+    InjectEvent(relogSession, &CppBuildInsightsGuid, desc,
+                ti.ProcessId(), ti.ThreadId(), ti.ProcessorIndex(), 
+                ti.StartTimestamp(), p.GetData(), (unsigned long)p.Size());
+}
