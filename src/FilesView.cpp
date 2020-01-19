@@ -30,7 +30,7 @@ void FilesView::OnFileParse(FileGroup files, const void* relogSession)
         parentPath = files[files.Size() - 2].Path();
     }
 
-    auto& td = timingDataCache_->GetTimingData(currentFile);
+    auto& td = miscellaneousCache_->GetTimingData(currentFile);
 
     Payload p = PayloadBuilder<uint16_t, const char*, const char*, uint32_t, const wchar_t*, const char*,
         const char*, uint16_t, const char*, uint32_t, uint32_t>::Build(

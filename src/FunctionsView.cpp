@@ -4,11 +4,16 @@
 
 #include "PayloadBuilder.h"
 
+enum class EventId
+{
+    FORCE_INLINEE = 1
+};
+
 AnalysisControl FunctionsView::OnActivity(const EventStack& eventStack, const void* relogSession)
 {
     // We avoid emitting functions that take less than 100 milliseconds to optimize
     // in order to limit the size of the dataset that WPA has to deal with.
-    if (timingDataCache_->GetTimingData(eventStack.Back()).Duration < std::chrono::milliseconds(100)) {
+    if (miscellaneousCache_->GetTimingData(eventStack.Back()).Duration < std::chrono::milliseconds(100)) {
         return AnalysisControl::CONTINUE;
     }
 
@@ -22,7 +27,7 @@ AnalysisControl FunctionsView::OnSimpleEvent(const EventStack& eventStack, const
     // We avoid emitting functions that take less than 100 milliseconds to optimize
     // in order to limit the size of the dataset that WPA has to deal with.
     if (    eventStack.Size() >= 2 
-        &&  timingDataCache_->GetTimingData(eventStack[eventStack.Size()-2]).Duration < std::chrono::milliseconds(100)) 
+        &&  miscellaneousCache_->GetTimingData(eventStack[eventStack.Size()-2]).Duration < std::chrono::milliseconds(100)) 
     {
         return AnalysisControl::CONTINUE;
     }
@@ -38,7 +43,7 @@ void FunctionsView::EmitFunctionActivity(Function func, const void* relogSession
 
     auto* context = contextBuilder_->GetContextData();
 
-    auto& td = timingDataCache_->GetTimingData(func);
+    auto& td = miscellaneousCache_->GetTimingData(func);
 
     Payload p = PayloadBuilder<uint16_t, const char*, const char*, uint32_t, 
         const wchar_t*, const char*, const char*, uint32_t>::Build(
@@ -55,6 +60,14 @@ void FunctionsView::EmitFunctionActivity(Function func, const void* relogSession
     InjectEvent(relogSession, &CppBuildInsightsGuid, desc, 
         func.ProcessId(), func.ThreadId(), func.ProcessorIndex(),
         func.StartTimestamp(), p.GetData(), (unsigned long)p.Size());
+
+    desc = &CppBuildInsightsFunctionActivity_Extended1;
+
+    Payload p2 = PayloadBuilder<uint64_t>::Build(func.InstanceId());
+
+    InjectEvent(relogSession, &CppBuildInsightsGuid, desc, 
+        func.ProcessId(), func.ThreadId(), func.ProcessorIndex(),
+        func.StartTimestamp(), p2.GetData(), (unsigned long)p2.Size());
 }
 
 void FunctionsView::EmitFunctionForceInlinee(Function func, ForceInlinee forceInlinee, 
@@ -65,7 +78,7 @@ void FunctionsView::EmitFunctionForceInlinee(Function func, ForceInlinee forceIn
     auto* context = contextBuilder_->GetContextData();
 
     Payload p = PayloadBuilder<uint16_t, const char*, const char*, uint32_t,
-        const wchar_t*, const char*, const char*, const char*, const char*,
+        const wchar_t*, const char*, const char*, const char*, const char*, 
         const char*, const char*, int32_t>::Build(
             context->TimelineId,
             context->TimelineDescription,
@@ -75,13 +88,22 @@ void FunctionsView::EmitFunctionForceInlinee(Function func, ForceInlinee forceIn
             func.Name(),
             "CodeGeneration",
             "ForceInlinee",
-            "Name",
+            "",
             forceInlinee.Name(),
-            "Size",
+            "",
             forceInlinee.Size()
         );
 
     InjectEvent(relogSession, &CppBuildInsightsGuid, desc,
         forceInlinee.ProcessId(), forceInlinee.ThreadId(), forceInlinee.ProcessorIndex(),
         forceInlinee.Timestamp(), p.GetData(), (unsigned long)p.Size());
+
+    desc = &CppBuildInsightsFunctionSimpleEvent_Extended1;
+
+    Payload p2 = PayloadBuilder<uint64_t, uint16_t>::Build(func.InstanceId(),
+        static_cast<uint16_t>(EventId::FORCE_INLINEE));
+
+    InjectEvent(relogSession, &CppBuildInsightsGuid, desc, 
+        forceInlinee.ProcessId(), forceInlinee.ThreadId(), forceInlinee.ProcessorIndex(),
+        forceInlinee.Timestamp(), p2.GetData(), (unsigned long)p2.Size());
 }

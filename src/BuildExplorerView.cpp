@@ -160,7 +160,7 @@ void BuildExplorerView::LogActivity(const void* relogSession, Activity a,
     PCEVENT_DESCRIPTOR desc = &CppBuildInsightsBuildExplorerActivity;
 
     auto* context = contextBuilder_->GetContextData();
-    auto& td = timingDataCache_->GetTimingData(a);
+    auto& td = miscellaneousCache_->GetTimingData(a);
 
     Payload p = PayloadBuilder<
         uint16_t, const char*, const char*, uint32_t, const wchar_t*, 

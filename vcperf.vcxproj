@@ -95,6 +95,10 @@
       <LanguageStandard>stdcpp17</LanguageStandard>
       <PreprocessorDefinitions>$(ExternalPreprocessorDefinitions);_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
     <PreBuildEvent>
       <Command>mc $(SolutionDir)\src\CppBuildInsightsEtw.xml -h $(IntDir) -r $(IntDir)</Command>
     </PreBuildEvent>
@@ -112,6 +116,10 @@
       <LanguageStandard>stdcpp17</LanguageStandard>
       <PreprocessorDefinitions>$(ExternalPreprocessorDefinitions);_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
     <PreBuildEvent>
       <Command>mc $(SolutionDir)\src\CppBuildInsightsEtw.xml -h $(IntDir) -r $(IntDir)</Command>
     </PreBuildEvent>
@@ -134,6 +142,8 @@
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
       <Command>mc $(SolutionDir)\src\CppBuildInsightsEtw.xml -h $(IntDir) -r $(IntDir)</Command>
@@ -157,6 +167,8 @@
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
       <Command>mc $(SolutionDir)\src\CppBuildInsightsEtw.xml -h $(IntDir) -r $(IntDir)</Command>
@@ -178,7 +190,7 @@
   <ItemGroup>
     <ClInclude Include="src\BuildExplorerView.h" />
     <ClInclude Include="src\Commands.h" />
-    <ClInclude Include="src\TimingDataCache.h" />
+    <ClInclude Include="src\MiscellaneousCache.h" />
     <ClInclude Include="src\FilesView.h" />
     <ClInclude Include="src\FunctionsView.h" />
     <ClInclude Include="src\PayloadBuilder.h" />

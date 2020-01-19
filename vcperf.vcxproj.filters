@@ -68,7 +68,7 @@
     <ClInclude Include="src\ContextBuilder.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\TimingDataCache.h">
+    <ClInclude Include="src\MiscellaneousCache.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

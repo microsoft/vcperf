@@ -7,7 +7,7 @@
 
 #include "ExpensiveTemplateInstantiationCache.h"
 #include "ContextBuilder.h"
-#include "TimingDataCache.h"
+#include "MiscellaneousCache.h"
 #include "BuildExplorerView.h"
 #include "FunctionsView.h"
 #include "FilesView.h"
@@ -239,14 +239,14 @@ HRESULT DoStop(const std::wstring& sessionName, const std::filesystem::path& out
 
     ExpensiveTemplateInstantiationCache etic{analyzeTemplates};
     ContextBuilder cb;
-    TimingDataCache tdc;
-    BuildExplorerView bev{&cb, &tdc};
-    FunctionsView funcv{&cb, &tdc};
-    FilesView fv{&cb, &tdc};
-    TemplateInstantiationsView tiv{&cb, &etic, &tdc, analyzeTemplates};
+    MiscellaneousCache mc;
+    BuildExplorerView bev{&cb, &mc};
+    FunctionsView funcv{&cb, &mc};
+    FilesView fv{&cb, &mc};
+    TemplateInstantiationsView tiv{&cb, &etic, &mc, analyzeTemplates};
 
-    auto analyzerGroup = MakeStaticAnalyzerGroup(&cb, &etic, &tdc);
-    auto reloggerGroup = MakeStaticReloggerGroup(&etic, &tdc, &cb, &bev, &funcv, &fv, &tiv);
+    auto analyzerGroup = MakeStaticAnalyzerGroup(&cb, &etic, &mc);
+    auto reloggerGroup = MakeStaticReloggerGroup(&etic, &mc, &cb, &bev, &funcv, &fv, &tiv);
 
     RELOG_RETENTION_OPTIONS options{};
 
@@ -304,14 +304,14 @@ HRESULT DoAnalyze(const std::filesystem::path& inputFile, const std::filesystem:
 {
     ExpensiveTemplateInstantiationCache etic{analyzeTemplates};
     ContextBuilder cb;
-    TimingDataCache tdc;
-    BuildExplorerView bev{&cb, &tdc};
-    FunctionsView funcv{&cb, &tdc};
-    FilesView fv{&cb, &tdc};
-    TemplateInstantiationsView tiv{&cb, &etic, &tdc, analyzeTemplates};
+    MiscellaneousCache mc;
+    BuildExplorerView bev{&cb, &mc};
+    FunctionsView funcv{&cb, &mc};
+    FilesView fv{&cb, &mc};
+    TemplateInstantiationsView tiv{&cb, &etic, &mc, analyzeTemplates};
 
-    auto analyzerGroup = MakeStaticAnalyzerGroup(&cb, &etic, &tdc);
-    auto reloggerGroup = MakeStaticReloggerGroup(&etic, &tdc, &cb, &bev, &funcv, &fv, &tiv);
+    auto analyzerGroup = MakeStaticAnalyzerGroup(&cb, &etic, &mc);
+    auto reloggerGroup = MakeStaticReloggerGroup(&etic, &mc, &cb, &bev, &funcv, &fv, &tiv);
 
     RELOG_RETENTION_OPTIONS options{};
 

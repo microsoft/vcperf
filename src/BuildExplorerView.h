@@ -2,7 +2,7 @@
 
 #include "CppBuildInsights.hpp"
 #include "ContextBuilder.h"
-#include "TimingDataCache.h"
+#include "MiscellaneousCache.h"
 
 
 using namespace Microsoft::Cpp::BuildInsights;
@@ -14,9 +14,9 @@ class BuildExplorerView : public IRelogger
 {
 public:
     BuildExplorerView(ContextBuilder* contextBuilder,
-        TimingDataCache* timingDataCache) :
+        MiscellaneousCache* miscellaneousCache) :
         contextBuilder_{contextBuilder},
-        timingDataCache_{timingDataCache}
+        miscellaneousCache_{miscellaneousCache}
     {}
 
     AnalysisControl OnStartActivity(const EventStack& eventStack, 
@@ -101,5 +101,5 @@ private:
     std::wstring invocationInfoString_;
 
     ContextBuilder* contextBuilder_;
-    TimingDataCache* timingDataCache_;
+    MiscellaneousCache* miscellaneousCache_;
 };

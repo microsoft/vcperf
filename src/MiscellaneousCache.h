@@ -11,10 +11,10 @@ using namespace Microsoft::Cpp::BuildInsights;
 
 using namespace Activities;
 
-class TimingDataCache : public IAnalyzer
+class MiscellaneousCache : public IAnalyzer
 {
 public:
-    TimingDataCache():
+    MiscellaneousCache():
         pass_{0},
         exclusivityLeaves_{}
     {}

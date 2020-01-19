@@ -21,7 +21,7 @@ void TemplateInstantiationsView::OnTemplateInstantiationStart(
 
     auto* context = contextBuilder_->GetContextData();
 
-    auto& td = timingDataCache_->GetTimingData(ti);
+    auto& td = miscellaneousCache_->GetTimingData(ti);
 
     const char* primaryTemplateName = std::get<1>(tiInfo);
     const char* specializationName = std::get<2>(tiInfo);

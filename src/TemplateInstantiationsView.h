@@ -5,7 +5,7 @@
 #include "PayloadBuilder.h"
 #include "ContextBuilder.h"
 #include "ExpensiveTemplateInstantiationCache.h"
-#include "TimingDataCache.h"
+#include "MiscellaneousCache.h"
 
 using namespace Microsoft::Cpp::BuildInsights;
 
@@ -15,11 +15,11 @@ public:
     TemplateInstantiationsView(
         ContextBuilder* contextBuilder,
         const ExpensiveTemplateInstantiationCache* tiCache,
-        TimingDataCache* timingDataCache,
+        MiscellaneousCache* miscellaneousCache,
         bool isEnabled) :
         contextBuilder_{contextBuilder},
         tiCache_{tiCache},
-        timingDataCache_{timingDataCache},
+        miscellaneousCache_{miscellaneousCache},
         isEnabled_{isEnabled}
     {}
 
@@ -40,7 +40,7 @@ public:
 private:
     ContextBuilder* contextBuilder_;
     const ExpensiveTemplateInstantiationCache* tiCache_;
-    TimingDataCache* timingDataCache_;
+    MiscellaneousCache* miscellaneousCache_;
 
     bool isEnabled_;
 };
