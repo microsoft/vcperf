@@ -81,7 +81,8 @@ AnalysisControl ContextBuilder::OnSimpleEvent(const EventStack& eventStack)
     return AnalysisControl::CONTINUE;
 }
 
-void ContextBuilder::ProcessLinkerOutput(const LinkerGroup& linkers, const FileOutput& output, bool overwrite)
+void ContextBuilder::ProcessLinkerOutput(const LinkerGroup& linkers, 
+    const FileOutput& output, bool overwrite)
 {
     // A linker invocation can respawn itself. If this occurs we assign
     // the linker's main component to all invocations.
@@ -100,22 +101,23 @@ void ContextBuilder::ProcessLinkerOutput(const LinkerGroup& linkers, const FileO
     }
 }
 
-void ContextBuilder::OnLibOutput(LinkerGroup linkers, LibOutput output)
+void ContextBuilder::OnLibOutput(const LinkerGroup& linkers, const LibOutput& output)
 {
     ProcessLinkerOutput(linkers, output, true);
 }
 
-void ContextBuilder::OnExecutableImageOutput(LinkerGroup linkers, ExecutableImageOutput output)
+void ContextBuilder::OnExecutableImageOutput(const LinkerGroup& linkers, 
+    const ExecutableImageOutput& output)
 {
     ProcessLinkerOutput(linkers, output, true);
 }
 
-void ContextBuilder::OnImpLibOutput(LinkerGroup linkers, ImpLibOutput output)
+void ContextBuilder::OnImpLibOutput(const LinkerGroup& linkers, const ImpLibOutput& output)
 {
     ProcessLinkerOutput(linkers, output, false);
 }
 
-void ContextBuilder::OnCompilerInput(Compiler cl, FileInput input)
+void ContextBuilder::OnCompilerInput(const Compiler& cl, const FileInput& input)
 {
     auto it = mainComponentCache_.find(cl.InstanceId());
 
@@ -137,7 +139,7 @@ void ContextBuilder::OnCompilerInput(Compiler cl, FileInput input)
     }
 }
 
-void ContextBuilder::OnCompilerOutput(Compiler cl, ObjOutput output)
+void ContextBuilder::OnCompilerOutput(const Compiler& cl, const ObjOutput& output)
 {
     auto it = mainComponentCache_.find(cl.InstanceId());
 
@@ -159,7 +161,7 @@ void ContextBuilder::OnCompilerOutput(Compiler cl, ObjOutput output)
     }
 }
 
-void ContextBuilder::OnRootActivity(Activity root)
+void ContextBuilder::OnRootActivity(const Activity& root)
 {
     unsigned long long id = root.InstanceId();
 
@@ -179,7 +181,7 @@ void ContextBuilder::OnRootActivity(Activity root)
     currentContextData_ = &newContext;
 }
 
-void ContextBuilder::OnNestedActivity(Activity parent, Activity child)
+void ContextBuilder::OnNestedActivity(const Activity& parent, const Activity& child)
 {
     unsigned long long childId = child.InstanceId();
 
@@ -197,7 +199,7 @@ void ContextBuilder::OnNestedActivity(Activity parent, Activity child)
     currentContextData_ = propagatedContext;
 }
 
-void ContextBuilder::OnInvocation(Invocation invocation)
+void ContextBuilder::OnInvocation(const Invocation& invocation)
 {
     unsigned long long id = invocation.InstanceId();
 
@@ -246,7 +248,7 @@ void ContextBuilder::OnInvocation(Invocation invocation)
     currentContextData_ = &newContext;
 }
     
-void ContextBuilder::OnCompilerPass(Compiler cl, CompilerPass pass)
+void ContextBuilder::OnCompilerPass(const Compiler& cl, const CompilerPass& pass)
 {
     ProcessParallelismForkPoint(cl, pass);
 
@@ -260,12 +262,14 @@ void ContextBuilder::OnCompilerPass(Compiler cl, CompilerPass pass)
         CacheString(activeComponents_, pass.InstanceId(), path);
 }
 
-void ContextBuilder::OnC2Thread(C2DLL c2, Activity threadOwner, Thread thread)
+void ContextBuilder::OnC2Thread(const C2DLL& c2, const Activity& threadOwner, 
+    const Thread& thread)
 {
     ProcessParallelismForkPoint(threadOwner, thread);
 }
 
-void ContextBuilder::ProcessParallelismForkPoint(Activity parent, Activity child)
+void ContextBuilder::ProcessParallelismForkPoint(const Activity& parent, 
+    const Activity& child)
 {
     unsigned long long parentId = parent.InstanceId();
 
@@ -310,7 +314,7 @@ void ContextBuilder::ProcessParallelismForkPoint(ContextLink& parentContextLink,
     currentContextData_ = &newContext;
 }
 
-void ContextBuilder::OnStopRootActivity(Activity activity)
+void ContextBuilder::OnStopRootActivity(const Activity& activity)
 {
     unsigned long long id = activity.InstanceId();
 
@@ -324,7 +328,8 @@ void ContextBuilder::OnStopRootActivity(Activity activity)
     contextData_.erase(id);
 }
 
-void ContextBuilder::OnStopNestedActivity(Activity parent, Activity child)
+void ContextBuilder::OnStopNestedActivity(const Activity& parent, 
+    const Activity& child)
 {
     auto itParent = GetContextLink(parent.InstanceId());
     auto itChild = GetContextLink(child.InstanceId());
@@ -348,20 +353,20 @@ void ContextBuilder::OnStopNestedActivity(Activity parent, Activity child)
     activityContextLinks_.erase(itChild);
 }
 
-void ContextBuilder::OnStopCompilerPass(CompilerPass pass)
+void ContextBuilder::OnStopCompilerPass(const CompilerPass& pass)
 {
     activeComponents_.erase(pass.InstanceId());
     contextData_.erase(pass.InstanceId());
 }
 
-void ContextBuilder::OnStopInvocation(Invocation invocation)
+void ContextBuilder::OnStopInvocation(const Invocation& invocation)
 {
     activeComponents_.erase(invocation.InstanceId());
     invocationDescriptions_.erase(invocation.InstanceId());
     contextData_.erase(invocation.InstanceId());
 }
 
-void ContextBuilder::OnStopC2Thread(C2DLL c2, Thread thread)
+void ContextBuilder::OnStopC2Thread(const C2DLL& c2, const Thread& thread)
 {
     contextData_.erase(thread.InstanceId());
 }

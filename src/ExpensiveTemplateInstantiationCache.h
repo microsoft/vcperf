@@ -68,12 +68,12 @@ private:
         return analysisCount_ == 1;
     }
 
-    void OnTemplateInstantiation(TemplateInstantiation instantiation);
-    void OnSymbolName(SymbolName symbol);
-    void Phase1RegisterPrimaryTemplateLocalTime(TemplateInstantiation instantiation);
-    void Phase1MergePrimaryTemplateDuration(SymbolName symbol);
-    void Phase2RegisterSpecializationKey(TemplateInstantiation instantiation);
-    void Phase2MergeSpecializationKey(SymbolName symbol);
+    void OnTemplateInstantiation(const TemplateInstantiation& instantiation);
+    void OnSymbolName(const SymbolName& symbol);
+    void Phase1RegisterPrimaryTemplateLocalTime(const TemplateInstantiation& instantiation);
+    void Phase1MergePrimaryTemplateDuration(const SymbolName& symbol);
+    void Phase2RegisterSpecializationKey(const TemplateInstantiation& instantiation);
+    void Phase2MergeSpecializationKey(const SymbolName& symbol);
     void DetermineTopPrimaryTemplates();
 
     int analysisCount_;

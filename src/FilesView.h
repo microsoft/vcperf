@@ -18,7 +18,7 @@ public:
     AnalysisControl OnStartActivity(const EventStack& eventStack,
         const void* relogSession) override;
 
-    void OnFileParse(FileGroup files, const void* relogSession);
+    void OnFileParse(const FileGroup& files, const void* relogSession);
 
 private:
     ContextBuilder* contextBuilder_;

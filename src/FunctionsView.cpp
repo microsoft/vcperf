@@ -70,8 +70,8 @@ void FunctionsView::EmitFunctionActivity(Function func, const void* relogSession
         func.StartTimestamp(), p2.GetData(), (unsigned long)p2.Size());
 }
 
-void FunctionsView::EmitFunctionForceInlinee(Function func, ForceInlinee forceInlinee, 
-    const void* relogSession)
+void FunctionsView::EmitFunctionForceInlinee(const Function& func, 
+    const ForceInlinee& forceInlinee, const void* relogSession)
 {
     PCEVENT_DESCRIPTOR desc = &CppBuildInsightsFunctionSimpleEvent;
 

@@ -60,7 +60,8 @@ AnalysisControl BuildExplorerView::OnSimpleEvent(const EventStack& eventStack,
     return AnalysisControl::CONTINUE;
 }
 
-void BuildExplorerView::EmitInvocationEvents(Invocation invocation, const void* relogSession)
+void BuildExplorerView::EmitInvocationEvents(const Invocation& invocation, 
+    const void* relogSession)
 {
     LogActivity(relogSession, invocation);
 
@@ -79,8 +80,8 @@ void BuildExplorerView::EmitInvocationEvents(Invocation invocation, const void* 
         "WorkingDirectory", invocation.WorkingDirectory());
 }
 
-void BuildExplorerView::OnCompilerEnvironmentVariable(Compiler cl, 
-    EnvironmentVariable envVar, const void* relogSession)
+void BuildExplorerView::OnCompilerEnvironmentVariable(const Compiler& cl, 
+    const EnvironmentVariable& envVar, const void* relogSession)
 {
     auto* name = envVar.Name();
 
@@ -115,43 +116,43 @@ void BuildExplorerView::OnCompilerEnvironmentVariable(Compiler cl,
     }
 }
 
-void BuildExplorerView::OnLinkerEnvironmentVariable(Linker link, 
-    EnvironmentVariable envVar, const void* relogSession)
+void BuildExplorerView::OnLinkerEnvironmentVariable(const Linker& link, 
+    const EnvironmentVariable& envVar, const void* relogSession)
 {
     auto* name = envVar.Name();
 
-    if (_wcsicmp(name, L"LINK") == 0)
+    if (_wcsicmp(name, L"LINK") == 0) 
     {
         ProcessStringProperty(relogSession, link, "Env Var: LINK", envVar.Value());
         return;
     }
 
-    if (_wcsicmp(name, L"_LINK_") == 0)
+    if (_wcsicmp(name, L"_LINK_") == 0) 
     {
         ProcessStringProperty(relogSession, link, "Env Var: _LINK_", envVar.Value());
         return;
     }
-
-    if (_wcsicmp(name, L"LIB") == 0)
+    
+    if (_wcsicmp(name, L"LIB") == 0) 
     {
         ProcessStringProperty(relogSession, link, "Env Var: LIB", envVar.Value());
         return;
     }
-
-    if (_wcsicmp(name, L"PATH") == 0)
+    
+    if (_wcsicmp(name, L"PATH") == 0) 
     {
         ProcessStringProperty(relogSession, link, "Env Var: PATH", envVar.Value());
         return;
     }
-
-    if (_wcsicmp(name, L"TMP") == 0)
+    
+    if (_wcsicmp(name, L"TMP") == 0) 
     {
         ProcessStringProperty(relogSession, link, "Env Var: TMP", envVar.Value());
         return;
     }
 }
 
-void BuildExplorerView::LogActivity(const void* relogSession, Activity a, 
+void BuildExplorerView::LogActivity(const void* relogSession, const Activity& a, 
     const char* activityName)
 {
     using std::chrono::duration_cast;
@@ -184,7 +185,7 @@ void BuildExplorerView::LogActivity(const void* relogSession, Activity a,
 
 template <typename TChar>
 void BuildExplorerView::ProcessStringProperty(const void* relogSession, 
-    const Entity& entity, const char* name, const TChar* value)
+    const Invocation& invocation, const char* name, const TChar* value)
 {
     size_t len = std::char_traits<TChar>::length(value);
 
@@ -197,51 +198,40 @@ void BuildExplorerView::ProcessStringProperty(const void* relogSession,
         memcpy(segment, value, COMMAND_LINE_SEGMENT_LEN * sizeof(TChar));
         segment[COMMAND_LINE_SEGMENT_LEN] = 0;
 
-        LogStringPropertySegment(relogSession, entity, name, segment);
+        LogStringPropertySegment(relogSession, invocation, name, segment);
 
         len -= COMMAND_LINE_SEGMENT_LEN;
         value += COMMAND_LINE_SEGMENT_LEN;
     }
 
-    LogStringPropertySegment(relogSession, entity, name, value);
+    LogStringPropertySegment(relogSession, invocation, name, value);
 }
 
 
 void BuildExplorerView::LogStringPropertySegment(const void* relogSession, 
-    const Entity& entity, const char* name, const char* value)
+    const Invocation& invocation, const char* name, const char* value)
 {
-    PCEVENT_DESCRIPTOR desc = &CppBuildInsightsBuildExplorerAnsiStringProperty;
-
-    auto* context = contextBuilder_->GetContextData();
-
-    Payload p = PayloadBuilder<
-        uint16_t, const char*, const char*, uint32_t, const wchar_t*, 
-        const wchar_t*, const char*, const char*>::Build(
-            context->TimelineId,
-            context->TimelineDescription,
-            context->Tool,
-            context->InvocationId,
-            context->InvocationDescription,
-            context->Component,
-            name,
-            value
-        );
-
-    InjectEvent(relogSession, &CppBuildInsightsGuid, desc,
-        entity.ProcessId(), entity.ThreadId(), entity.ProcessorIndex(),
-        entity.Timestamp(), p.GetData(), (unsigned long)p.Size());
+    LogStringPropertySegment(relogSession, invocation, name, value, 
+        &CppBuildInsightsBuildExplorerAnsiStringProperty);
 }
 
 void BuildExplorerView::LogStringPropertySegment(const void* relogSession,
-    const Entity& entity, const char* name, const wchar_t* value)
+    const Invocation& invocation, const char* name, const wchar_t* value)
 {
-    PCEVENT_DESCRIPTOR desc = &CppBuildInsightsBuildExplorerUnicodeStringProperty;
+    LogStringPropertySegment(relogSession, invocation, name, value, 
+        &CppBuildInsightsBuildExplorerUnicodeStringProperty);
+}
 
+template <typename TChar>
+void BuildExplorerView::LogStringPropertySegment(const void* relogSession,
+    const Invocation& invocation, const char* name, const TChar* value,
+    PCEVENT_DESCRIPTOR desc)
+{
     auto* context = contextBuilder_->GetContextData();
 
     Payload p = PayloadBuilder<
         uint16_t, const char*, const char*, uint32_t, const wchar_t*,
-        const wchar_t*, const char*, const wchar_t*>::Build(
+        const wchar_t*, const char*, const TChar*>::Build(
             context->TimelineId,
             context->TimelineDescription,
             context->Tool,
@@ -253,6 +243,6 @@ void BuildExplorerView::LogStringPropertySegment(const void* relogSession,
         );
 
     InjectEvent(relogSession, &CppBuildInsightsGuid, desc,
-        entity.ProcessId(), entity.ThreadId(), entity.ProcessorIndex(),
-        entity.Timestamp(), p.GetData(), (unsigned long)p.Size());
+        invocation.ProcessId(), invocation.ThreadId(), invocation.ProcessorIndex(),
+        invocation.StartTimestamp(), p.GetData(), (unsigned long)p.Size());
 }

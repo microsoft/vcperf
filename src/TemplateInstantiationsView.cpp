@@ -4,7 +4,7 @@
 
 
 void TemplateInstantiationsView::OnTemplateInstantiationStart( 
-    TemplateInstantiation ti, const void* relogSession)
+    const TemplateInstantiation& ti, const void* relogSession)
 {
     using std::chrono::duration_cast;
     using std::chrono::microseconds;

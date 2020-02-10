@@ -39,6 +39,9 @@
     <ClCompile Include="src\ExpensiveTemplateInstantiationCache.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\GenericFields.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\BuildExplorerView.h">
@@ -71,6 +74,9 @@
     <ClInclude Include="src\MiscellaneousCache.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\GenericFields.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="$(IntDir)CppBuildInsightsEtw.rc">
@@ -79,8 +85,5 @@
   </ItemGroup>
   <ItemGroup>
     <Xml Include="src\CppBuildInsightsEtw.xml" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
   </ItemGroup>
 </Project>

@@ -67,7 +67,7 @@ AnalysisControl ExpensiveTemplateInstantiationCache::OnEndAnalysisPass()
 }
 
 void ExpensiveTemplateInstantiationCache::
-    OnTemplateInstantiation(TemplateInstantiation instantiation)
+    OnTemplateInstantiation(const TemplateInstantiation& instantiation)
 {
     switch (analysisPass_)
     {
@@ -84,7 +84,7 @@ void ExpensiveTemplateInstantiationCache::
     }
 }
 
-void ExpensiveTemplateInstantiationCache::OnSymbolName(SymbolName symbol)
+void ExpensiveTemplateInstantiationCache::OnSymbolName(const SymbolName& symbol)
 {
     switch (analysisPass_)
     {
@@ -102,7 +102,7 @@ void ExpensiveTemplateInstantiationCache::OnSymbolName(SymbolName symbol)
 }
 
 void ExpensiveTemplateInstantiationCache::
-    Phase1RegisterPrimaryTemplateLocalTime(TemplateInstantiation instantiation)
+    Phase1RegisterPrimaryTemplateLocalTime(const TemplateInstantiation& instantiation)
 {
     unsigned int microseconds = (unsigned int)std::chrono::
         duration_cast<std::chrono::microseconds>(instantiation.Duration()).count();
@@ -111,7 +111,7 @@ void ExpensiveTemplateInstantiationCache::
 }
 
 void ExpensiveTemplateInstantiationCache::
-    Phase1MergePrimaryTemplateDuration(SymbolName symbol)
+    Phase1MergePrimaryTemplateDuration(const SymbolName& symbol)
 {
     auto itPrimary = localPrimaryTemplateTimes_.find(symbol.Key());
 
@@ -127,14 +127,15 @@ void ExpensiveTemplateInstantiationCache::
 }
 
 void ExpensiveTemplateInstantiationCache::
-    Phase2RegisterSpecializationKey(TemplateInstantiation instantiation)
+    Phase2RegisterSpecializationKey(const TemplateInstantiation& instantiation)
 {
     if (keysToConsider_.find(instantiation.PrimaryTemplateSymbolKey()) != keysToConsider_.end()) {
         localSpecializationKeysToConsider_.insert(instantiation.SpecializationSymbolKey());
     }
 }
 
-void ExpensiveTemplateInstantiationCache::Phase2MergeSpecializationKey(SymbolName symbol)
+void ExpensiveTemplateInstantiationCache::
+    Phase2MergeSpecializationKey(const SymbolName& symbol)
 {
     auto it = localSpecializationKeysToConsider_.find(symbol.Key());
 

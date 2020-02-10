@@ -22,6 +22,19 @@
           <opcode name="SimpleEvent"
                   symbol="CPP_BUILDINSIGHTS_OPCODE_SIMPLEEVENT"
                   value="22"/>
+
+          <opcode name="ActivityExtension1"
+                  symbol="CPP_BUILDINSIGHTS_OPCODE_ACTIVITYEXTENSION1"
+                  value="23"/>
+
+          <opcode name="SimpleEventExtension1"
+                  symbol="CPP_BUILDINSIGHTS_OPCODE_SIMPLEEVENTEXTENSION1"
+                  value="24"/>
+
+          <opcode name="GenericField"
+                  symbol="CPP_BUILDINSIGHTS_OPCODE_GENERICFIELD"
+                  value="25"/>
+        
         </opcodes>
 
 
@@ -214,7 +227,7 @@
           <event value="1502"
               symbol="CppBuildInsightsFunctionActivity_Extended1"
               task="Functions"
-              opcode="Activity"
+              opcode="ActivityExtension1"
               template="FunctionActivityTemplate_Extended1"
               level="win:Informational"
               version="0"
@@ -223,7 +236,7 @@
           <event value="1503"
               symbol="CppBuildInsightsFunctionSimpleEvent_Extended1"
               task="Functions"
-              opcode="SimpleEvent"
+              opcode="SimpleEventExtension1"
               template="FunctionSimpleEventTemplate_Extended1"
               level="win:Informational"
               version="0"
@@ -267,6 +280,61 @@
 
         </events>
 
+        <templates>
+
+          <template tid="AnsiStringGenericFieldTemplate">
+            <data name="Value" inType="win:AnsiString"/>
+          </template>
+
+          <template tid="UTF8StringGenericFieldTemplate">
+            <data name="Value" inType="win:AnsiString"/>
+          </template>
+
+          <template tid="UnicodeStringGenericFieldTemplate">
+            <data name="Value" inType="win:UnicodeString"/>
+          </template>
+
+          <template tid="IntegerGenericFieldTemplate">
+            <data name="Value" inType="win:Int64"/>
+          </template>
+
+        </templates>
+
+        <events>
+          <!-- Generic field event values must be between 2500 and 2999 -->
+          <event value="2500"
+              symbol="CppBuildInsightsAnsiStringGenericField"
+              opcode="GenericField"
+              template="AnsiStringGenericFieldTemplate"
+              level="win:Informational"
+              version="0"
+              keywords="" />
+
+          <event value="2501"
+              symbol="CppBuildInsightsUTF8StringGenericField"
+              opcode="GenericField"
+              template="UTF8StringGenericFieldTemplate"
+              level="win:Informational"
+              version="0"
+              keywords="" />
+
+          <event value="2502"
+              symbol="CppBuildInsightsUnicodeStringGenericField"
+              opcode="GenericField"
+              template="UnicodeStringGenericFieldTemplate"
+              level="win:Informational"
+              version="0"
+              keywords="" />
+
+          <event value="2503"
+              symbol="CppBuildInsightsIntegerGenericField"
+              opcode="GenericField"
+              template="IntegerGenericFieldTemplate"
+              level="win:Informational"
+              version="0"
+              keywords="" />
+
+        </events>
 
       </provider>
     </events>

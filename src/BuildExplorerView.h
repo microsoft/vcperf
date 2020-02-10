@@ -28,31 +28,31 @@ public:
     AnalysisControl OnSimpleEvent(const EventStack& eventStack, 
         const void* relogSession) override;
 
-    void OnInvocation(Invocation invocation, const void* relogSession)
+    void OnInvocation(const Invocation& invocation, const void* relogSession)
     {
         EmitInvocationEvents(invocation, relogSession);
     }
 
-    void OnCompilerPass(CompilerPass pass, const void* relogSession) 
+    void OnCompilerPass(const CompilerPass& pass, const void* relogSession) 
     {
         LogActivity(relogSession, pass);
     }
 
-    void OnThread(Activity a, Thread t, const void* relogSession)
+    void OnThread(const Activity& a, const Thread& t, const void* relogSession)
     {   
         OnThreadActivity(a, t, relogSession);
     }
 
-    void OnCommandLine(Invocation invocation, CommandLine commandLine, 
+    void OnCommandLine(const Invocation& invocation, const CommandLine& commandLine, 
         const void* relogSession)
     {
-        OnInvocationProperty(invocation, "CommandLine", commandLine.Value(), relogSession);
+        ProcessStringProperty(relogSession, invocation, "CommandLine", commandLine.Value());
     }
 
-    void OnCompilerEnvironmentVariable(Compiler cl, EnvironmentVariable envVar, 
+    void OnCompilerEnvironmentVariable(const Compiler& cl, const EnvironmentVariable& envVar, 
         const void* relogSession);
 
-    void OnLinkerEnvironmentVariable(Linker link, EnvironmentVariable envVar, 
+    void OnLinkerEnvironmentVariable(const Linker& link, const EnvironmentVariable& envVar, 
         const void* relogSession);
 
     AnalysisControl OnEndRelogging() override
@@ -64,7 +64,7 @@ private:
 
     AnalysisControl OnActivity(const EventStack& eventStack, const void* relogSession);
 
-    void OnThreadActivity(Activity a, Thread t, const void* relogSession)
+    void OnThreadActivity(const Activity& a, const Thread& t, const void* relogSession)
     {
         std::string activityName = a.EntityName();
         activityName += "Thread";
@@ -72,31 +72,28 @@ private:
         LogActivity(relogSession, t, activityName.c_str());
     }
 
-    template <typename TChar>
-    void OnInvocationProperty(const Invocation& invocation, const char* name, 
-        const TChar* value, const void* relogSession)
-    {
-        ProcessStringProperty(relogSession, invocation, name, value);
-    }
+    void EmitInvocationEvents(const Invocation& invocation, const void* relogSession);
 
-    void EmitInvocationEvents(Invocation invocation, const void* relogSession);
+    void LogActivity(const void* relogSession, const Activity& a, const char* activityName);
 
-    void LogActivity(const void* relogSession, Activity a, const char* activityName);
-
-    void LogActivity(const void* relogSession, Activity a)
+    void LogActivity(const void* relogSession, const Activity& a)
     {
         LogActivity(relogSession, a, a.EntityName());
     }
 
     template <typename TChar>
     void ProcessStringProperty(const void* relogSession, 
-        const Entity& entity, const char* name, const TChar* value);
+        const Invocation& invocation, const char* name, const TChar* value);
 
     void LogStringPropertySegment(const void* relogSession, 
-        const Entity& entity, const char* name, const char* value);
+        const Invocation& invocation, const char* name, const char* value);
 
     void LogStringPropertySegment(const void* relogSession, 
-        const Entity& entity, const char* name, const wchar_t* value);
+        const Invocation& invocation, const char* name, const wchar_t* value);
+
+    template <typename TChar>
+    void LogStringPropertySegment(const void* relogSession, const Invocation& invocation, 
+        const char* name, const TChar* value, PCEVENT_DESCRIPTOR desc);
 
     std::wstring invocationInfoString_;
 

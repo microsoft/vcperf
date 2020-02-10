@@ -35,7 +35,7 @@ public:
         return AnalysisControl::CONTINUE;
     }
 
-    void OnTemplateInstantiationStart(TemplateInstantiation ti, const void* relogSession);
+    void OnTemplateInstantiationStart(const TemplateInstantiation& ti, const void* relogSession);
 
 private:
     ContextBuilder* contextBuilder_;

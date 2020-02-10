@@ -123,28 +123,28 @@ private:
         return analysisCount_ == 1;
     }
 
-    void OnLibOutput(LinkerGroup linkers, LibOutput output);
-    void OnExecutableImageOutput(LinkerGroup linkers, ExecutableImageOutput output);
-    void OnImpLibOutput(LinkerGroup linkers, ImpLibOutput output);
-    void OnCompilerInput(Compiler cl, FileInput input);
-    void OnCompilerOutput(Compiler cl, ObjOutput output);
+    void OnLibOutput(const LinkerGroup& linkers, const LibOutput& output);
+    void OnExecutableImageOutput(const LinkerGroup& linkers, const ExecutableImageOutput& output);
+    void OnImpLibOutput(const LinkerGroup& linkers, const ImpLibOutput& output);
+    void OnCompilerInput(const Compiler& cl, const FileInput& input);
+    void OnCompilerOutput(const Compiler& cl, const ObjOutput& output);
 
     void ProcessLinkerOutput(const LinkerGroup& linkers, const FileOutput& output, bool overwrite);
 
-    void OnRootActivity(Activity root);
-    void OnNestedActivity(Activity parent, Activity child);
-    void OnInvocation(Invocation invocation);
-    void OnCompilerPass(Compiler cl, CompilerPass pass);
-    void OnC2Thread(C2DLL c2, Activity threadOwner, Thread thread);
+    void OnRootActivity(const Activity& root);
+    void OnNestedActivity(const Activity& parent, const Activity& child);
+    void OnInvocation(const Invocation& invocation);
+    void OnCompilerPass(const Compiler& cl, const CompilerPass& pass);
+    void OnC2Thread(const C2DLL& c2, const Activity& threadOwner, const Thread& thread);
 
-    void ProcessParallelismForkPoint(Activity parent, Activity child);
+    void ProcessParallelismForkPoint(const Activity& parent, const Activity& child);
     void ProcessParallelismForkPoint(ContextLink& parentContextLink, const Activity& child);
 
-    void OnStopRootActivity(Activity activity);
-    void OnStopNestedActivity(Activity parent, Activity child);
-    void OnStopCompilerPass(CompilerPass pass);
-    void OnStopInvocation(Invocation invocation);
-    void OnStopC2Thread(C2DLL c2, Thread thread);
+    void OnStopRootActivity(const Activity& activity);
+    void OnStopNestedActivity(const Activity& parent, const Activity& child);
+    void OnStopCompilerPass(const CompilerPass& pass);
+    void OnStopInvocation(const Invocation& invocation);
+    void OnStopC2Thread(const C2DLL& c2, const Thread& thread);
 
     unsigned short GetNewTimelineId();
 

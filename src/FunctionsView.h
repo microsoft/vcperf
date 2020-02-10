@@ -32,7 +32,7 @@ private:
 
     void EmitFunctionActivity(Function func, const void* relogSession);
 
-    void EmitFunctionForceInlinee(Function func, ForceInlinee forceInlinee,
+    void EmitFunctionForceInlinee(const Function& func, const ForceInlinee& forceInlinee,
         const void* relogSession);
 
     ContextBuilder* contextBuilder_;
