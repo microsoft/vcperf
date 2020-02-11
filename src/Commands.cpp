@@ -8,6 +8,7 @@
 #include "Analyzers\ExpensiveTemplateInstantiationCache.h"
 #include "Analyzers\ContextBuilder.h"
 #include "Analyzers\MiscellaneousCache.h"
+#include "Analyzers\RestartedLinkerDetector.h"
 #include "Views\BuildExplorerView.h"
 #include "Views\FunctionsView.h"
 #include "Views\FilesView.h"
@@ -210,15 +211,42 @@ HRESULT DoStop(const std::wstring& sessionName, const std::filesystem::path& out
 {
     TRACING_SESSION_STATISTICS statistics{};
 
+    // The C++ Build Insights SDK supports two types of analyses: 
+    // 
+    // 1. A regular analysis that simply receives each event in the trace in 
+    //    succession. The output of this analysis type is up to the author's
+    //    discretion. This type of analysis makes use of a chain of analyzers
+    //    that each take a turn in processing each event. Multipass analyses are 
+    //    allowed, in which the trace is passed through the analysis chain several 
+    //    times.
+    // 2. A relogging analysis which also receives each event in succession, but
+    //    allows transforming and writing them back in a new ETW output trace.
+    //    This type of analysis make use of two analyzer chains:
+    //
+    //        a) A regular analyzer chain that runs before the relogging phase.
+    //           This is useful if you want to precompute information before
+    //           generating the output trace. Multipass analyses are allowed.
+    //        b) A relogger chain which allows transforming and writing the
+    //           events in a new trace. Only one pass is allowed.
+    //
+    // vcperf makes use of a relogging analysis. 
+    //
+    // The RestartedLinkerDetector analyzer requires a prepass to cache
+    // the required information. We add it to the analyzer chain that runs
+    // before the relogging phase.
+    //
+    // Both the ContextBuilder and the BuildExplorerView query this analyzer
+    // so we pass a pointer to it in their constructors.
     ExpensiveTemplateInstantiationCache etic{analyzeTemplates};
-    ContextBuilder cb;
+    RestartedLinkerDetector rld;
+    ContextBuilder cb{&rld};
     MiscellaneousCache mc;
-    BuildExplorerView bev{&cb, &mc};
+    BuildExplorerView bev{&rld, &cb, &mc};
     FunctionsView funcv{&cb, &mc};
     FilesView fv{&cb, &mc};
     TemplateInstantiationsView tiv{&cb, &etic, &mc, analyzeTemplates};
-
-    auto analyzerGroup = MakeStaticAnalyzerGroup(&cb, &etic, &mc);
+    
+    auto analyzerGroup = MakeStaticAnalyzerGroup(&rld, &cb, &etic, &mc);
     auto reloggerGroup = MakeStaticReloggerGroup(&etic, &mc, &cb, &bev, &funcv, &fv, &tiv);
 
     std::wcout << L"Stopping and analyzing tracing session " << sessionName << L"..." << std::endl;
@@ -272,15 +300,17 @@ HRESULT DoStopNoAnalyze(const std::wstring& sessionName, const std::filesystem::
 
 HRESULT DoAnalyze(const std::filesystem::path& inputFile, const std::filesystem::path& outputFile, bool analyzeTemplates)
 {
+    // See above for an explanation of how this code works.
     ExpensiveTemplateInstantiationCache etic{analyzeTemplates};
-    ContextBuilder cb;
+    RestartedLinkerDetector rld;
+    ContextBuilder cb{&rld};
     MiscellaneousCache mc;
-    BuildExplorerView bev{&cb, &mc};
+    BuildExplorerView bev{&rld, &cb, &mc};
     FunctionsView funcv{&cb, &mc};
     FilesView fv{&cb, &mc};
     TemplateInstantiationsView tiv{&cb, &etic, &mc, analyzeTemplates};
 
-    auto analyzerGroup = MakeStaticAnalyzerGroup(&cb, &etic, &mc);
+    auto analyzerGroup = MakeStaticAnalyzerGroup(&rld, &cb, &etic, &mc);
     auto reloggerGroup = MakeStaticReloggerGroup(&etic, &mc, &cb, &bev, &funcv, &fv, &tiv);
 
     std::wcout << L"Analyzing..." << std::endl;

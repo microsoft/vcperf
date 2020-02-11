@@ -92,6 +92,9 @@
     <ClInclude Include="src\VcperfBuildInsights.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Analyzers\RestartedLinkerDetector.h">
+      <Filter>Header Files\Analyzers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="$(IntDir)CppBuildInsightsEtw.rc">

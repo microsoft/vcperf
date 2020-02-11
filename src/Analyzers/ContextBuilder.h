@@ -10,6 +10,7 @@
 #include "VcperfBuildInsights.h"
 #include "Utility.h"
 #include "PayloadBuilder.h"
+#include "RestartedLinkerDetector.h"
 
 namespace vcperf
 {
@@ -49,7 +50,7 @@ private:
     typedef std::unordered_map<unsigned long long, ContextLink> ContextLinkMap;
 
 public:
-    ContextBuilder() :
+    ContextBuilder(const RestartedLinkerDetector* restartedLinkerDetector) :
         analysisCount_{0},
         analysisPass_{0},
         timelineCount_{0},
@@ -61,7 +62,8 @@ public:
         invocationDescriptions_{},
         timelineDescriptions_{},
         currentContextData_{nullptr},
-        currentInstanceId_{0}
+        currentInstanceId_{0},
+        restartedLinkerDetector_{restartedLinkerDetector}
     {
     }
 
@@ -194,6 +196,11 @@ private:
 
     ContextData* currentContextData_;
     unsigned long long currentInstanceId_;
+
+    // This is a pointer to a RestartedLinkerDetector analyzer located
+    // earlier in the analysis chain. It will be used by the ContextBuilder
+    // to determine whether a linker has been restarted.
+    const RestartedLinkerDetector* restartedLinkerDetector_;
 };
 
 } // namespace vcperf

@@ -226,6 +226,15 @@ void ContextBuilder::OnInvocation(const Invocation& invocation)
     const wchar_t* wTool = invocation.Type() == Invocation::Type::LINK ?
         L"Link" : L"CL";
 
+    // Modify the Invocation Description string to indicate whether a linker
+    // was restarted. The Invocation description string is what is used to
+    // populate the Invocation Description column of the Build Explorer view.
+    const wchar_t* wRestartedLabel = L"";
+
+    if (restartedLinkerDetector_->WasLinkerRestarted(invocation)) {
+        wRestartedLabel = L"Restarted ";
+    }
+
     std::wstring invocationIdString = std::to_wstring(invocation.InvocationId());
 
     unsigned long long instanceId = invocation.EventInstanceId();
@@ -237,14 +246,14 @@ void ContextBuilder::OnInvocation(const Invocation& invocation)
         std::wstring component = L"<" + std::wstring{wTool} + L" Invocation " + invocationIdString + L" Info>";
         newContext.Component = CacheString(activeComponents_, instanceId, std::move(component));
 
-        std::wstring invocationDescription = std::wstring{wTool} + L" Invocation " + invocationIdString;
+        std::wstring invocationDescription = std::wstring{wRestartedLabel} + wTool + L" Invocation " + invocationIdString;
         newContext.InvocationDescription = CacheString(invocationDescriptions_, instanceId, std::move(invocationDescription));
     }
     else
     {
         newContext.Component = it->second.Path.c_str();
 
-        std::wstring invocationDescription = std::wstring{wTool} + L" Invocation " + invocationIdString + 
+        std::wstring invocationDescription = std::wstring{wRestartedLabel} + wTool + L" Invocation " + invocationIdString + 
             L" (" + newContext.Component + L")";
         newContext.InvocationDescription = CacheString(invocationDescriptions_, instanceId, std::move(invocationDescription));
     }

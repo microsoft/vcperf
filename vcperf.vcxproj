@@ -192,6 +192,7 @@
     <ClInclude Include="src\Analyzers\ContextBuilder.h" />
     <ClInclude Include="src\Analyzers\MiscellaneousCache.h" />
     <ClInclude Include="src\Analyzers\ExpensiveTemplateInstantiationCache.h" />
+    <ClInclude Include="src\Analyzers\RestartedLinkerDetector.h" />
     <ClInclude Include="src\VcperfBuildInsights.h" />
     <ClInclude Include="src\Views\BuildExplorerView.h" />
     <ClInclude Include="src\Views\FilesView.h" />
