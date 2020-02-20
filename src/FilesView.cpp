@@ -12,7 +12,7 @@ AnalysisControl FilesView::OnStartActivity(const EventStack& eventStack,
 }
 
 
-void FilesView::OnFileParse(const FileGroup& files, const void* relogSession)
+void FilesView::OnFileParse(const FrontEndFileGroup& files, const void* relogSession)
 {
     using std::chrono::duration_cast;
     using std::chrono::milliseconds;
@@ -21,7 +21,7 @@ void FilesView::OnFileParse(const FileGroup& files, const void* relogSession)
 
     auto* context = contextBuilder_->GetContextData();
 
-    const File& currentFile = files.Back();
+    const FrontEndFile& currentFile = files.Back();
 
     const char* parentPath = "";
 

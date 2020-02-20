@@ -76,7 +76,7 @@ AnalysisControl ContextBuilder::OnSimpleEvent(const EventStack& eventStack)
 
     currentContextData_ = nullptr;
     currentInstanceId_ = eventStack.Size() == 1 ? 0 : 
-        eventStack[eventStack.Size() - 2].InstanceId();
+        eventStack[eventStack.Size() - 2].EventInstanceId();
 
     return AnalysisControl::CONTINUE;
 }
@@ -89,7 +89,7 @@ void ContextBuilder::ProcessLinkerOutput(const LinkerGroup& linkers,
 
     for (const Invocation& invocation : linkers)
     {
-        auto it = mainComponentCache_.find(invocation.InstanceId());
+        auto it = mainComponentCache_.find(invocation.EventInstanceId());
 
         if (!overwrite && it != mainComponentCache_.end()) {
             continue;
@@ -97,7 +97,7 @@ void ContextBuilder::ProcessLinkerOutput(const LinkerGroup& linkers,
 
         assert(overwrite || it == mainComponentCache_.end());
 
-        mainComponentCache_[invocation.InstanceId()].Path = output.Path();
+        mainComponentCache_[invocation.EventInstanceId()].Path = output.Path();
     }
 }
 
@@ -119,11 +119,11 @@ void ContextBuilder::OnImpLibOutput(const LinkerGroup& linkers, const ImpLibOutp
 
 void ContextBuilder::OnCompilerInput(const Compiler& cl, const FileInput& input)
 {
-    auto it = mainComponentCache_.find(cl.InstanceId());
+    auto it = mainComponentCache_.find(cl.EventInstanceId());
 
     if (it == mainComponentCache_.end() || !it->second.IsInput) 
     {
-        auto& component = mainComponentCache_[cl.InstanceId()];
+        auto& component = mainComponentCache_[cl.EventInstanceId()];
         
         component.Path = input.Path();
         component.IsInput = true;
@@ -141,11 +141,11 @@ void ContextBuilder::OnCompilerInput(const Compiler& cl, const FileInput& input)
 
 void ContextBuilder::OnCompilerOutput(const Compiler& cl, const ObjOutput& output)
 {
-    auto it = mainComponentCache_.find(cl.InstanceId());
+    auto it = mainComponentCache_.find(cl.EventInstanceId());
 
     if (it == mainComponentCache_.end()) 
     {
-        auto& component = mainComponentCache_[cl.InstanceId()];
+        auto& component = mainComponentCache_[cl.EventInstanceId()];
         
         component.Path = output.Path();
         component.IsInput = false;
@@ -163,7 +163,7 @@ void ContextBuilder::OnCompilerOutput(const Compiler& cl, const ObjOutput& outpu
 
 void ContextBuilder::OnRootActivity(const Activity& root)
 {
-    unsigned long long id = root.InstanceId();
+    unsigned long long id = root.EventInstanceId();
 
     assert(activityContextLinks_.find(id) == activityContextLinks_.end());
     assert(contextData_.find(id) == contextData_.end());
@@ -183,9 +183,9 @@ void ContextBuilder::OnRootActivity(const Activity& root)
 
 void ContextBuilder::OnNestedActivity(const Activity& parent, const Activity& child)
 {
-    unsigned long long childId = child.InstanceId();
+    unsigned long long childId = child.EventInstanceId();
 
-    auto itParent = activityContextLinks_.find(parent.InstanceId());
+    auto itParent = activityContextLinks_.find(parent.EventInstanceId());
 
     assert(itParent != activityContextLinks_.end());
     assert(activityContextLinks_.find(childId) == activityContextLinks_.end());
@@ -194,14 +194,14 @@ void ContextBuilder::OnNestedActivity(const Activity& parent, const Activity& ch
 
     itParent->second.TimelineReuseCount++;
 
-    activityContextLinks_.try_emplace(child.InstanceId(), propagatedContext, 0);
+    activityContextLinks_.try_emplace(child.EventInstanceId(), propagatedContext, 0);
 
     currentContextData_ = propagatedContext;
 }
 
 void ContextBuilder::OnInvocation(const Invocation& invocation)
 {
-    unsigned long long id = invocation.InstanceId();
+    unsigned long long id = invocation.EventInstanceId();
 
     auto itContextLink = activityContextLinks_.find(id);
 
@@ -223,7 +223,7 @@ void ContextBuilder::OnInvocation(const Invocation& invocation)
 
     std::wstring invocationIdString = std::to_wstring(invocation.InvocationId());
 
-    unsigned long long instanceId = invocation.InstanceId();
+    unsigned long long instanceId = invocation.EventInstanceId();
 
     auto it = mainComponentCache_.find(instanceId);
 
@@ -259,7 +259,7 @@ void ContextBuilder::OnCompilerPass(const Compiler& cl, const CompilerPass& pass
     }
 
     currentContextData_->Component = 
-        CacheString(activeComponents_, pass.InstanceId(), path);
+        CacheString(activeComponents_, pass.EventInstanceId(), path);
 }
 
 void ContextBuilder::OnC2Thread(const C2DLL& c2, const Activity& threadOwner, 
@@ -271,7 +271,7 @@ void ContextBuilder::OnC2Thread(const C2DLL& c2, const Activity& threadOwner,
 void ContextBuilder::ProcessParallelismForkPoint(const Activity& parent, 
     const Activity& child)
 {
-    unsigned long long parentId = parent.InstanceId();
+    unsigned long long parentId = parent.EventInstanceId();
 
     auto itParentLink = activityContextLinks_.find(parentId);
     assert(itParentLink != activityContextLinks_.end());
@@ -282,7 +282,7 @@ void ContextBuilder::ProcessParallelismForkPoint(const Activity& parent,
 void ContextBuilder::ProcessParallelismForkPoint(ContextLink& parentContextLink, 
     const Activity& child)
 {
-    unsigned long long id = child.InstanceId();
+    unsigned long long id = child.EventInstanceId();
         
     assert(activityContextLinks_.find(id) == activityContextLinks_.end());
     assert(contextData_.find(id) == contextData_.end());
@@ -316,7 +316,7 @@ void ContextBuilder::ProcessParallelismForkPoint(ContextLink& parentContextLink,
 
 void ContextBuilder::OnStopRootActivity(const Activity& activity)
 {
-    unsigned long long id = activity.InstanceId();
+    unsigned long long id = activity.EventInstanceId();
 
     auto it = GetContextLink(id);
 
@@ -331,8 +331,8 @@ void ContextBuilder::OnStopRootActivity(const Activity& activity)
 void ContextBuilder::OnStopNestedActivity(const Activity& parent, 
     const Activity& child)
 {
-    auto itParent = GetContextLink(parent.InstanceId());
-    auto itChild = GetContextLink(child.InstanceId());
+    auto itParent = GetContextLink(parent.EventInstanceId());
+    auto itChild = GetContextLink(child.EventInstanceId());
 
     assert(itChild->second.TimelineReuseCount == 0);
 
@@ -355,20 +355,20 @@ void ContextBuilder::OnStopNestedActivity(const Activity& parent,
 
 void ContextBuilder::OnStopCompilerPass(const CompilerPass& pass)
 {
-    activeComponents_.erase(pass.InstanceId());
-    contextData_.erase(pass.InstanceId());
+    activeComponents_.erase(pass.EventInstanceId());
+    contextData_.erase(pass.EventInstanceId());
 }
 
 void ContextBuilder::OnStopInvocation(const Invocation& invocation)
 {
-    activeComponents_.erase(invocation.InstanceId());
-    invocationDescriptions_.erase(invocation.InstanceId());
-    contextData_.erase(invocation.InstanceId());
+    activeComponents_.erase(invocation.EventInstanceId());
+    invocationDescriptions_.erase(invocation.EventInstanceId());
+    contextData_.erase(invocation.EventInstanceId());
 }
 
 void ContextBuilder::OnStopC2Thread(const C2DLL& c2, const Thread& thread)
 {
-    contextData_.erase(thread.InstanceId());
+    contextData_.erase(thread.EventInstanceId());
 }
 
 unsigned short ContextBuilder::GetNewTimelineId()

@@ -66,7 +66,7 @@ private:
 
     void OnThreadActivity(const Activity& a, const Thread& t, const void* relogSession)
     {
-        std::string activityName = a.EntityName();
+        std::string activityName = a.EventName();
         activityName += "Thread";
 
         LogActivity(relogSession, t, activityName.c_str());
@@ -78,7 +78,7 @@ private:
 
     void LogActivity(const void* relogSession, const Activity& a)
     {
-        LogActivity(relogSession, a, a.EntityName());
+        LogActivity(relogSession, a, a.EventName());
     }
 
     template <typename TChar>

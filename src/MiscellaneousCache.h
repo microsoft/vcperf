@@ -29,7 +29,7 @@ public:
     
     const TimingData& GetTimingData(const Activity& a)
     {
-        return timingData_[a.InstanceId()];
+        return timingData_[a.EventInstanceId()];
     }
 
     AnalysisControl OnEndAnalysisPass() override
@@ -47,14 +47,14 @@ public:
 
         Activity a{eventStack.Back()};
 
-        assert(timingData_.find(a.InstanceId()) == timingData_.end());
+        assert(timingData_.find(a.EventInstanceId()) == timingData_.end());
 
-        auto& t = timingData_[a.InstanceId()];
+        auto& t = timingData_[a.EventInstanceId()];
 
         t.Duration = a.Duration();
         t.CPUTime = a.CPUTime();
 
-        auto it = exclusivityLeaves_.find(eventStack.Back().InstanceId());
+        auto it = exclusivityLeaves_.find(eventStack.Back().EventInstanceId());
 
         if (it == exclusivityLeaves_.end())
         {
@@ -77,19 +77,19 @@ public:
             return AnalysisControl::CONTINUE;
         }
 
-        auto& child = eventStack.Back();
-        auto& parent = eventStack[stackSize - 2];
+        auto child = eventStack.Back();
+        auto parent = eventStack[stackSize - 2];
 
-        unsigned long long childEntityId = eventStack.Back().EntityId();
+        unsigned long long childEventId = eventStack.Back().EventId();
 
-        if (childEntityId == parent.EntityId()) {
+        if (childEventId == parent.EventId()) {
             return AnalysisControl::CONTINUE;
         }
 
-        if (    childEntityId == Info<Function>::ID
-            ||  childEntityId == Info<File>::ID)
+        if (    childEventId == Info<Function>::ID
+            ||  childEventId == Info<FrontEndFile>::ID)
         {
-            exclusivityLeaves_.insert(eventStack[stackSize - 2].InstanceId());
+            exclusivityLeaves_.insert(eventStack[stackSize - 2].EventInstanceId());
         }
 
         return AnalysisControl::CONTINUE;

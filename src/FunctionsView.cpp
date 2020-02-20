@@ -63,7 +63,7 @@ void FunctionsView::EmitFunctionActivity(Function func, const void* relogSession
 
     desc = &CppBuildInsightsFunctionActivity_Extended1;
 
-    Payload p2 = PayloadBuilder<uint64_t>::Build(func.InstanceId());
+    Payload p2 = PayloadBuilder<uint64_t>::Build(func.EventInstanceId());
 
     InjectEvent(relogSession, &CppBuildInsightsGuid, desc, 
         func.ProcessId(), func.ThreadId(), func.ProcessorIndex(),
@@ -100,7 +100,7 @@ void FunctionsView::EmitFunctionForceInlinee(const Function& func,
 
     desc = &CppBuildInsightsFunctionSimpleEvent_Extended1;
 
-    Payload p2 = PayloadBuilder<uint64_t, uint16_t>::Build(func.InstanceId(),
+    Payload p2 = PayloadBuilder<uint64_t, uint16_t>::Build(func.EventInstanceId(),
         static_cast<uint16_t>(EventId::FORCE_INLINEE));
 
     InjectEvent(relogSession, &CppBuildInsightsGuid, desc, 

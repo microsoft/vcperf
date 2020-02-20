@@ -18,15 +18,15 @@ AnalysisControl BuildExplorerView::OnActivity(const EventStack& eventStack,
         return AnalysisControl::CONTINUE;
     }
 
-	switch (eventStack.Back().EntityId())
+	switch (eventStack.Back().EventId())
 	{
-	case Info<LinkerPass1>::ID:
-	case Info<LinkerPass2>::ID:
-	case Info<LinkerPreLTCGOptRef>::ID:
-	case Info<LinkerLTCG>::ID:
-	case Info<LinkerOptRef>::ID:
-	case Info<LinkerOptICF>::ID:
-	case Info<LinkerOptLBR>::ID:
+	case Info<Pass1>::ID:
+	case Info<Pass2>::ID:
+	case Info<PreLTCGOptRef>::ID:
+	case Info<LTCG>::ID:
+	case Info<OptRef>::ID:
+	case Info<OptICF>::ID:
+	case Info<OptLBR>::ID:
 	case Info<C1DLL>::ID:
 	case Info<C2DLL>::ID:
 	case Info<WholeProgramAnalysis>::ID:
