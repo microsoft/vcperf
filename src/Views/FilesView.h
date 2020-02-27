@@ -1,12 +1,13 @@
 #pragma once
 
-#include "CppBuildInsights.hpp"
-#include "ContextBuilder.h"
-#include "MiscellaneousCache.h"
+#include "VcperfBuildInsights.h"
+#include "Analyzers\ContextBuilder.h"
+#include "Analyzers\MiscellaneousCache.h"
 
-using namespace Microsoft::Cpp::BuildInsights;
+namespace vcperf
+{
 
-class FilesView : public IRelogger
+class FilesView : public BI::IRelogger
 {
 public:
     FilesView(ContextBuilder* contextBuilder,
@@ -15,12 +16,14 @@ public:
         miscellaneousCache_{miscellaneousCache}
     {}
 
-    AnalysisControl OnStartActivity(const EventStack& eventStack,
+    BI::AnalysisControl OnStartActivity(const BI::EventStack& eventStack,
         const void* relogSession) override;
 
-    void OnFileParse(const FrontEndFileGroup& files, const void* relogSession);
+    void OnFileParse(const A::FrontEndFileGroup& files, const void* relogSession);
 
 private:
     ContextBuilder* contextBuilder_;
     MiscellaneousCache* miscellaneousCache_;
 };
+
+} // namespace vcperf

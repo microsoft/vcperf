@@ -1,5 +1,12 @@
 #include "ExpensiveTemplateInstantiationCache.h"
 
+using namespace Microsoft::Cpp::BuildInsights;
+using namespace Activities;
+using namespace SimpleEvents;
+
+namespace vcperf
+{
+
 std::tuple<bool, const char*, const char*> ExpensiveTemplateInstantiationCache::
     GetTemplateInstantiationInfo(const TemplateInstantiation& ti) const 
 {
@@ -104,8 +111,8 @@ void ExpensiveTemplateInstantiationCache::OnSymbolName(const SymbolName& symbol)
 void ExpensiveTemplateInstantiationCache::
     Phase1RegisterPrimaryTemplateLocalTime(const TemplateInstantiation& instantiation)
 {
-    unsigned int microseconds = (unsigned int)std::chrono::
-        duration_cast<std::chrono::microseconds>(instantiation.Duration()).count();
+    unsigned int microseconds = static_cast<unsigned int>(std::chrono::
+        duration_cast<std::chrono::microseconds>(instantiation.Duration()).count());
 
     localPrimaryTemplateTimes_[instantiation.PrimaryTemplateSymbolKey()] += microseconds;
 }
@@ -153,10 +160,10 @@ void ExpensiveTemplateInstantiationCache::DetermineTopPrimaryTemplates()
     unsigned int cutoff = 500000;
 
     unsigned long long durationBasedCutoff = 
-        (unsigned long long)(0.05 * traceDuration_.count());
+        static_cast<unsigned long long>(0.05 * traceDuration_.count());
 
     if (durationBasedCutoff < cutoff) {
-        cutoff = (unsigned int)durationBasedCutoff;
+        cutoff = static_cast<unsigned int>(durationBasedCutoff);
     }
 
     for (auto& p : primaryTemplateStats_)
@@ -176,3 +183,5 @@ void ExpensiveTemplateInstantiationCache::DetermineTopPrimaryTemplates()
     primaryTemplateStats_.clear();
     localPrimaryTemplateTimes_.clear();
 }
+
+} // namespace vcperf

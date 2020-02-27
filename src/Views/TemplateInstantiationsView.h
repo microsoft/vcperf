@@ -1,15 +1,16 @@
 #pragma once
 
-#include "CppBuildInsights.hpp"
+#include "VcperfBuildInsights.h"
 #include "Utility.h"
 #include "PayloadBuilder.h"
-#include "ContextBuilder.h"
-#include "ExpensiveTemplateInstantiationCache.h"
-#include "MiscellaneousCache.h"
+#include "Analyzers\ContextBuilder.h"
+#include "Analyzers\ExpensiveTemplateInstantiationCache.h"
+#include "Analyzers\MiscellaneousCache.h"
 
-using namespace Microsoft::Cpp::BuildInsights;
+namespace vcperf
+{
 
-class TemplateInstantiationsView : public IRelogger
+class TemplateInstantiationsView : public BI::IRelogger
 {
 public:
     TemplateInstantiationsView(
@@ -23,19 +24,19 @@ public:
         isEnabled_{isEnabled}
     {}
 
-    AnalysisControl OnStartActivity(const EventStack& eventStack, const void* relogSession) override
+    BI::AnalysisControl OnStartActivity(const BI::EventStack& eventStack, const void* relogSession) override
     {
         if (!isEnabled_) {
-            return AnalysisControl::CONTINUE;
+            return BI::AnalysisControl::CONTINUE;
         }
 
         MatchEventStackInMemberFunction(eventStack, this, 
             &TemplateInstantiationsView::OnTemplateInstantiationStart, relogSession);
 
-        return AnalysisControl::CONTINUE;
+        return BI::AnalysisControl::CONTINUE;
     }
 
-    void OnTemplateInstantiationStart(const TemplateInstantiation& ti, const void* relogSession);
+    void OnTemplateInstantiationStart(const A::TemplateInstantiation& ti, const void* relogSession);
 
 private:
     ContextBuilder* contextBuilder_;
@@ -44,3 +45,5 @@ private:
 
     bool isEnabled_;
 };
+
+} // namespace vcperf

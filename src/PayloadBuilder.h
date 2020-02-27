@@ -4,6 +4,9 @@
 #include <array>
 #include <numeric>
 
+namespace vcperf
+{
+
 class Payload
 {
 public:
@@ -74,7 +77,8 @@ private:
     template <unsigned fieldIndex, typename Field, typename... OtherFields>
     static void ComputeFieldSizes(FieldSizeArray& sizes, Field field, OtherFields... otherFields) {
 
-        static_assert(std::is_integral_v<Field> || std::is_floating_point_v<Field>, "Only integral, floating-point, and pointer types can be used for payload fields.");
+        static_assert(std::is_integral_v<Field> || std::is_floating_point_v<Field>, 
+            "Only integral, floating-point, and pointer types can be used for payload fields.");
 
         sizes[fieldIndex] = sizeof(Field);
 
@@ -105,7 +109,8 @@ private:
     template <unsigned fieldIndex, typename Field, typename... OtherFields>
     static void CopyFields(uint8_t* dataPtr, FieldSizeArray& sizes, Field field, OtherFields... otherFields) {
 
-        static_assert(std::is_integral_v<Field> || std::is_floating_point_v<Field>, "Only integral, floating-point, and pointer types can be used for payload fields.");
+        static_assert(std::is_integral_v<Field> || std::is_floating_point_v<Field>, 
+            "Only integral, floating-point, and pointer types can be used for payload fields.");
 
         memcpy(dataPtr, &field, sizes[fieldIndex]);
 
@@ -124,3 +129,5 @@ private:
     static void CopyFields(uint8_t* dataPtr, FieldSizeArray& sizes) {
     }
 };
+
+} // namespace vcperf

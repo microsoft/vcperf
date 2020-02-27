@@ -4,6 +4,13 @@
 
 #include "PayloadBuilder.h"
 
+using namespace Microsoft::Cpp::BuildInsights;
+using namespace Activities;
+using namespace SimpleEvents;
+
+namespace vcperf
+{
+
 enum class EventId
 {
     FORCE_INLINEE = 1
@@ -107,3 +114,5 @@ void FunctionsView::EmitFunctionForceInlinee(const Function& func,
         forceInlinee.ProcessId(), forceInlinee.ThreadId(), forceInlinee.ProcessorIndex(),
         forceInlinee.Timestamp(), p2.GetData(), (unsigned long)p2.Size());
 }
+
+} // namespace vcperf

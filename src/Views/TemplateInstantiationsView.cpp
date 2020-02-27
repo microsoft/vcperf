@@ -2,6 +2,12 @@
 #include "CppBuildInsightsEtw.h"
 #include "PayloadBuilder.h"
 
+using namespace Microsoft::Cpp::BuildInsights;
+using namespace Activities;
+using namespace SimpleEvents;
+
+namespace vcperf
+{
 
 void TemplateInstantiationsView::OnTemplateInstantiationStart( 
     const TemplateInstantiation& ti, const void* relogSession)
@@ -42,3 +48,5 @@ void TemplateInstantiationsView::OnTemplateInstantiationStart(
                 ti.ProcessId(), ti.ThreadId(), ti.ProcessorIndex(), 
                 ti.StartTimestamp(), p.GetData(), (unsigned long)p.Size());
 }
+
+} // namespace vcperf

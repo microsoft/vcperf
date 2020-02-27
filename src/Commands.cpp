@@ -3,17 +3,20 @@
 
 #include <iostream>
 
-#include "CppBuildInsights.hpp"
+#include "VcperfBuildInsights.h"
 
-#include "ExpensiveTemplateInstantiationCache.h"
-#include "ContextBuilder.h"
-#include "MiscellaneousCache.h"
-#include "BuildExplorerView.h"
-#include "FunctionsView.h"
-#include "FilesView.h"
-#include "TemplateInstantiationsView.h"
+#include "Analyzers\ExpensiveTemplateInstantiationCache.h"
+#include "Analyzers\ContextBuilder.h"
+#include "Analyzers\MiscellaneousCache.h"
+#include "Views\BuildExplorerView.h"
+#include "Views\FunctionsView.h"
+#include "Views\FilesView.h"
+#include "Views\TemplateInstantiationsView.h"
 
 using namespace Microsoft::Cpp::BuildInsights;
+
+namespace vcperf
+{
 
 const wchar_t* ResultCodeToString(RESULT_CODE rc)
 {
@@ -302,3 +305,5 @@ HRESULT DoAnalyze(const std::filesystem::path& inputFile, const std::filesystem:
 
     return S_OK;
 }
+
+} // namespace vcperf

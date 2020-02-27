@@ -1,5 +1,10 @@
 #include "ContextBuilder.h"
 
+using namespace Microsoft::Cpp::BuildInsights;
+using namespace Activities;
+using namespace SimpleEvents;
+
+using namespace vcperf;
 
 AnalysisControl ContextBuilder::OnStartActivity(const EventStack& eventStack)
 {
@@ -51,20 +56,20 @@ AnalysisControl ContextBuilder::OnSimpleEvent(const EventStack& eventStack)
 {
     if (MustCacheMainComponents()) 
     {
-        if (	MatchEventStackInMemberFunction(eventStack, this, 
-				    &ContextBuilder::OnLibOutput)
+        if (    MatchEventStackInMemberFunction(eventStack, this, 
+                    &ContextBuilder::OnLibOutput)
 
-		    ||	MatchEventStackInMemberFunction(eventStack, this, 
-				    &ContextBuilder::OnExecutableImageOutput)
+            ||  MatchEventStackInMemberFunction(eventStack, this, 
+                    &ContextBuilder::OnExecutableImageOutput)
 
-            ||	MatchEventStackInMemberFunction(eventStack, this, 
-				    &ContextBuilder::OnImpLibOutput)
+            ||  MatchEventStackInMemberFunction(eventStack, this, 
+                    &ContextBuilder::OnImpLibOutput)
             
-            ||	MatchEventStackInMemberFunction(eventStack, this, 
-				    &ContextBuilder::OnCompilerInput)
+            ||  MatchEventStackInMemberFunction(eventStack, this, 
+                    &ContextBuilder::OnCompilerInput)
 
-            ||	MatchEventStackInMemberFunction(eventStack, this, 
-				    &ContextBuilder::OnCompilerOutput))
+            ||  MatchEventStackInMemberFunction(eventStack, this, 
+                    &ContextBuilder::OnCompilerOutput))
         {}
 
         return AnalysisControl::CONTINUE;

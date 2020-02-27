@@ -1,10 +1,7 @@
 #pragma once
 
-#include "CppBuildInsights.hpp"
-
-using namespace Microsoft::Cpp::BuildInsights;
-
-using namespace Activities;
+namespace vcperf
+{
 
 struct Guid : GUID
 {
@@ -29,6 +26,8 @@ struct Guid : GUID
 // f78a07b0-796a-5da4-5c20-61aa526e77af
 constexpr Guid CppBuildInsightsGuid = Guid{0xf78a07b0, 0x796a, 0x5da4,
     0x5c, 0x20, 0x61, 0xaa, 0x52, 0x6e, 0x77, 0xaf};
+
+} // namespace vcperf
 
 
 

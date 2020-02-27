@@ -5,7 +5,7 @@
 
 #include "Commands.h"
 
-#include "CppBuildInsights.hpp"
+#include "VcperfBuildInsights.h"
 
 #ifndef VCPERF_VERSION
 #define VCPERF_VERSION DEVELOPER VERSION
@@ -28,6 +28,8 @@ enum class StartSubCommand
 };
 
 using namespace Microsoft::Cpp::BuildInsights;
+
+using namespace vcperf;
 
 bool CheckCommand(std::wstring arg, const wchar_t* value)
 {

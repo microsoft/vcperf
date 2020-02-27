@@ -5,13 +5,12 @@
 #include <chrono>
 #include <assert.h>
 
-#include "CppBuildInsights.hpp"
+#include "VcperfBuildInsights.h"
 
-using namespace Microsoft::Cpp::BuildInsights;
+namespace vcperf
+{
 
-using namespace Activities;
-
-class MiscellaneousCache : public IAnalyzer
+class MiscellaneousCache : public BI::IAnalyzer
 {
 public:
     MiscellaneousCache():
@@ -27,25 +26,25 @@ public:
         std::chrono::nanoseconds ExclusiveCPUTime;
     };
     
-    const TimingData& GetTimingData(const Activity& a)
+    const TimingData& GetTimingData(const A::Activity& a)
     {
         return timingData_[a.EventInstanceId()];
     }
 
-    AnalysisControl OnEndAnalysisPass() override
+    BI::AnalysisControl OnEndAnalysisPass() override
     {
         ++pass_;
 
-        return AnalysisControl::CONTINUE;
+        return BI::AnalysisControl::CONTINUE;
     }
 
-    AnalysisControl OnStopActivity(const EventStack& eventStack) override
+    BI::AnalysisControl OnStopActivity(const BI::EventStack& eventStack) override
     {
         if (pass_) {
-            return AnalysisControl::CONTINUE;
+            return BI::AnalysisControl::CONTINUE;
         }
 
-        Activity a{eventStack.Back()};
+        A::Activity a{eventStack.Back()};
 
         assert(timingData_.find(a.EventInstanceId()) == timingData_.end());
 
@@ -68,13 +67,13 @@ public:
 
             exclusivityLeaves_.erase(it);
 
-            return AnalysisControl::CONTINUE;
+            return BI::AnalysisControl::CONTINUE;
         }
 
         size_t stackSize = eventStack.Size();
 
         if (stackSize <= 1) {
-            return AnalysisControl::CONTINUE;
+            return BI::AnalysisControl::CONTINUE;
         }
 
         auto child = eventStack.Back();
@@ -83,16 +82,16 @@ public:
         unsigned long long childEventId = eventStack.Back().EventId();
 
         if (childEventId == parent.EventId()) {
-            return AnalysisControl::CONTINUE;
+            return BI::AnalysisControl::CONTINUE;
         }
 
-        if (    childEventId == Info<Function>::ID
-            ||  childEventId == Info<FrontEndFile>::ID)
+        if (    childEventId == BI::EVENT_ID_FUNCTION 
+            ||  childEventId == BI::EVENT_ID_FRONT_END_FILE)
         {
             exclusivityLeaves_.insert(eventStack[stackSize - 2].EventInstanceId());
         }
 
-        return AnalysisControl::CONTINUE;
+        return BI::AnalysisControl::CONTINUE;
     }
 
 private:
@@ -102,3 +101,5 @@ private:
     std::unordered_set<unsigned long long> exclusivityLeaves_;
     
 };
+
+} // namespace vcperf

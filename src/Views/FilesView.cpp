@@ -2,6 +2,11 @@
 #include "CppBuildInsightsEtw.h"
 #include "PayloadBuilder.h"
 
+using namespace Microsoft::Cpp::BuildInsights;
+using namespace Activities;
+
+namespace vcperf
+{
 
 AnalysisControl FilesView::OnStartActivity(const EventStack& eventStack,
     const void* relogSession)
@@ -10,7 +15,6 @@ AnalysisControl FilesView::OnStartActivity(const EventStack& eventStack,
 
     return AnalysisControl::CONTINUE;
 }
-
 
 void FilesView::OnFileParse(const FrontEndFileGroup& files, const void* relogSession)
 {
@@ -51,3 +55,5 @@ void FilesView::OnFileParse(const FrontEndFileGroup& files, const void* relogSes
         currentFile.ProcessId(), currentFile.ThreadId(), currentFile.ProcessorIndex(),
         currentFile.StartTimestamp(), p.GetData(), (unsigned long)p.Size());
 }
+
+} // namespace vcperf

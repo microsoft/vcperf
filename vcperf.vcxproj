@@ -91,7 +91,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(IntDir);src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <PreprocessorDefinitions>$(ExternalPreprocessorDefinitions);_MBCS;CPP_BUILD_INSIGHTS_RELOG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
@@ -112,7 +112,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(IntDir);src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <PreprocessorDefinitions>$(ExternalPreprocessorDefinitions);_MBCS;CPP_BUILD_INSIGHTS_RELOG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
@@ -135,7 +135,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(IntDir);src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <PreprocessorDefinitions>$(ExternalPreprocessorDefinitions);_MBCS;CPP_BUILD_INSIGHTS_RELOG;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
@@ -160,7 +160,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(IntDir);src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <PreprocessorDefinitions>$(ExternalPreprocessorDefinitions);_MBCS;CPP_BUILD_INSIGHTS_RELOG;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
@@ -178,28 +178,29 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\BuildExplorerView.cpp" />
+    <ClCompile Include="src\Analyzers\ContextBuilder.cpp" />
+    <ClCompile Include="src\Analyzers\ExpensiveTemplateInstantiationCache.cpp" />
+    <ClCompile Include="src\Views\BuildExplorerView.cpp" />
+    <ClCompile Include="src\Views\FilesView.cpp" />
+    <ClCompile Include="src\Views\FunctionsView.cpp" />
+    <ClCompile Include="src\Views\TemplateInstantiationsView.cpp" />
     <ClCompile Include="src\Commands.cpp" />
-    <ClCompile Include="src\ContextBuilder.cpp" />
-    <ClCompile Include="src\ExpensiveTemplateInstantiationCache.cpp" />
-    <ClCompile Include="src\FilesView.cpp" />
-    <ClCompile Include="src\FunctionsView.cpp" />
     <ClCompile Include="src\GenericFields.cpp" />
     <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\TemplateInstantiationsView.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\BuildExplorerView.h" />
+    <ClInclude Include="src\Analyzers\ContextBuilder.h" />
+    <ClInclude Include="src\Analyzers\MiscellaneousCache.h" />
+    <ClInclude Include="src\Analyzers\ExpensiveTemplateInstantiationCache.h" />
+    <ClInclude Include="src\VcperfBuildInsights.h" />
+    <ClInclude Include="src\Views\BuildExplorerView.h" />
+    <ClInclude Include="src\Views\FilesView.h" />
+    <ClInclude Include="src\Views\FunctionsView.h" />
+    <ClInclude Include="src\Views\TemplateInstantiationsView.h" />
     <ClInclude Include="src\Commands.h" />
     <ClInclude Include="src\GenericFields.h" />
-    <ClInclude Include="src\MiscellaneousCache.h" />
-    <ClInclude Include="src\FilesView.h" />
-    <ClInclude Include="src\FunctionsView.h" />
     <ClInclude Include="src\PayloadBuilder.h" />
-    <ClInclude Include="src\ExpensiveTemplateInstantiationCache.h" />
-    <ClInclude Include="src\TemplateInstantiationsView.h" />
     <ClInclude Include="src\Utility.h" />
-    <ClInclude Include="src\ContextBuilder.h" />
   </ItemGroup>
   <ItemGroup>
     <Xml Include="src\CppBuildInsightsEtw.xml">

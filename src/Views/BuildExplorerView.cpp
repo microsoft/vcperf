@@ -3,39 +3,46 @@
 #include "CppBuildInsightsEtw.h"
 #include "PayloadBuilder.h"
 
+using namespace Microsoft::Cpp::BuildInsights;
+using namespace Activities;
+using namespace SimpleEvents;
+
+namespace vcperf
+{
+
 AnalysisControl BuildExplorerView::OnActivity(const EventStack& eventStack, 
     const void* relogSession)
 {
-    if (	MatchEventInMemberFunction(eventStack.Back(), this, 
-				&BuildExplorerView::OnInvocation, relogSession)
+    if (    MatchEventInMemberFunction(eventStack.Back(), this, 
+                &BuildExplorerView::OnInvocation, relogSession)
 
-		||	MatchEventStackInMemberFunction(eventStack, this,
-				&BuildExplorerView::OnCompilerPass, relogSession)
+        ||  MatchEventStackInMemberFunction(eventStack, this,
+                &BuildExplorerView::OnCompilerPass, relogSession)
 
-        ||	MatchEventStackInMemberFunction(eventStack, this,
-				&BuildExplorerView::OnThread, relogSession))
+        ||  MatchEventStackInMemberFunction(eventStack, this,
+                &BuildExplorerView::OnThread, relogSession))
     {
         return AnalysisControl::CONTINUE;
     }
 
-	switch (eventStack.Back().EventId())
-	{
-	case Info<Pass1>::ID:
-	case Info<Pass2>::ID:
-	case Info<PreLTCGOptRef>::ID:
-	case Info<LTCG>::ID:
-	case Info<OptRef>::ID:
-	case Info<OptICF>::ID:
-	case Info<OptLBR>::ID:
-	case Info<C1DLL>::ID:
-	case Info<C2DLL>::ID:
-	case Info<WholeProgramAnalysis>::ID:
-	case Info<CodeGeneration>::ID:
-		break;
+    switch (eventStack.Back().EventId())
+    {
+    case Info<Pass1>::ID:
+    case Info<Pass2>::ID:
+    case Info<PreLTCGOptRef>::ID:
+    case Info<LTCG>::ID:
+    case Info<OptRef>::ID:
+    case Info<OptICF>::ID:
+    case Info<OptLBR>::ID:
+    case Info<C1DLL>::ID:
+    case Info<C2DLL>::ID:
+    case Info<WholeProgramAnalysis>::ID:
+    case Info<CodeGeneration>::ID:
+        break;
 
-	default:
-		return AnalysisControl::CONTINUE;
-	}
+    default:
+        return AnalysisControl::CONTINUE;
+    }
 
     LogActivity(relogSession, eventStack.Back());
 
@@ -45,14 +52,14 @@ AnalysisControl BuildExplorerView::OnActivity(const EventStack& eventStack,
 AnalysisControl BuildExplorerView::OnSimpleEvent(const EventStack& eventStack, 
     const void* relogSession)
 {
-    if (	MatchEventStackInMemberFunction(eventStack, this, 
+    if (    MatchEventStackInMemberFunction(eventStack, this, 
                 &BuildExplorerView::OnCommandLine, relogSession)
 
-		||	MatchEventStackInMemberFunction(eventStack, this,
-				&BuildExplorerView::OnCompilerEnvironmentVariable, relogSession)
+        ||  MatchEventStackInMemberFunction(eventStack, this,
+                &BuildExplorerView::OnCompilerEnvironmentVariable, relogSession)
         
-        ||	MatchEventStackInMemberFunction(eventStack, this,
-				&BuildExplorerView::OnLinkerEnvironmentVariable, relogSession))
+        ||  MatchEventStackInMemberFunction(eventStack, this,
+                &BuildExplorerView::OnLinkerEnvironmentVariable, relogSession))
     {
         return AnalysisControl::CONTINUE;
     }
@@ -246,3 +253,5 @@ void BuildExplorerView::LogStringPropertySegment(const void* relogSession,
         invocation.ProcessId(), invocation.ThreadId(), invocation.ProcessorIndex(),
         invocation.StartTimestamp(), p.GetData(), (unsigned long)p.Size());
 }
+
+} // namespace vcperf

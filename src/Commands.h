@@ -3,6 +3,9 @@
 #include <filesystem>
 #include <string>
 
+namespace vcperf
+{
+
 enum class VerbosityLevel
 {
     INVALID,
@@ -15,3 +18,5 @@ HRESULT DoStart(const std::wstring& sessionName, bool cpuSampling, VerbosityLeve
 HRESULT DoStop(const std::wstring& sessionName, const std::filesystem::path& outputFile, bool analyzeTemplates = false);
 HRESULT DoStopNoAnalyze(const std::wstring& sessionName, const std::filesystem::path& outputFile);
 HRESULT DoAnalyze(const std::filesystem::path& inputFile, const std::filesystem::path& outputFile, bool analyzeTemplates = false);
+
+} // namespace vcperf

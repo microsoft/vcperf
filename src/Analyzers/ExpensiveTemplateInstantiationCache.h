@@ -5,13 +5,12 @@
 #include <unordered_set>
 #include <tuple>
 
-#include "CppBuildInsights.hpp"
+#include "VcperfBuildInsights.h"
 
-using namespace Microsoft::Cpp::BuildInsights;
-using namespace Activities;
-using namespace SimpleEvents;
+namespace vcperf
+{
 
-class ExpensiveTemplateInstantiationCache : public IAnalyzer
+class ExpensiveTemplateInstantiationCache : public BI::IAnalyzer
 {
     struct PrimaryTemplateStats
     {
@@ -33,47 +32,47 @@ public:
     {}
 
     std::tuple<bool, const char*, const char*> 
-        GetTemplateInstantiationInfo(const TemplateInstantiation& ti) const;
+        GetTemplateInstantiationInfo(const A::TemplateInstantiation& ti) const;
 
-    AnalysisControl OnTraceInfo(const TraceInfo& traceInfo) override 
+    BI::AnalysisControl OnTraceInfo(const BI::TraceInfo& traceInfo) override 
     {
         traceDuration_ = traceInfo.Duration();
-        return AnalysisControl::CONTINUE;
+        return BI::AnalysisControl::CONTINUE;
     }
 
-    AnalysisControl OnBeginAnalysis() override
+    BI::AnalysisControl OnBeginAnalysis() override
     {
         analysisCount_++;
-        return AnalysisControl::CONTINUE;
+        return BI::AnalysisControl::CONTINUE;
     }
 
-    AnalysisControl OnEndAnalysis() override
+    BI::AnalysisControl OnEndAnalysis() override
     {
         analysisCount_--;
-        return AnalysisControl::CONTINUE;
+        return BI::AnalysisControl::CONTINUE;
     }
 
-    AnalysisControl OnBeginAnalysisPass() override 
+    BI::AnalysisControl OnBeginAnalysisPass() override 
     {
         analysisPass_++;
-        return AnalysisControl::CONTINUE;
+        return BI::AnalysisControl::CONTINUE;
     }
 
-    AnalysisControl OnStopActivity(const EventStack& eventStack) override;
-    AnalysisControl OnSimpleEvent(const EventStack& eventStack) override;
-    AnalysisControl OnEndAnalysisPass() override;
+    BI::AnalysisControl OnStopActivity(const BI::EventStack& eventStack) override;
+    BI::AnalysisControl OnSimpleEvent(const BI::EventStack& eventStack) override;
+    BI::AnalysisControl OnEndAnalysisPass() override;
 
 private:
     bool IsRelogging() const {
         return analysisCount_ == 1;
     }
 
-    void OnTemplateInstantiation(const TemplateInstantiation& instantiation);
-    void OnSymbolName(const SymbolName& symbol);
-    void Phase1RegisterPrimaryTemplateLocalTime(const TemplateInstantiation& instantiation);
-    void Phase1MergePrimaryTemplateDuration(const SymbolName& symbol);
-    void Phase2RegisterSpecializationKey(const TemplateInstantiation& instantiation);
-    void Phase2MergeSpecializationKey(const SymbolName& symbol);
+    void OnTemplateInstantiation(const A::TemplateInstantiation& instantiation);
+    void OnSymbolName(const SE::SymbolName& symbol);
+    void Phase1RegisterPrimaryTemplateLocalTime(const A::TemplateInstantiation& instantiation);
+    void Phase1MergePrimaryTemplateDuration(const SE::SymbolName& symbol);
+    void Phase2RegisterSpecializationKey(const A::TemplateInstantiation& instantiation);
+    void Phase2MergeSpecializationKey(const SE::SymbolName& symbol);
     void DetermineTopPrimaryTemplates();
 
     int analysisCount_;
@@ -86,6 +85,8 @@ private:
     std::unordered_map<unsigned long long, const char*> keysToConsider_;
 
     // Phase 1
+    // The const char* keys in primaryTemplateStats_ point to the unique 
+    // cached values in cachedSymbolNames_.
     std::unordered_map<const char*, PrimaryTemplateStats> primaryTemplateStats_;
     std::unordered_map<unsigned long long, unsigned int> localPrimaryTemplateTimes_;
 
@@ -95,3 +96,5 @@ private:
     bool isEnabled_;
 
 };
+
+} // namespace vcperf

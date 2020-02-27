@@ -2,11 +2,14 @@
 
 #include <cwchar>
 #include <cstdint>
-#include "CppBuildInsights.hpp"
+#include "VcperfBuildInsights.h"
 
-using namespace Microsoft::Cpp::BuildInsights;
+namespace vcperf
+{
 
-void LogGenericStringField(const char* value, const Event& e, const void* relogSession);
-void LogGenericStringField(const wchar_t* value, const Event& e, const void* relogSession);
-void LogGenericUTF8StringField(const char* value, const Event& e, const void* relogSession);
-void LogGenericIntegerField(int64_t value, const Event& e, const void* relogSession);
+void LogGenericStringField(const char* value, const BI::Event& e, const void* relogSession);
+void LogGenericStringField(const wchar_t* value, const BI::Event& e, const void* relogSession);
+void LogGenericUTF8StringField(const char* value, const BI::Event& e, const void* relogSession);
+void LogGenericIntegerField(int64_t value, const BI::Event& e, const void* relogSession);
+
+} // namespace vcperf

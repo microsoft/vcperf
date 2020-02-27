@@ -1,10 +1,13 @@
-#include "CppBuildInsights.hpp"
+#include "VcperfBuildInsights.h"
 #include "GenericFields.h"
 #include "PayloadBuilder.h"
 #include "CppBuildInsightsEtw.h"
 #include "Utility.h"
 
 using namespace Microsoft::Cpp::BuildInsights;
+
+namespace vcperf
+{
 
 template <typename TField>
 void LogGenericField(TField value, PCEVENT_DESCRIPTOR desc, const Event& e, const void* relogSession)
@@ -36,3 +39,4 @@ void LogGenericIntegerField(int64_t value, const Event& e, const void* relogSess
     LogGenericField(value, &CppBuildInsightsIntegerGenericField, e, relogSession);
 }
 
+} // namespace vcperf

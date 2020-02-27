@@ -13,47 +13,50 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Source Files\Views">
+      <UniqueIdentifier>{f61a812e-1836-4138-94d5-51a333458674}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Analyzers">
+      <UniqueIdentifier>{c72eeb06-e722-4c16-b021-4fef2d5bebf4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Views">
+      <UniqueIdentifier>{5bfef654-b52c-4c77-a35d-95b8c98bfe70}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Analyzers">
+      <UniqueIdentifier>{e8d7ee64-3202-4eb3-9409-a5b48b479489}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\BuildExplorerView.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\Commands.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\FilesView.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\FunctionsView.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\TemplateInstantiationsView.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ContextBuilder.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ExpensiveTemplateInstantiationCache.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\GenericFields.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Views\BuildExplorerView.cpp">
+      <Filter>Source Files\Views</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Views\FilesView.cpp">
+      <Filter>Source Files\Views</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Views\FunctionsView.cpp">
+      <Filter>Source Files\Views</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Views\TemplateInstantiationsView.cpp">
+      <Filter>Source Files\Views</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Analyzers\ContextBuilder.cpp">
+      <Filter>Source Files\Analyzers</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Analyzers\ExpensiveTemplateInstantiationCache.cpp">
+      <Filter>Source Files\Analyzers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\BuildExplorerView.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\Commands.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\FilesView.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\FunctionsView.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\PayloadBuilder.h">
@@ -62,19 +65,31 @@
     <ClInclude Include="src\Utility.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\TemplateInstantiationsView.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ExpensiveTemplateInstantiationCache.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ContextBuilder.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\MiscellaneousCache.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\GenericFields.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Views\BuildExplorerView.h">
+      <Filter>Header Files\Views</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Views\FunctionsView.h">
+      <Filter>Header Files\Views</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Views\TemplateInstantiationsView.h">
+      <Filter>Header Files\Views</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Views\FilesView.h">
+      <Filter>Header Files\Views</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Analyzers\ExpensiveTemplateInstantiationCache.h">
+      <Filter>Header Files\Analyzers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Analyzers\MiscellaneousCache.h">
+      <Filter>Header Files\Analyzers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Analyzers\ContextBuilder.h">
+      <Filter>Header Files\Analyzers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\VcperfBuildInsights.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

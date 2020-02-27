@@ -7,15 +7,14 @@
 #include <unordered_map>
 #include <assert.h>
 
-#include "CppBuildInsights.hpp"
+#include "VcperfBuildInsights.h"
 #include "Utility.h"
 #include "PayloadBuilder.h"
 
-using namespace Microsoft::Cpp::BuildInsights;
-using namespace Activities;
-using namespace SimpleEvents;
+namespace vcperf
+{
 
-class ContextBuilder : public IAnalyzer
+class ContextBuilder : public BI::IAnalyzer
 {
     struct Component
     {
@@ -66,27 +65,27 @@ public:
     {
     }
 
-    AnalysisControl OnBeginAnalysis() override
+    BI::AnalysisControl OnBeginAnalysis() override
     {
         analysisCount_++;
-        return AnalysisControl::CONTINUE;
+        return BI::AnalysisControl::CONTINUE;
     }
 
-    AnalysisControl OnEndAnalysis() override
+    BI::AnalysisControl OnEndAnalysis() override
     {
         analysisCount_--;
-        return AnalysisControl::CONTINUE;
+        return BI::AnalysisControl::CONTINUE;
     }
 
-    AnalysisControl OnBeginAnalysisPass() override 
+    BI::AnalysisControl OnBeginAnalysisPass() override 
     {
         analysisPass_++;
-        return AnalysisControl::CONTINUE;
+        return BI::AnalysisControl::CONTINUE;
     }
 
-    AnalysisControl OnStartActivity(const EventStack& eventStack) override;
-    AnalysisControl OnStopActivity(const EventStack& eventStack) override;
-    AnalysisControl OnSimpleEvent(const EventStack& eventStack) override;
+    BI::AnalysisControl OnStartActivity(const BI::EventStack& eventStack) override;
+    BI::AnalysisControl OnStopActivity(const BI::EventStack& eventStack) override;
+    BI::AnalysisControl OnSimpleEvent(const BI::EventStack& eventStack) override;
 
     const ContextData* GetContextData() 
     {
@@ -123,28 +122,28 @@ private:
         return analysisCount_ == 1;
     }
 
-    void OnLibOutput(const LinkerGroup& linkers, const LibOutput& output);
-    void OnExecutableImageOutput(const LinkerGroup& linkers, const ExecutableImageOutput& output);
-    void OnImpLibOutput(const LinkerGroup& linkers, const ImpLibOutput& output);
-    void OnCompilerInput(const Compiler& cl, const FileInput& input);
-    void OnCompilerOutput(const Compiler& cl, const ObjOutput& output);
+    void OnLibOutput(const A::LinkerGroup& linkers, const SE::LibOutput& output);
+    void OnExecutableImageOutput(const A::LinkerGroup& linkers, const SE::ExecutableImageOutput& output);
+    void OnImpLibOutput(const A::LinkerGroup& linkers, const SE::ImpLibOutput& output);
+    void OnCompilerInput(const A::Compiler& cl, const SE::FileInput& input);
+    void OnCompilerOutput(const A::Compiler& cl, const SE::ObjOutput& output);
 
-    void ProcessLinkerOutput(const LinkerGroup& linkers, const FileOutput& output, bool overwrite);
+    void ProcessLinkerOutput(const A::LinkerGroup& linkers, const SE::FileOutput& output, bool overwrite);
 
-    void OnRootActivity(const Activity& root);
-    void OnNestedActivity(const Activity& parent, const Activity& child);
-    void OnInvocation(const Invocation& invocation);
-    void OnCompilerPass(const Compiler& cl, const CompilerPass& pass);
-    void OnC2Thread(const C2DLL& c2, const Activity& threadOwner, const Thread& thread);
+    void OnRootActivity(const A::Activity& root);
+    void OnNestedActivity(const A::Activity& parent, const A::Activity& child);
+    void OnInvocation(const A::Invocation& invocation);
+    void OnCompilerPass(const A::Compiler& cl, const A::CompilerPass& pass);
+    void OnC2Thread(const A::C2DLL& c2, const A::Activity& threadOwner, const A::Thread& thread);
 
-    void ProcessParallelismForkPoint(const Activity& parent, const Activity& child);
-    void ProcessParallelismForkPoint(ContextLink& parentContextLink, const Activity& child);
+    void ProcessParallelismForkPoint(const A::Activity& parent, const A::Activity& child);
+    void ProcessParallelismForkPoint(ContextLink& parentContextLink, const A::Activity& child);
 
-    void OnStopRootActivity(const Activity& activity);
-    void OnStopNestedActivity(const Activity& parent, const Activity& child);
-    void OnStopCompilerPass(const CompilerPass& pass);
-    void OnStopInvocation(const Invocation& invocation);
-    void OnStopC2Thread(const C2DLL& c2, const Thread& thread);
+    void OnStopRootActivity(const A::Activity& activity);
+    void OnStopNestedActivity(const A::Activity& parent, const A::Activity& child);
+    void OnStopCompilerPass(const A::CompilerPass& pass);
+    void OnStopInvocation(const A::Invocation& invocation);
+    void OnStopC2Thread(const A::C2DLL& c2, const A::Thread& thread);
 
     unsigned short GetNewTimelineId();
 
@@ -196,3 +195,5 @@ private:
     ContextData* currentContextData_;
     unsigned long long currentInstanceId_;
 };
+
+} // namespace vcperf
