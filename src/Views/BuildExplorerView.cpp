@@ -27,17 +27,17 @@ AnalysisControl BuildExplorerView::OnActivity(const EventStack& eventStack,
 
     switch (eventStack.Back().EventId())
     {
-    case Info<Pass1>::ID:
-    case Info<Pass2>::ID:
-    case Info<PreLTCGOptRef>::ID:
-    case Info<LTCG>::ID:
-    case Info<OptRef>::ID:
-    case Info<OptICF>::ID:
-    case Info<OptLBR>::ID:
-    case Info<C1DLL>::ID:
-    case Info<C2DLL>::ID:
-    case Info<WholeProgramAnalysis>::ID:
-    case Info<CodeGeneration>::ID:
+    case EVENT_ID_PASS1:
+    case EVENT_ID_PASS2:
+    case EVENT_ID_PRE_LTCG_OPT_REF:
+    case EVENT_ID_LTCG:
+    case EVENT_ID_OPT_REF:
+    case EVENT_ID_OPT_ICF:
+    case EVENT_ID_OPT_LBR:
+    case EVENT_ID_C1_DLL:
+    case EVENT_ID_C2_DLL:
+    case EVENT_ID_WHOLE_PROGRAM_ANALYSIS:
+    case EVENT_ID_CODE_GENERATION:
         break;
 
     default:
