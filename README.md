@@ -8,7 +8,7 @@ vcperf is a C++ build analysis tool for the MSVC toolchain. It is built on top o
 
 ## How vcperf works
 
-vcperf makes use of the [Event Tracing for Windows](https://docs.microsoft.com/windows/win32/etw/about-event-tracing) (ETW) relogging interface available in the [C++ Build Insights SDK (ADD LINK)](). This interface allows vcperf to translate an MSVC build trace into a new, customized ETW event format that is suitable for viewing in WPA. The translation process involves determining the context of each event, and emiting new events that include this information. For example, when vcperf emits an event for the code generation time of a function, it also includes the compiler or linker invocation in which the code generation took place. Having this context available allows gaining more insight from the data, such as determining the functions that took longest to generate for one particular invocation.
+vcperf makes use of the [Event Tracing for Windows](https://docs.microsoft.com/windows/win32/etw/about-event-tracing) (ETW) relogging interface available in the [C++ Build Insights SDK](https://docs.microsoft.com/cpp/build-insights/reference/sdk/overview?view=vs-2019). This interface allows vcperf to translate an MSVC build trace into a new, customized ETW event format that is suitable for viewing in WPA. The translation process involves determining the context of each event, and emiting new events that include this information. For example, when vcperf emits an event for the code generation time of a function, it also includes the compiler or linker invocation in which the code generation took place. Having this context available allows gaining more insight from the data, such as determining the functions that took longest to generate for one particular invocation.
 
 ## Customizing vcperf to your needs
 
@@ -17,7 +17,7 @@ We made vcperf available as an open-source project to allow you to customize it 
 - Writing the events in a format that works with a different viewer.
 - Modifying and filtering the events shown in WPA.
 
-An example vcperf extension is shown in the following Git commit: [ADD EXAMPLE COMMIT LINK HERE](). It detects linkers that were restarted during your build due to error conditions, and highlights them in the Build Explorer view.
+An example vcperf extension is shown in the following Git commit: [ba2dd59fa1ec43542be3cca3641156cd18dc98df](https://github.com/microsoft/vcperf/commit/ba2dd59fa1ec43542be3cca3641156cd18dc98df). It detects linkers that were restarted during your build due to error conditions, and highlights them in the Build Explorer view.
 
 ## Contributing
 
