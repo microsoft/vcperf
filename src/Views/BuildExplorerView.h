@@ -43,7 +43,7 @@ public:
     void OnCommandLine(const A::Invocation& invocation, const SE::CommandLine& commandLine, 
         const void* relogSession)
     {
-        ProcessStringProperty(relogSession, invocation, "CommandLine", commandLine.Value());
+        ProcessStringProperty(relogSession, commandLine, "CommandLine", commandLine.Value());
     }
 
     void OnCompilerEnvironmentVariable(const A::Compiler& cl, const SE::EnvironmentVariable& envVar, 
@@ -80,16 +80,16 @@ private:
 
     template <typename TChar>
     void ProcessStringProperty(const void* relogSession, 
-        const A::Invocation& invocation, const char* name, const TChar* value);
+        const BI::Event& e, const char* name, const TChar* value);
 
     void LogStringPropertySegment(const void* relogSession, 
-        const A::Invocation& invocation, const char* name, const char* value);
+        const BI::Event& e, const char* name, const char* value);
 
     void LogStringPropertySegment(const void* relogSession, 
-        const A::Invocation& invocation, const char* name, const wchar_t* value);
+        const BI::Event& e, const char* name, const wchar_t* value);
 
     template <typename TChar>
-    void LogStringPropertySegment(const void* relogSession, const A::Invocation& invocation, 
+    void LogStringPropertySegment(const void* relogSession, const BI::Event& e,
         const char* name, const TChar* value, PCEVENT_DESCRIPTOR desc);
 
     std::wstring invocationInfoString_;
