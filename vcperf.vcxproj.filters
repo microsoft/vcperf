@@ -101,4 +101,7 @@
   <ItemGroup>
     <Xml Include="src\CppBuildInsightsEtw.xml" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
 </Project>
