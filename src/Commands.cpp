@@ -206,7 +206,8 @@ HRESULT DoStart(const std::wstring& sessionName, bool cpuSampling, VerbosityLeve
 }
 
 
-HRESULT DoStop(const std::wstring& sessionName, const std::filesystem::path& outputFile, bool analyzeTemplates)
+HRESULT DoStop(const std::wstring& sessionName, const std::filesystem::path& outputFile, bool analyzeTemplates,
+    bool generateChromeTrace)
 {
     TRACING_SESSION_STATISTICS statistics{};
 
@@ -270,7 +271,8 @@ HRESULT DoStopNoAnalyze(const std::wstring& sessionName, const std::filesystem::
     return S_OK;
 }
 
-HRESULT DoAnalyze(const std::filesystem::path& inputFile, const std::filesystem::path& outputFile, bool analyzeTemplates)
+HRESULT DoAnalyze(const std::filesystem::path& inputFile, const std::filesystem::path& outputFile, bool analyzeTemplates,
+    bool generateChromeTrace)
 {
     ExpensiveTemplateInstantiationCache etic{analyzeTemplates};
     ContextBuilder cb;
