@@ -37,6 +37,7 @@ private:
 
     void OnRootActivity(const A::Activity& root);
     void OnNestedActivity(const A::Activity& parent, const A::Activity& child);
+    void OnFinishActivity(const A::Activity& activity);
 
     Entry* CreateEntry(const A::Activity& activity);
 

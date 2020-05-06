@@ -18,15 +18,16 @@ AnalysisControl ExecutionHierarchy::OnStartActivity(const EventStack& eventStack
 {
     if (   MatchEventStackInMemberFunction(eventStack, this, &ExecutionHierarchy::OnNestedActivity)
         || MatchEventInMemberFunction(eventStack.Back(), this, &ExecutionHierarchy::OnRootActivity))
-    {
-
-    }
+    {}
 
     return AnalysisControl::CONTINUE;
 }
 
 AnalysisControl ExecutionHierarchy::OnStopActivity(const EventStack& eventStack)
 {
+    if (MatchEventStackInMemberFunction(eventStack, this, &ExecutionHierarchy::OnFinishActivity)
+    {}
+
     return AnalysisControl::CONTINUE;
 }
 
@@ -53,6 +54,14 @@ void ExecutionHierarchy::OnNestedActivity(const Activity& parent, const Activity
     auto& children = parentEntryIt->second.Children;
     assert(std::find(children.begin(), children.end(), childEntry) == children.end());
     children.push_back(childEntry);
+}
+
+void ExecutionHierarchy::OnFinishActivity(const Activity& activity)
+{
+    auto it = entries_.find(activity.EventInstanceId());
+    assert(it != entries_.end());
+
+    it->second.StopTimestamp = ConvertTime(activity.StopTimestamp(), activity.TickFrequency());
 }
 
 ExecutionHierarchy::Entry* ExecutionHierarchy::CreateEntry(const Activity& activity)
