@@ -180,6 +180,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\Analyzers\ContextBuilder.cpp" />
+    <ClCompile Include="src\Analyzers\ExecutionHierarchy.cpp" />
     <ClCompile Include="src\Analyzers\ExpensiveTemplateInstantiationCache.cpp" />
     <ClCompile Include="src\Views\BuildExplorerView.cpp" />
     <ClCompile Include="src\Views\FilesView.cpp" />
@@ -191,6 +192,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Analyzers\ContextBuilder.h" />
+    <ClInclude Include="src\Analyzers\ExecutionHierarchy.h" />
     <ClInclude Include="src\Analyzers\MiscellaneousCache.h" />
     <ClInclude Include="src\Analyzers\ExpensiveTemplateInstantiationCache.h" />
     <ClInclude Include="src\VcperfBuildInsights.h" />

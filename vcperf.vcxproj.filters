@@ -54,6 +54,9 @@
     <ClCompile Include="src\Analyzers\ExpensiveTemplateInstantiationCache.cpp">
       <Filter>Source Files\Analyzers</Filter>
     </ClCompile>
+    <ClCompile Include="src\Analyzers\ExecutionHierarchy.cpp">
+      <Filter>Source Files\Analyzers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Commands.h">
@@ -91,6 +94,9 @@
     </ClInclude>
     <ClInclude Include="src\VcperfBuildInsights.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Analyzers\ExecutionHierarchy.h">
+      <Filter>Header Files\Analyzers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
