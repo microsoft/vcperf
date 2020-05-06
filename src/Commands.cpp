@@ -165,6 +165,62 @@ void PrintError(RESULT_CODE failureCode)
     std::wcout << std::endl;
 }
 
+RESULT_CODE StopToWPA(const std::wstring& sessionName, const std::filesystem::path& outputFile, bool analyzeTemplates,
+    TRACING_SESSION_STATISTICS& statistics)
+{
+    ExpensiveTemplateInstantiationCache etic{ analyzeTemplates };
+    ContextBuilder cb;
+    MiscellaneousCache mc;
+    BuildExplorerView bev{ &cb, &mc };
+    FunctionsView funcv{ &cb, &mc };
+    FilesView fv{ &cb, &mc };
+    TemplateInstantiationsView tiv{ &cb, &etic, &mc, analyzeTemplates };
+
+    auto analyzerGroup = MakeStaticAnalyzerGroup(&cb, &etic, &mc);
+    auto reloggerGroup = MakeStaticReloggerGroup(&etic, &mc, &cb, &bev, &funcv, &fv, &tiv);
+
+    unsigned long long systemEventsRetentionFlags = RELOG_RETENTION_SYSTEM_EVENT_FLAGS_CPU_SAMPLES;
+
+    int analysisPassCount = analyzeTemplates ? 2 : 1;
+
+    return StopAndRelogTracingSession(sessionName.c_str(), outputFile.c_str(),
+        &statistics, analysisPassCount, systemEventsRetentionFlags, analyzerGroup, reloggerGroup);
+}
+
+RESULT_CODE StopToChromeTrace(const std::wstring& sessionName, const std::filesystem::path& outputFile, bool analyzeTemplates,
+    TRACING_SESSION_STATISTICS& statistics)
+{
+    // TODO: implement
+    return RESULT_CODE::RESULT_CODE_FAILURE_MISSING_ANALYSIS_CALLBACK;
+}
+
+RESULT_CODE AnalyzeToWPA(const std::filesystem::path& inputFile, const std::filesystem::path& outputFile, bool analyzeTemplates)
+{
+    ExpensiveTemplateInstantiationCache etic{ analyzeTemplates };
+    ContextBuilder cb;
+    MiscellaneousCache mc;
+    BuildExplorerView bev{ &cb, &mc };
+    FunctionsView funcv{ &cb, &mc };
+    FilesView fv{ &cb, &mc };
+    TemplateInstantiationsView tiv{ &cb, &etic, &mc, analyzeTemplates };
+
+    auto analyzerGroup = MakeStaticAnalyzerGroup(&cb, &etic, &mc);
+    auto reloggerGroup = MakeStaticReloggerGroup(&etic, &mc, &cb, &bev, &funcv, &fv, &tiv);
+
+    unsigned long long systemEventsRetentionFlags = RELOG_RETENTION_SYSTEM_EVENT_FLAGS_CPU_SAMPLES;
+
+    int analysisPassCount = analyzeTemplates ? 2 : 1;
+
+    return Relog(inputFile.c_str(), outputFile.c_str(), analysisPassCount,
+        systemEventsRetentionFlags, analyzerGroup, reloggerGroup);
+}
+
+RESULT_CODE AnalyzeToChromeTrace(const std::filesystem::path& inputFile, const std::filesystem::path& outputFile, bool analyzeTemplates)
+{
+    // TODO: implement
+    return RESULT_CODE::RESULT_CODE_FAILURE_MISSING_ANALYSIS_CALLBACK;
+}
+
 HRESULT DoStart(const std::wstring& sessionName, bool cpuSampling, VerbosityLevel verbosityLevel)
 {
     TRACING_SESSION_OPTIONS options{};
@@ -209,27 +265,18 @@ HRESULT DoStart(const std::wstring& sessionName, bool cpuSampling, VerbosityLeve
 HRESULT DoStop(const std::wstring& sessionName, const std::filesystem::path& outputFile, bool analyzeTemplates,
     bool generateChromeTrace)
 {
-    TRACING_SESSION_STATISTICS statistics{};
-
-    ExpensiveTemplateInstantiationCache etic{analyzeTemplates};
-    ContextBuilder cb;
-    MiscellaneousCache mc;
-    BuildExplorerView bev{&cb, &mc};
-    FunctionsView funcv{&cb, &mc};
-    FilesView fv{&cb, &mc};
-    TemplateInstantiationsView tiv{&cb, &etic, &mc, analyzeTemplates};
-
-    auto analyzerGroup = MakeStaticAnalyzerGroup(&cb, &etic, &mc);
-    auto reloggerGroup = MakeStaticReloggerGroup(&etic, &mc, &cb, &bev, &funcv, &fv, &tiv);
-
     std::wcout << L"Stopping and analyzing tracing session " << sessionName << L"..." << std::endl;
 
-    unsigned long long systemEventsRetentionFlags = RELOG_RETENTION_SYSTEM_EVENT_FLAGS_CPU_SAMPLES;
-
-    int analysisPassCount = analyzeTemplates ? 2 : 1;
-
-    auto rc = StopAndRelogTracingSession(sessionName.c_str(), outputFile.c_str(),
-        &statistics, analysisPassCount, systemEventsRetentionFlags, analyzerGroup, reloggerGroup);
+    TRACING_SESSION_STATISTICS statistics{};
+    RESULT_CODE rc;
+    if (!generateChromeTrace)
+    {
+        rc = StopToWPA(sessionName, outputFile, analyzeTemplates, statistics);
+    }
+    else
+    {
+        rc = StopToChromeTrace(sessionName, outputFile, analyzeTemplates, statistics);
+    }
 
     PrintTraceStatistics(statistics);
 
@@ -274,25 +321,17 @@ HRESULT DoStopNoAnalyze(const std::wstring& sessionName, const std::filesystem::
 HRESULT DoAnalyze(const std::filesystem::path& inputFile, const std::filesystem::path& outputFile, bool analyzeTemplates,
     bool generateChromeTrace)
 {
-    ExpensiveTemplateInstantiationCache etic{analyzeTemplates};
-    ContextBuilder cb;
-    MiscellaneousCache mc;
-    BuildExplorerView bev{&cb, &mc};
-    FunctionsView funcv{&cb, &mc};
-    FilesView fv{&cb, &mc};
-    TemplateInstantiationsView tiv{&cb, &etic, &mc, analyzeTemplates};
-
-    auto analyzerGroup = MakeStaticAnalyzerGroup(&cb, &etic, &mc);
-    auto reloggerGroup = MakeStaticReloggerGroup(&etic, &mc, &cb, &bev, &funcv, &fv, &tiv);
-
     std::wcout << L"Analyzing..." << std::endl;
-
-    unsigned long long systemEventsRetentionFlags = RELOG_RETENTION_SYSTEM_EVENT_FLAGS_CPU_SAMPLES;
-
-    int analysisPassCount = analyzeTemplates ? 2 : 1;
-
-    auto rc = Relog(inputFile.c_str(), outputFile.c_str(), analysisPassCount, 
-        systemEventsRetentionFlags, analyzerGroup, reloggerGroup);
+    
+    RESULT_CODE rc;
+    if (!generateChromeTrace)
+    {
+        rc = AnalyzeToWPA(inputFile, outputFile, analyzeTemplates);
+    }
+    else
+    {
+        rc = AnalyzeToChromeTrace(inputFile, outputFile, analyzeTemplates);
+    }
 
     if (rc != RESULT_CODE_SUCCESS)
     {
