@@ -20,10 +20,12 @@ public:
         unsigned long ThreadId;
         std::chrono::nanoseconds StartTimestamp;
         std::chrono::nanoseconds StopTimestamp;
-        std::wstring Name;
+        std::string Name;
 
         std::vector<Entry*> Children;
     };
+
+    typedef std::vector<Entry*> TRoots;
 
 public:
 
@@ -32,6 +34,8 @@ public:
     BI::AnalysisControl OnStartActivity(const BI::EventStack& eventStack) override;
     BI::AnalysisControl OnStopActivity(const BI::EventStack& eventStack) override;
     BI::AnalysisControl OnSimpleEvent(const BI::EventStack& eventStack) override;
+
+    inline const TRoots& GetRoots() const { return roots_; }
 
 private:
 
@@ -44,7 +48,7 @@ private:
     std::chrono::nanoseconds ConvertTime(long long ticks, long long frequency) const;
 
     std::unordered_map<unsigned long long, Entry> entries_;
-    std::vector<Entry*> roots_;
+    TRoots roots_;
 };
 
 } // namespace vcperf

@@ -25,7 +25,7 @@ AnalysisControl ExecutionHierarchy::OnStartActivity(const EventStack& eventStack
 
 AnalysisControl ExecutionHierarchy::OnStopActivity(const EventStack& eventStack)
 {
-    if (MatchEventStackInMemberFunction(eventStack, this, &ExecutionHierarchy::OnFinishActivity)
+    if (MatchEventStackInMemberFunction(eventStack, this, &ExecutionHierarchy::OnFinishActivity))
     {}
 
     return AnalysisControl::CONTINUE;
@@ -76,7 +76,7 @@ ExecutionHierarchy::Entry* ExecutionHierarchy::CreateEntry(const Activity& activ
     entry.StartTimestamp = ConvertTime(activity.StartTimestamp(), activity.TickFrequency());
     entry.StopTimestamp = ConvertTime(activity.StopTimestamp(), activity.TickFrequency());
     // TODO: cache Name, refer to ContextBuilder::CacheString
-    entry.Name = activity.EventWideName();
+    entry.Name = activity.EventName();
 
     return &entry;
 }

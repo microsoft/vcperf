@@ -8,10 +8,12 @@
 #include "Analyzers\ExpensiveTemplateInstantiationCache.h"
 #include "Analyzers\ContextBuilder.h"
 #include "Analyzers\MiscellaneousCache.h"
+#include "Analyzers\ExecutionHierarchy.h"
 #include "Views\BuildExplorerView.h"
 #include "Views\FunctionsView.h"
 #include "Views\FilesView.h"
 #include "Views\TemplateInstantiationsView.h"
+#include "Views\ChromeFlameGraphView.h"
 
 using namespace Microsoft::Cpp::BuildInsights;
 
@@ -190,8 +192,13 @@ RESULT_CODE StopToWPA(const std::wstring& sessionName, const std::filesystem::pa
 RESULT_CODE StopToChromeTrace(const std::wstring& sessionName, const std::filesystem::path& outputFile, bool analyzeTemplates,
     TRACING_SESSION_STATISTICS& statistics)
 {
-    // TODO: implement
-    return RESULT_CODE::RESULT_CODE_FAILURE_MISSING_ANALYSIS_CALLBACK;
+    ExecutionHierarchy eh;
+    ChromeFlameGraphView cfgv{ &eh, outputFile, analyzeTemplates };
+
+    auto analyzerGroup = MakeStaticAnalyzerGroup(&eh, &cfgv);
+    int analysisPassCount = 1;
+
+    return StopAndAnalyzeTracingSession(sessionName.c_str(), analysisPassCount, &statistics, analyzerGroup);
 }
 
 RESULT_CODE AnalyzeToWPA(const std::filesystem::path& inputFile, const std::filesystem::path& outputFile, bool analyzeTemplates)
@@ -217,8 +224,13 @@ RESULT_CODE AnalyzeToWPA(const std::filesystem::path& inputFile, const std::file
 
 RESULT_CODE AnalyzeToChromeTrace(const std::filesystem::path& inputFile, const std::filesystem::path& outputFile, bool analyzeTemplates)
 {
-    // TODO: implement
-    return RESULT_CODE::RESULT_CODE_FAILURE_MISSING_ANALYSIS_CALLBACK;
+    ExecutionHierarchy eh;
+    ChromeFlameGraphView cfgv{ &eh, outputFile, analyzeTemplates };
+
+    auto analyzerGroup = MakeStaticAnalyzerGroup(&eh, &cfgv);
+    int analysisPassCount = 1;
+
+    return Analyze(inputFile.c_str(), analysisPassCount, analyzerGroup);
 }
 
 HRESULT DoStart(const std::wstring& sessionName, bool cpuSampling, VerbosityLevel verbosityLevel)
