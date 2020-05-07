@@ -5,21 +5,6 @@
 using namespace Microsoft::Cpp::BuildInsights;
 using namespace vcperf;
 
-/*// define a way to convert std::wstring to std::string when serializing
-#include <locale>
-#include <codecvt>
-namespace nlohmann
-{
-    template <>
-    struct adl_serializer<std::wstring>
-    {
-        static void to_json(json& j, const std::wstring& s)
-        {
-            j = std::wstring_convert<std::codecvt_utf8<wchar_t>>().to_bytes(s);
-        }
-    };
-}*/
-
 ChromeFlameGraphView::ChromeFlameGraphView(ExecutionHierarchy* hierarchy, const std::filesystem::path& outputFile,
                                            bool analyzeTemplates) :
     hierarchy_{hierarchy},
