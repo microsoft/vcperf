@@ -185,6 +185,7 @@
     <ClCompile Include="src\Analyzers\ExpensiveTemplateInstantiationCache.cpp" />
     <ClCompile Include="src\Views\BuildExplorerView.cpp" />
     <ClCompile Include="src\Views\ChromeFlameGraphView.cpp" />
+    <ClCompile Include="src\Views\ChromeFlameGraph\PackedProcessThreadRemapping.cpp" />
     <ClCompile Include="src\Views\FilesView.cpp" />
     <ClCompile Include="src\Views\FunctionsView.cpp" />
     <ClCompile Include="src\Views\TemplateInstantiationsView.cpp" />
@@ -200,6 +201,7 @@
     <ClInclude Include="src\VcperfBuildInsights.h" />
     <ClInclude Include="src\Views\BuildExplorerView.h" />
     <ClInclude Include="src\Views\ChromeFlameGraphView.h" />
+    <ClInclude Include="src\Views\ChromeFlameGraph\PackedProcessThreadRemapping.h" />
     <ClInclude Include="src\Views\FilesView.h" />
     <ClInclude Include="src\Views\FunctionsView.h" />
     <ClInclude Include="src\Views\TemplateInstantiationsView.h" />

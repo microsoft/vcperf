@@ -25,6 +25,12 @@
     <Filter Include="Header Files\Analyzers">
       <UniqueIdentifier>{e8d7ee64-3202-4eb3-9409-a5b48b479489}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Views\ChromeFlameGraph">
+      <UniqueIdentifier>{16101513-e862-44dd-b288-283de6be73de}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Views\ChromeFlameGraph">
+      <UniqueIdentifier>{e2c52991-0f64-4dca-88f2-14ff79041b30}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Commands.cpp">
@@ -59,6 +65,9 @@
     </ClCompile>
     <ClCompile Include="src\Views\ChromeFlameGraphView.cpp">
       <Filter>Source Files\Views</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Views\ChromeFlameGraph\PackedProcessThreadRemapping.cpp">
+      <Filter>Header Files\Views\ChromeFlameGraph</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -103,6 +112,9 @@
     </ClInclude>
     <ClInclude Include="src\Views\ChromeFlameGraphView.h">
       <Filter>Header Files\Views</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Views\ChromeFlameGraph\PackedProcessThreadRemapping.h">
+      <Filter>Source Files\Views\ChromeFlameGraph</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

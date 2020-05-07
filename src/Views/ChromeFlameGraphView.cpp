@@ -9,18 +9,33 @@ ChromeFlameGraphView::ChromeFlameGraphView(ExecutionHierarchy* hierarchy, const 
                                            bool analyzeTemplates) :
     hierarchy_{hierarchy},
     outputFile_{outputFile},
-    analyzeTemplates_{analyzeTemplates}
+    analyzeTemplates_{analyzeTemplates},
+    remappings_{}
 {
 }
 
 AnalysisControl ChromeFlameGraphView::OnEndAnalysis()
 {
+    CalculatePackedProcessThreadRemapping();
+
     std::ofstream outputStream(outputFile_);
     if (!outputStream)
     {
         return AnalysisControl::FAILURE;
     }
 
+    ExportTo(outputStream);
+    outputStream.close();
+
+    return AnalysisControl::CONTINUE;
+}
+
+void ChromeFlameGraphView::CalculatePackedProcessThreadRemapping()
+{
+}
+
+void ChromeFlameGraphView::ExportTo(std::ostream& outputStream) const
+{
     nlohmann::json json = nlohmann::json::object();
 
     // add hierarchy
@@ -35,15 +50,13 @@ AnalysisControl ChromeFlameGraphView::OnEndAnalysis()
     json["displayTimeUnit"] = "ms";
 
     outputStream << std::setw(2) << json << std::endl;
-    outputStream.close();
-
-    return AnalysisControl::CONTINUE;
 }
 
 void ChromeFlameGraphView::AddEntry(const ExecutionHierarchy::Entry* entry, nlohmann::json& traceEvents) const
 {
-    unsigned long processId = entry->ProcessId;
-    unsigned long threadId = entry->ThreadId;
+    const PackedProcessThreadRemapping::Remap* remap = remappings_.GetRemapFor(entry->Id);
+    unsigned long processId = remap != nullptr ? remap->ProcessId : entry->ProcessId;
+    unsigned long threadId  = remap != nullptr ? remap->ThreadId  : entry->ThreadId;
 
     if (entry->Children.size() == 0)
     {
