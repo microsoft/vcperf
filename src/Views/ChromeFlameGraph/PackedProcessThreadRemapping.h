@@ -27,7 +27,8 @@ public:
 
 private:
 
-    void RemapRoots(const ExecutionHierarchy* hierarchy);
+    void RemapRootsProcessId(const ExecutionHierarchy* hierarchy);
+    void RemapEntriesThreadId(const ExecutionHierarchy* hierarchy);
 
     std::unordered_map<unsigned long long, Remap> remappings_;
 };

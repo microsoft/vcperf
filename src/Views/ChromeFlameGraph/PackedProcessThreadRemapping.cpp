@@ -15,7 +15,8 @@ void PackedProcessThreadRemapping::Calculate(const ExecutionHierarchy* hierarchy
 {
     assert(remappings_.empty());
 
-    RemapRoots(hierarchy);
+    RemapRootsProcessId(hierarchy);
+    RemapEntriesThreadIds(hierarchy);
 }
 
 const PackedProcessThreadRemapping::Remap* PackedProcessThreadRemapping::GetRemapFor(unsigned long long id) const
@@ -24,7 +25,7 @@ const PackedProcessThreadRemapping::Remap* PackedProcessThreadRemapping::GetRema
     return it != remappings_.end() ? &it->second : nullptr;
 }
 
-void PackedProcessThreadRemapping::RemapRoots(const ExecutionHierarchy* hierarchy)
+void PackedProcessThreadRemapping::RemapRootsProcessId(const ExecutionHierarchy* hierarchy)
 {
     const ExecutionHierarchy::TRoots& roots = hierarchy->GetRoots();
     std::vector<unsigned long> overlappingProcessIds;
@@ -58,4 +59,8 @@ void PackedProcessThreadRemapping::RemapRoots(const ExecutionHierarchy* hierarch
         // roots always get assigned to the lowest ThreadId
         remappings_.try_emplace(root->Id, Remap{ remappedProcessId, 0 });
     }
+}
+
+void PackedProcessThreadRemapping::RemapEntriesThreadId(const ExecutionHierarchy* hierarchy)
+{
 }
