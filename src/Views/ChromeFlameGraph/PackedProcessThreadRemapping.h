@@ -1,7 +1,11 @@
 #pragma once
 
+#include <unordered_map>
+
 namespace vcperf
 {
+
+class ExecutionHierarchy;
 
 class PackedProcessThreadRemapping
 {
@@ -17,7 +21,15 @@ public:
 
     PackedProcessThreadRemapping();
 
+    void Calculate(const ExecutionHierarchy* hierarchy);
+
     const Remap* GetRemapFor(unsigned long long id) const;
+
+private:
+
+    void RemapRoots(const ExecutionHierarchy* hierarchy);
+
+    std::unordered_map<unsigned long long, Remap> remappings_;
 };
 
 } // namespace vcperf

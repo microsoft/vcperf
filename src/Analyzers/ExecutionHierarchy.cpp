@@ -8,6 +8,12 @@ using namespace SimpleEvents;
 
 using namespace vcperf;
 
+bool ExecutionHierarchy::Entry::OverlapsWith(const Entry* other) const
+{
+    return StartTimestamp < other->StopTimestamp &&
+           other->StartTimestamp < StopTimestamp;
+}
+
 ExecutionHierarchy::ExecutionHierarchy() :
     entries_{},
     roots_{}

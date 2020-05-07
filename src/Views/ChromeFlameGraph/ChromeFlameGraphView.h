@@ -23,7 +23,6 @@ public:
 private:
 
     void AddEntry(const ExecutionHierarchy::Entry* entry, nlohmann::json& traceEvents) const;
-    void CalculatePackedProcessThreadRemapping();
     void ExportTo(std::ostream& outputStream) const;
 
     ExecutionHierarchy* hierarchy_;

@@ -23,6 +23,8 @@ public:
         std::string Name;
 
         std::vector<Entry*> Children;
+
+        bool OverlapsWith(const Entry* other) const;
     };
 
     typedef std::vector<Entry*> TRoots;

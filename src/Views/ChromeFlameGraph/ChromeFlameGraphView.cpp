@@ -16,7 +16,7 @@ ChromeFlameGraphView::ChromeFlameGraphView(ExecutionHierarchy* hierarchy, const 
 
 AnalysisControl ChromeFlameGraphView::OnEndAnalysis()
 {
-    CalculatePackedProcessThreadRemapping();
+    remappings_.Calculate(hierarchy_);
 
     std::ofstream outputStream(outputFile_);
     if (!outputStream)
@@ -28,10 +28,6 @@ AnalysisControl ChromeFlameGraphView::OnEndAnalysis()
     outputStream.close();
 
     return AnalysisControl::CONTINUE;
-}
-
-void ChromeFlameGraphView::CalculatePackedProcessThreadRemapping()
-{
 }
 
 void ChromeFlameGraphView::ExportTo(std::ostream& outputStream) const
