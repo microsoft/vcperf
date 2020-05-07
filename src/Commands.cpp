@@ -13,7 +13,7 @@
 #include "Views\FunctionsView.h"
 #include "Views\FilesView.h"
 #include "Views\TemplateInstantiationsView.h"
-#include "Views\ChromeFlameGraphView.h"
+#include "Views\ChromeFlameGraph\ChromeFlameGraphView.h"
 
 using namespace Microsoft::Cpp::BuildInsights;
 
