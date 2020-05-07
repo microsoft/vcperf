@@ -42,6 +42,12 @@ AnalysisControl ExecutionHierarchy::OnSimpleEvent(const EventStack& eventStack)
     return AnalysisControl::CONTINUE;
 }
 
+const ExecutionHierarchy::Entry* ExecutionHierarchy::GetEntry(unsigned long long id) const
+{
+    auto it = entries_.find(id);
+    return it != entries_.end() ? &it->second : nullptr;
+}
+
 void ExecutionHierarchy::OnRootActivity(const Activity& root)
 {
     Entry* entry = CreateEntry(root);

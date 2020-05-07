@@ -27,7 +27,7 @@ public:
         bool OverlapsWith(const Entry* other) const;
     };
 
-    typedef std::vector<Entry*> TRoots;
+    typedef std::vector<const Entry*> TRoots;
 
 public:
 
@@ -37,6 +37,7 @@ public:
     BI::AnalysisControl OnStopActivity(const BI::EventStack& eventStack) override;
     BI::AnalysisControl OnSimpleEvent(const BI::EventStack& eventStack) override;
 
+    const Entry* GetEntry(unsigned long long id) const;
     inline const TRoots& GetRoots() const { return roots_; }
 
 private:

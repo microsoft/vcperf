@@ -3,6 +3,7 @@
 #include <fstream>
 
 using namespace Microsoft::Cpp::BuildInsights;
+using namespace Activities;
 using namespace vcperf;
 
 ChromeFlameGraphView::ChromeFlameGraphView(ExecutionHierarchy* hierarchy, const std::filesystem::path& outputFile,
@@ -12,6 +13,14 @@ ChromeFlameGraphView::ChromeFlameGraphView(ExecutionHierarchy* hierarchy, const 
     analyzeTemplates_{analyzeTemplates},
     remappings_{}
 {
+}
+
+BI::AnalysisControl ChromeFlameGraphView::OnStopActivity(const BI::EventStack& eventStack)
+{
+    if (MatchEventInMemberFunction(eventStack.Back(), this, &ChromeFlameGraphView::CalculateChildrenOffsets))
+    {}
+
+    return AnalysisControl::CONTINUE;
 }
 
 AnalysisControl ChromeFlameGraphView::OnEndAnalysis()
@@ -28,6 +37,17 @@ AnalysisControl ChromeFlameGraphView::OnEndAnalysis()
     outputStream.close();
 
     return AnalysisControl::CONTINUE;
+}
+
+void ChromeFlameGraphView::CalculateChildrenOffsets(const Activity& activity)
+{
+    const ExecutionHierarchy::Entry* entry = hierarchy_->GetEntry(activity.EventInstanceId());
+    assert(entry != nullptr);
+
+    if (entry->Children.size() > 0)
+    {
+        remappings_.CalculateChildrenLocalThreadData(entry);
+    }
 }
 
 void ChromeFlameGraphView::ExportTo(std::ostream& outputStream) const
