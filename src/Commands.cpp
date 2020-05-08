@@ -193,7 +193,10 @@ RESULT_CODE StopToChromeTrace(const std::wstring& sessionName, const std::filesy
     TRACING_SESSION_STATISTICS& statistics)
 {
     ExecutionHierarchy eh;
-    ChromeFlameGraphView cfgv{ &eh, outputFile, analyzeTemplates };
+    ChromeFlameGraphView::Filter f{ analyzeTemplates,
+                                    std::chrono::milliseconds(10),
+                                    std::chrono::milliseconds(10) };
+    ChromeFlameGraphView cfgv{ &eh, outputFile, f };
 
     auto analyzerGroup = MakeStaticAnalyzerGroup(&eh, &cfgv);
     int analysisPassCount = 1;
@@ -225,7 +228,10 @@ RESULT_CODE AnalyzeToWPA(const std::filesystem::path& inputFile, const std::file
 RESULT_CODE AnalyzeToChromeTrace(const std::filesystem::path& inputFile, const std::filesystem::path& outputFile, bool analyzeTemplates)
 {
     ExecutionHierarchy eh;
-    ChromeFlameGraphView cfgv{ &eh, outputFile, analyzeTemplates };
+    ChromeFlameGraphView::Filter f{ analyzeTemplates,
+                                    std::chrono::milliseconds(10),
+                                    std::chrono::milliseconds(10) };
+    ChromeFlameGraphView cfgv{ &eh, outputFile, f };
 
     auto analyzerGroup = MakeStaticAnalyzerGroup(&eh, &cfgv);
     int analysisPassCount = 1;

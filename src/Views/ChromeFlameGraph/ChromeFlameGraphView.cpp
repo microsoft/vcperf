@@ -7,17 +7,18 @@ using namespace Activities;
 using namespace vcperf;
 
 ChromeFlameGraphView::ChromeFlameGraphView(ExecutionHierarchy* hierarchy, const std::filesystem::path& outputFile,
-                                           bool analyzeTemplates) :
+                                           Filter filter) :
     hierarchy_{hierarchy},
     outputFile_{outputFile},
-    analyzeTemplates_{analyzeTemplates},
-    remappings_{}
+    remappings_{},
+    ignoredEntries_{},
+    filter_{filter}
 {
 }
 
 BI::AnalysisControl ChromeFlameGraphView::OnStopActivity(const BI::EventStack& eventStack)
 {
-    if (MatchEventInMemberFunction(eventStack.Back(), this, &ChromeFlameGraphView::CalculateChildrenOffsets))
+    if (MatchEventInMemberFunction(eventStack.Back(), this, &ChromeFlameGraphView::ProcessActivity))
     {}
 
     return AnalysisControl::CONTINUE;
@@ -37,6 +38,18 @@ AnalysisControl ChromeFlameGraphView::OnEndAnalysis()
     outputStream.close();
 
     return AnalysisControl::CONTINUE;
+}
+
+void ChromeFlameGraphView::ProcessActivity(const Activity& activity)
+{    
+    if (ShouldIgnore(activity))
+    {
+        ignoredEntries_.emplace(activity.EventInstanceId());
+    }
+    else
+    {
+        CalculateChildrenOffsets(activity);
+    }
 }
 
 void ChromeFlameGraphView::CalculateChildrenOffsets(const Activity& activity)
@@ -67,6 +80,11 @@ void ChromeFlameGraphView::ExportTo(std::ostream& outputStream) const
 
 void ChromeFlameGraphView::AddEntry(const ExecutionHierarchy::Entry* entry, nlohmann::json& traceEvents) const
 {
+    if (ignoredEntries_.find(entry->Id) != ignoredEntries_.end())
+    {
+        return;
+    }
+
     const PackedProcessThreadRemapping::Remap* remap = remappings_.GetRemapFor(entry->Id);
     unsigned long processId = remap != nullptr ? remap->ProcessId : entry->ProcessId;
     unsigned long threadId  = remap != nullptr ? remap->ThreadId  : entry->ThreadId;
@@ -115,4 +133,32 @@ void ChromeFlameGraphView::AddEntry(const ExecutionHierarchy::Entry* entry, nloh
         };
         traceEvents.push_back(endEvent);
     }
+}
+
+bool ChromeFlameGraphView::ShouldIgnore(const A::Activity& activity) const
+{
+    if (activity.EventId() == EVENT_ID_TEMPLATE_INSTANTIATION)
+    {
+        if (!filter_.AnalyzeTemplates)
+        {
+            return true;
+        }
+
+        auto durationMs = std::chrono::duration_cast<std::chrono::milliseconds>(activity.Duration());
+        if (durationMs < filter_.IgnoreTemplateInstantiationUnderMs)
+        {
+            return true;
+        }
+    }
+
+    if (activity.EventId() == EVENT_ID_FUNCTION)
+    {
+        auto durationMs = std::chrono::duration_cast<std::chrono::milliseconds>(activity.Duration());
+        if (durationMs < filter_.IgnoreFunctionUnderMs)
+        {
+            return true;
+        }
+    }
+
+    return false;
 }
