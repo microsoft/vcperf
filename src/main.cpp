@@ -45,7 +45,7 @@ bool CheckCommand(std::wstring arg, const wchar_t* value)
 bool ValidateFile(const std::filesystem::path& file, bool isInput, const std::wstring& extension)
 {
     if (file.extension() != extension) {
-        std::wcout << L"ERROR: Your " << (isInput ? L"input" : L"output") << L" file must have the " << extension << L"extension." << std::endl;
+        std::wcout << L"ERROR: Your " << (isInput ? L"input" : L"output") << L" file must have the " << extension << L" extension." << std::endl;
         return false;
     }
 
