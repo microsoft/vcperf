@@ -15,6 +15,7 @@ class ChromeFlameGraphView : public BI::IAnalyzer
 {
 public:
 
+    // controls which subhierarchies get ignored (check ChromeFlameGraphView::ShouldIgnore)
     struct Filter
     {
         bool AnalyzeTemplates = false;
