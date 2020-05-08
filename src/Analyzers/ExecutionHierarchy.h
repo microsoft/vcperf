@@ -48,10 +48,20 @@ private:
 
     Entry* CreateEntry(const A::Activity& activity);
 
+    void OnFrontEndFile(const A::FrontEndFile& frontEndFile);
+    void OnFunction(const A::Function& function);
+    void OnTemplateInstantiation(const A::TemplateInstantiation& templateInstantiation);
+    void OnSymbolName(const SE::SymbolName& symbolName);
+
     std::chrono::nanoseconds ConvertTime(long long ticks, long long frequency) const;
 
     std::unordered_map<unsigned long long, Entry> entries_;
     TRoots roots_;
+
+    typedef unsigned long long TSymbolKey;
+    std::unordered_map<TSymbolKey, std::string> symbolNames_;
+    typedef std::vector<unsigned long long> TUnresolvedTemplateInstantiationNames;
+    std::unordered_map<TSymbolKey, TUnresolvedTemplateInstantiationNames> unresolvedTemplateInstantiationsPerSymbol_;
 };
 
 } // namespace vcperf

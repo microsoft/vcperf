@@ -16,7 +16,9 @@ bool ExecutionHierarchy::Entry::OverlapsWith(const Entry* other) const
 
 ExecutionHierarchy::ExecutionHierarchy() :
     entries_{},
-    roots_{}
+    roots_{},
+    symbolNames_{},
+    unresolvedTemplateInstantiationsPerSymbol_{}
 {
 }
 
@@ -26,12 +28,17 @@ AnalysisControl ExecutionHierarchy::OnStartActivity(const EventStack& eventStack
         || MatchEventInMemberFunction(eventStack.Back(), this, &ExecutionHierarchy::OnRootActivity))
     {}
 
+    if (   MatchEventInMemberFunction(eventStack.Back(), this, &ExecutionHierarchy::OnFrontEndFile)
+        || MatchEventInMemberFunction(eventStack.Back(), this, &ExecutionHierarchy::OnFunction)
+        || MatchEventInMemberFunction(eventStack.Back(), this, &ExecutionHierarchy::OnTemplateInstantiation))
+    {}
+
     return AnalysisControl::CONTINUE;
 }
 
 AnalysisControl ExecutionHierarchy::OnStopActivity(const EventStack& eventStack)
 {
-    if (MatchEventStackInMemberFunction(eventStack, this, &ExecutionHierarchy::OnFinishActivity))
+    if (MatchEventInMemberFunction(eventStack.Back(), this, &ExecutionHierarchy::OnFinishActivity))
     {}
 
     return AnalysisControl::CONTINUE;
@@ -39,6 +46,9 @@ AnalysisControl ExecutionHierarchy::OnStopActivity(const EventStack& eventStack)
 
 AnalysisControl ExecutionHierarchy::OnSimpleEvent(const EventStack& eventStack)
 {
+    if (MatchEventInMemberFunction(eventStack.Back(), this, &ExecutionHierarchy::OnSymbolName))
+    {}
+
     return AnalysisControl::CONTINUE;
 }
 
@@ -87,10 +97,75 @@ ExecutionHierarchy::Entry* ExecutionHierarchy::CreateEntry(const Activity& activ
     entry.ThreadId = activity.ThreadId();
     entry.StartTimestamp = ConvertTime(activity.StartTimestamp(), activity.TickFrequency());
     entry.StopTimestamp = ConvertTime(activity.StopTimestamp(), activity.TickFrequency());
+
     // TODO: cache Name, refer to ContextBuilder::CacheString
     entry.Name = activity.EventName();
 
     return &entry;
+}
+
+void ExecutionHierarchy::OnFrontEndFile(const FrontEndFile& frontEndFile)
+{
+    auto it = entries_.find(frontEndFile.EventInstanceId());
+    assert(it != entries_.end());
+
+    // TODO: cache
+    it->second.Name = frontEndFile.Path();
+}
+
+void ExecutionHierarchy::OnFunction(const Function& function)
+{
+    auto it = entries_.find(function.EventInstanceId());
+    assert(it != entries_.end());
+
+    // TODO: cache
+    it->second.Name = function.Name();
+}
+
+void ExecutionHierarchy::OnTemplateInstantiation(const TemplateInstantiation& templateInstantiation)
+{
+    auto itSymbol = symbolNames_.find(templateInstantiation.SpecializationSymbolKey());
+    
+    // do we have the name already?
+    if (itSymbol != symbolNames_.end())
+    {
+        auto it = entries_.find(templateInstantiation.EventInstanceId());
+        assert(it != entries_.end());
+
+        // TODO: already cached?
+        it->second.Name = itSymbol->second;
+    }
+    else
+    {
+        // get us subscribed for name resolution (may already have some other activities following)
+        auto result = unresolvedTemplateInstantiationsPerSymbol_.try_emplace(templateInstantiation.SpecializationSymbolKey(),
+                                                                             TUnresolvedTemplateInstantiationNames());
+        result.first->second.push_back(templateInstantiation.EventInstanceId());
+    }
+}
+
+void ExecutionHierarchy::OnSymbolName(const SymbolName& symbolName)
+{
+    assert(symbolNames_.find(symbolName.Key()) == symbolNames_.end());
+    std::string& name = symbolNames_[symbolName.Key()];
+
+    // TODO: cache
+    name = symbolName.Name();
+
+    // now we've resolved the name, let subscribed activities know
+    auto itSubscribedForSymbol = unresolvedTemplateInstantiationsPerSymbol_.find(symbolName.Key());
+    if (itSubscribedForSymbol != unresolvedTemplateInstantiationsPerSymbol_.end())
+    {
+        for (unsigned long long id : itSubscribedForSymbol->second)
+        {
+            auto itEntry = entries_.find(id);
+            assert(itEntry != entries_.end());
+
+            // TODO: already cached?
+            itEntry->second.Name = name;
+        }
+        itSubscribedForSymbol->second.clear();
+    }
 }
 
 std::chrono::nanoseconds ExecutionHierarchy::ConvertTime(long long ticks, long long frequency) const
