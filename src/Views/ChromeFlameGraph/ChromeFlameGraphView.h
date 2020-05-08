@@ -3,7 +3,6 @@
 #include <filesystem>
 #include <iosfwd>
 #include <unordered_set>
-#include <nlohmann\json.hpp>
 
 #include "VcperfBuildInsights.h"
 #include "Analyzers\ExecutionHierarchy.h"
@@ -35,7 +34,6 @@ private:
 
     void ProcessActivity(const A::Activity& activity);
     void CalculateChildrenOffsets(const A::Activity& activity);
-    void AddEntry(const ExecutionHierarchy::Entry* entry, nlohmann::json& traceEvents) const;
     void ExportTo(std::ostream& outputStream) const;
     bool ShouldIgnore(const A::Activity& activity) const;
 
