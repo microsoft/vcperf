@@ -44,10 +44,7 @@ void ChromeFlameGraphView::CalculateChildrenOffsets(const Activity& activity)
     const ExecutionHierarchy::Entry* entry = hierarchy_->GetEntry(activity.EventInstanceId());
     assert(entry != nullptr);
 
-    if (entry->Children.size() > 0)
-    {
-        remappings_.CalculateChildrenLocalThreadData(entry);
-    }
+    remappings_.CalculateChildrenLocalThreadData(entry);
 }
 
 void ChromeFlameGraphView::ExportTo(std::ostream& outputStream) const

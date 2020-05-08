@@ -30,12 +30,15 @@ private:
 
     struct LocalOffsetData
     {
-        unsigned long LocalThreadId = 0UL;
+        unsigned long RawLocalThreadId = 0UL;
         unsigned long RequiredThreadIdToFitHierarchy = 0UL;
+        unsigned long CalculatedLocalThreadId = 0UL;
     };
 
     void RemapRootsProcessId(const ExecutionHierarchy* hierarchy);
     void RemapEntriesThreadId(const ExecutionHierarchy* hierarchy);
+    void RemapThreadIdFor(const ExecutionHierarchy::Entry* entry, unsigned long remappedProcessId,
+                          unsigned long parentAbsoluteThreadId);
 
     void CalculateChildrenLocalThreadId(const ExecutionHierarchy::Entry* entry);
     void CalculateChildrenExtraThreadIdToFitHierarchy(const ExecutionHierarchy::Entry* entry);
