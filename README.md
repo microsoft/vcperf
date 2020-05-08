@@ -94,10 +94,13 @@ This section briefly describes the source files found in the `src` directory.
 |Analyzers\ContextBuilder.cpp/.h|Analyzer that determines important information about every event, such as which *cl* or *link* invocation it comes from. This data is used by all *View* components when writing their events in the relogged trace.|
 |Analyzers\ExpensiveTemplateInstantiationCache.cpp/.h|Analyzer that pre-computes the templates with the longest instantiation times. This data is later consumed by *TemplateInstantiationsView*.|
 |Analyzers\MiscellaneousCache.h|Analyzer that can be used to cache miscellaneous data about a trace.|
+|Analyzers\ExecutionHierarchy.cpp/.h|Analyzer that creates a number of hierarchies out of a trace. Its data is later consumed by *ChromeFlameGraphView*.|
 |Views\BuildExplorerView.cpp/.h|Component that builds the view responsible for showing overall build times in WPA.|
 |Views\FilesView.cpp/.h|Component that builds the view responsible for showing file parsing times in WPA.|
 |Views\FunctionsView.cpp/.h|Component that builds the view responsible for showing function code generation times in WPA.|
 |Views\TemplateInstantiationsView.cpp/.h|Component that builds the view responsible for showing template instantiation times in WPA.|
+|Views\ChromeFlameGraph\ChromeFlameGraphView.cpp/.h|Component that creates and outputs a `.json` trace viewable in Google Chrome's trace viewer.|
+|Views\ChromeFlameGraph\PackedProcessThreadRemapping.cpp/.h|Component that attempts to keep entries on each hierarchy as close as possible by giving a more *logical distribution* of processes and threads.|
 |Commands.cpp/.h|Implements all commands available in vcperf.|
 |GenericFields.cpp/.h|Implements the generic field support, used to add custom columns to the views.|
 |main.cpp|The program's starting point. This file parses the command line and redirects control to a command in the Commands.cpp/.h file.|
