@@ -243,7 +243,7 @@ int wmain(int argc, wchar_t* argv[])
             return E_FAIL;
         }
 
-        return DoStop(sessionName, outputFile, analyzeTemplates);
+        return DoStop(sessionName, outputFile, analyzeTemplates, generateChromeTrace);
     }
     else if (CheckCommand(argv[1], L"stopnoanalyze")) 
     {
