@@ -97,8 +97,6 @@ ExecutionHierarchy::Entry* ExecutionHierarchy::CreateEntry(const Activity& activ
     entry.ThreadId = activity.ThreadId();
     entry.StartTimestamp = ConvertTime(activity.StartTimestamp(), activity.TickFrequency());
     entry.StopTimestamp = ConvertTime(activity.StopTimestamp(), activity.TickFrequency());
-
-    // TODO: cache Name, refer to ContextBuilder::CacheString
     entry.Name = activity.EventName();
 
     return &entry;
@@ -108,8 +106,6 @@ void ExecutionHierarchy::OnFrontEndFile(const FrontEndFile& frontEndFile)
 {
     auto it = entries_.find(frontEndFile.EventInstanceId());
     assert(it != entries_.end());
-
-    // TODO: cache
     it->second.Name = frontEndFile.Path();
 }
 
@@ -117,8 +113,6 @@ void ExecutionHierarchy::OnFunction(const Function& function)
 {
     auto it = entries_.find(function.EventInstanceId());
     assert(it != entries_.end());
-
-    // TODO: cache
     it->second.Name = function.Name();
 }
 
@@ -131,8 +125,6 @@ void ExecutionHierarchy::OnTemplateInstantiation(const TemplateInstantiation& te
     {
         auto it = entries_.find(templateInstantiation.EventInstanceId());
         assert(it != entries_.end());
-
-        // TODO: already cached?
         it->second.Name = itSymbol->second;
     }
     else
@@ -148,8 +140,6 @@ void ExecutionHierarchy::OnSymbolName(const SymbolName& symbolName)
 {
     assert(symbolNames_.find(symbolName.Key()) == symbolNames_.end());
     std::string& name = symbolNames_[symbolName.Key()];
-
-    // TODO: cache
     name = symbolName.Name();
 
     // now we've resolved the name, let subscribed activities know
@@ -160,8 +150,6 @@ void ExecutionHierarchy::OnSymbolName(const SymbolName& symbolName)
         {
             auto itEntry = entries_.find(id);
             assert(itEntry != entries_.end());
-
-            // TODO: already cached?
             itEntry->second.Name = name;
         }
         itSubscribedForSymbol->second.clear();
