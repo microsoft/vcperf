@@ -10,64 +10,66 @@ using namespace vcperf;
 // anonymous namespace to hold auxiliary functions (instead of using it in the class and requiring #include <nlohmann\json.hpp>
 namespace
 {
-    void AddEntry(const ExecutionHierarchy::Entry* entry, nlohmann::json& traceEvents,
-                  const PackedProcessThreadRemapping& remappings, const std::unordered_set<unsigned long long>& ignoredEntries)
+
+void AddEntry(const ExecutionHierarchy::Entry* entry, nlohmann::json& traceEvents,
+                const PackedProcessThreadRemapping& remappings, const std::unordered_set<unsigned long long>& ignoredEntries)
+{
+    if (ignoredEntries.find(entry->Id) != ignoredEntries.end())
     {
-        if (ignoredEntries.find(entry->Id) != ignoredEntries.end())
+        return;
+    }
+
+    const PackedProcessThreadRemapping::Remap* remap = remappings.GetRemapFor(entry->Id);
+    unsigned long processId = remap != nullptr ? remap->ProcessId : entry->ProcessId;
+    unsigned long threadId = remap != nullptr ? remap->ThreadId : entry->ThreadId;
+
+    if (entry->Children.size() == 0)
+    {
+        auto startTimestamp = std::chrono::duration_cast<std::chrono::microseconds>(entry->StartTimestamp);
+        auto duration = std::chrono::duration_cast<std::chrono::microseconds>(entry->StopTimestamp - entry->StartTimestamp);
+        nlohmann::json completeEvent =
         {
-            return;
+            { "ph", "X" },
+            { "pid", processId },
+            { "tid", threadId },
+            { "name", entry->Name },
+            { "ts", startTimestamp.count() },
+            { "dur", duration.count() }
+        };
+
+        traceEvents.push_back(completeEvent);
+    }
+    else
+    {
+        auto startTimestamp = std::chrono::duration_cast<std::chrono::microseconds>(entry->StartTimestamp);
+        nlohmann::json beginEvent =
+        {
+            { "ph", "B" },
+            { "pid", processId },
+            { "tid", threadId },
+            { "name", entry->Name },
+            { "ts", startTimestamp.count() }
+        };
+        traceEvents.push_back(beginEvent);
+
+        for (const ExecutionHierarchy::Entry* child : entry->Children)
+        {
+            AddEntry(child, traceEvents, remappings, ignoredEntries);
         }
 
-        const PackedProcessThreadRemapping::Remap* remap = remappings.GetRemapFor(entry->Id);
-        unsigned long processId = remap != nullptr ? remap->ProcessId : entry->ProcessId;
-        unsigned long threadId = remap != nullptr ? remap->ThreadId : entry->ThreadId;
-
-        if (entry->Children.size() == 0)
+        auto stopTimestamp = std::chrono::duration_cast<std::chrono::microseconds>(entry->StopTimestamp);
+        nlohmann::json endEvent =
         {
-            auto startTimestamp = std::chrono::duration_cast<std::chrono::microseconds>(entry->StartTimestamp);
-            auto duration = std::chrono::duration_cast<std::chrono::microseconds>(entry->StopTimestamp - entry->StartTimestamp);
-            nlohmann::json completeEvent =
-            {
-                { "ph", "X" },
-                { "pid", processId },
-                { "tid", threadId },
-                { "name", entry->Name },
-                { "ts", startTimestamp.count() },
-                { "dur", duration.count() }
-            };
-
-            traceEvents.push_back(completeEvent);
-        }
-        else
-        {
-            auto startTimestamp = std::chrono::duration_cast<std::chrono::microseconds>(entry->StartTimestamp);
-            nlohmann::json beginEvent =
-            {
-                { "ph", "B" },
-                { "pid", processId },
-                { "tid", threadId },
-                { "name", entry->Name },
-                { "ts", startTimestamp.count() }
-            };
-            traceEvents.push_back(beginEvent);
-
-            for (const ExecutionHierarchy::Entry* child : entry->Children)
-            {
-                AddEntry(child, traceEvents, remappings, ignoredEntries);
-            }
-
-            auto stopTimestamp = std::chrono::duration_cast<std::chrono::microseconds>(entry->StopTimestamp);
-            nlohmann::json endEvent =
-            {
-                { "ph", "E" },
-                { "pid", processId },
-                { "tid", threadId },
-                { "ts", stopTimestamp.count() }
-            };
-            traceEvents.push_back(endEvent);
-        }
+            { "ph", "E" },
+            { "pid", processId },
+            { "tid", threadId },
+            { "ts", stopTimestamp.count() }
+        };
+        traceEvents.push_back(endEvent);
     }
 }
+
+}  // anonymous namespace
 
 ChromeFlameGraphView::ChromeFlameGraphView(ExecutionHierarchy* hierarchy, const std::filesystem::path& outputFile,
                                            Filter filter) :
