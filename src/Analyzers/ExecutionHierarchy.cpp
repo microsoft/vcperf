@@ -159,26 +159,23 @@ void ExecutionHierarchy::OnFunction(const Function& function)
 
 void ExecutionHierarchy::OnTemplateInstantiation(const TemplateInstantiation& templateInstantiation)
 {
+    // SymbolName events get executed after all TemplateInstantiation in the same FrontEndPass take place
+    // and we're sure to have exclusive keys for these symbols (they may have matching names between
+    // FrontEndPass activities, but their key is unique for the trace)
+    assert(symbolNames_.find(templateInstantiation.SpecializationSymbolKey()) == symbolNames_.end());
     auto itSymbol = symbolNames_.find(templateInstantiation.SpecializationSymbolKey());
-    
-    // do we have the name already?
-    if (itSymbol != symbolNames_.end())
-    {
-        auto it = entries_.find(templateInstantiation.EventInstanceId());
-        assert(it != entries_.end());
-        it->second.Name = itSymbol->second;
-    }
-    else
-    {
-        // get us subscribed for name resolution (may already have some other activities following)
-        auto result = unresolvedTemplateInstantiationsPerSymbol_.try_emplace(templateInstantiation.SpecializationSymbolKey(),
-                                                                             TUnresolvedTemplateInstantiationNames());
-        result.first->second.push_back(templateInstantiation.EventInstanceId());
-    }
+
+    // get us subscribed for name resolution (may already have some other activities following)
+    auto result = unresolvedTemplateInstantiationsPerSymbol_.try_emplace(templateInstantiation.SpecializationSymbolKey(),
+                                                                            TUnresolvedTemplateInstantiationNames());
+    result.first->second.push_back(templateInstantiation.EventInstanceId());
 }
 
 void ExecutionHierarchy::OnSymbolName(const SymbolName& symbolName)
 {
+    // SymbolName events get executed after all TemplateInstantiation in the same FrontEndPass take place
+    // and we're sure to have exclusive keys for these symbols (they may have matching names between
+    // FrontEndPass activities, but their key is unique for the trace)
     assert(symbolNames_.find(symbolName.Key()) == symbolNames_.end());
     std::string& name = symbolNames_[symbolName.Key()];
     name = symbolName.Name();
