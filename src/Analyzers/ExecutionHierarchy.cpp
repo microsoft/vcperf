@@ -8,6 +8,29 @@ using namespace SimpleEvents;
 
 using namespace vcperf;
 
+namespace
+{
+    std::string ToString(const std::wstring& wstring)
+    {
+        assert(!wstring.empty());
+
+        const UINT codePage = CP_ACP;
+        int requiredSize = WideCharToMultiByte(codePage, 0, wstring.c_str(), static_cast<int>(wstring.size()),
+                                               NULL, 0, NULL, NULL);
+        std::string convertedString = std::string(requiredSize, '\0');
+        WideCharToMultiByte(codePage, 0, wstring.c_str(), static_cast<int>(wstring.size()),
+                            &convertedString[0], requiredSize, NULL, NULL);
+
+        return convertedString;
+    }
+
+    std::chrono::nanoseconds ConvertTime(long long ticks, long long frequency)
+    {
+        return std::chrono::nanoseconds{ Internal::ConvertTickPrecision(ticks, frequency, std::chrono::nanoseconds::period::den) };
+    }
+
+}  // anonymous namespace
+
 bool ExecutionHierarchy::Entry::OverlapsWith(const Entry* other) const
 {
     return StartTimestamp < other->StopTimestamp &&
@@ -28,7 +51,8 @@ AnalysisControl ExecutionHierarchy::OnStartActivity(const EventStack& eventStack
         || MatchEventInMemberFunction(eventStack.Back(), this, &ExecutionHierarchy::OnRootActivity))
     {}
 
-    if (   MatchEventInMemberFunction(eventStack.Back(), this, &ExecutionHierarchy::OnFrontEndFile)
+    if (   MatchEventInMemberFunction(eventStack.Back(), this, &ExecutionHierarchy::OnInvocation)
+        || MatchEventInMemberFunction(eventStack.Back(), this, &ExecutionHierarchy::OnFrontEndFile)
         || MatchEventInMemberFunction(eventStack.Back(), this, &ExecutionHierarchy::OnFunction)
         || MatchEventInMemberFunction(eventStack.Back(), this, &ExecutionHierarchy::OnTemplateInstantiation))
     {}
@@ -46,7 +70,9 @@ AnalysisControl ExecutionHierarchy::OnStopActivity(const EventStack& eventStack)
 
 AnalysisControl ExecutionHierarchy::OnSimpleEvent(const EventStack& eventStack)
 {
-    if (MatchEventInMemberFunction(eventStack.Back(), this, &ExecutionHierarchy::OnSymbolName))
+    if (   MatchEventInMemberFunction(eventStack.Back(), this, &ExecutionHierarchy::OnSymbolName)
+        || MatchEventStackInMemberFunction(eventStack, this, &ExecutionHierarchy::OnCommandLine)
+        || MatchEventStackInMemberFunction(eventStack, this, &ExecutionHierarchy::OnEnvironmentVariable))
     {}
 
     return AnalysisControl::CONTINUE;
@@ -100,6 +126,16 @@ ExecutionHierarchy::Entry* ExecutionHierarchy::CreateEntry(const Activity& activ
     entry.Name = activity.EventName();
 
     return &entry;
+}
+
+void ExecutionHierarchy::OnInvocation(const Invocation& invocation)
+{
+    auto it = entries_.find(invocation.EventInstanceId());
+    assert(it != entries_.end());
+
+    it->second.Properties.try_emplace("Tool Path", ToString(invocation.ToolPath()));
+    it->second.Properties.try_emplace("Working Directory", ToString(invocation.WorkingDirectory()));
+    it->second.Properties.try_emplace("Tool Version", invocation.ToolVersionString());
 }
 
 void ExecutionHierarchy::OnFrontEndFile(const FrontEndFile& frontEndFile)
@@ -156,7 +192,40 @@ void ExecutionHierarchy::OnSymbolName(const SymbolName& symbolName)
     }
 }
 
-std::chrono::nanoseconds ExecutionHierarchy::ConvertTime(long long ticks, long long frequency) const
+void ExecutionHierarchy::OnCommandLine(const A::Activity& parent, const CommandLine& commandLine)
 {
-    return std::chrono::nanoseconds{ Internal::ConvertTickPrecision(ticks, frequency, std::chrono::nanoseconds::period::den) };
+    auto it = entries_.find(parent.EventInstanceId());
+    assert(it != entries_.end());
+
+    it->second.Properties.try_emplace("Command Line", ToString(commandLine.Value()));
+}
+
+void ExecutionHierarchy::OnEnvironmentVariable(const A::Activity& parent, const EnvironmentVariable& environmentVariable)
+{
+    // we're not interested in all of them, only the ones that impact the build process
+    bool process = false;
+    if (parent.EventId() == EVENT_ID::EVENT_ID_COMPILER)
+    {
+        process = _wcsicmp(environmentVariable.Name(), L"CL") == 0
+               || _wcsicmp(environmentVariable.Name(), L"_CL_") == 0
+               || _wcsicmp(environmentVariable.Name(), L"INCLUDE") == 0
+               || _wcsicmp(environmentVariable.Name(), L"LIBPATH") == 0
+               || _wcsicmp(environmentVariable.Name(), L"PATH") == 0;
+    }
+    else if (parent.EventId() == EVENT_ID::EVENT_ID_LINKER)
+    {
+        process = _wcsicmp(environmentVariable.Name(), L"LINK") == 0
+               || _wcsicmp(environmentVariable.Name(), L"_LINK_") == 0
+               || _wcsicmp(environmentVariable.Name(), L"LIB") == 0
+               || _wcsicmp(environmentVariable.Name(), L"PATH") == 0
+               || _wcsicmp(environmentVariable.Name(), L"TMP") == 0;
+    }
+
+    if (process)
+    {
+        auto it = entries_.find(parent.EventInstanceId());
+        assert(it != entries_.end());
+        
+        it->second.Properties.try_emplace("Env Var: " + ToString(environmentVariable.Name()), ToString(environmentVariable.Value()));
+    }
 }

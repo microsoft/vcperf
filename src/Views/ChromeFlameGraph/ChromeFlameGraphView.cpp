@@ -37,6 +37,18 @@ void AddEntry(const ExecutionHierarchy::Entry* entry, nlohmann::json& traceEvent
             { "dur", duration.count() }
         };
 
+        // add extra properties, if any
+        if (!entry->Properties.empty())
+        {
+            nlohmann::json args = nlohmann::json::object();
+            for (auto pair : entry->Properties)
+            {
+                args[pair.first] = pair.second;
+            }
+
+            completeEvent["args"] = args;
+        }
+
         traceEvents.push_back(completeEvent);
     }
     else
@@ -50,6 +62,19 @@ void AddEntry(const ExecutionHierarchy::Entry* entry, nlohmann::json& traceEvent
             { "name", entry->Name },
             { "ts", startTimestamp.count() }
         };
+
+        // add extra properties, if any
+        if (!entry->Properties.empty())
+        {
+            nlohmann::json args = nlohmann::json::object();
+            for (auto pair : entry->Properties)
+            {
+                args[pair.first] = pair.second;
+            }
+
+            beginEvent["args"] = args;
+        }
+
         traceEvents.push_back(beginEvent);
 
         for (const ExecutionHierarchy::Entry* child : entry->Children)

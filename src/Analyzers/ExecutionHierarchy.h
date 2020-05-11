@@ -23,6 +23,7 @@ public:
         std::string Name;
 
         std::vector<Entry*> Children;
+        std::unordered_map<std::string, std::string> Properties;
 
         bool OverlapsWith(const Entry* other) const;
     };
@@ -48,12 +49,14 @@ private:
 
     Entry* CreateEntry(const A::Activity& activity);
 
+    void OnInvocation(const A::Invocation& invocation);
     void OnFrontEndFile(const A::FrontEndFile& frontEndFile);
     void OnFunction(const A::Function& function);
     void OnTemplateInstantiation(const A::TemplateInstantiation& templateInstantiation);
-    void OnSymbolName(const SE::SymbolName& symbolName);
 
-    std::chrono::nanoseconds ConvertTime(long long ticks, long long frequency) const;
+    void OnSymbolName(const SE::SymbolName& symbolName);
+    void OnCommandLine(const A::Activity& parent, const SE::CommandLine& commandLine);
+    void OnEnvironmentVariable(const A::Activity& parent, const SE::EnvironmentVariable& environmentVariable);
 
     std::unordered_map<unsigned long long, Entry> entries_;
     TRoots roots_;
