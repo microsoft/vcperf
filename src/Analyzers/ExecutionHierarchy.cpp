@@ -133,7 +133,12 @@ void ExecutionHierarchy::OnInvocation(const Invocation& invocation)
     auto it = entries_.find(invocation.EventInstanceId());
     assert(it != entries_.end());
 
-    it->second.Properties.try_emplace("Tool Path", ToString(invocation.ToolPath()));
+    // may not be present, as it's not available in earlier versions of the toolset
+    if (invocation.ToolPath() != nullptr)
+    {
+        it->second.Properties.try_emplace("Tool Path", ToString(invocation.ToolPath()));
+    }
+
     it->second.Properties.try_emplace("Working Directory", ToString(invocation.WorkingDirectory()));
     it->second.Properties.try_emplace("Tool Version", invocation.ToolVersionString());
 }
