@@ -63,10 +63,10 @@
     <ClCompile Include="src\Analyzers\ExecutionHierarchy.cpp">
       <Filter>Source Files\Analyzers</Filter>
     </ClCompile>
-    <ClCompile Include="src\Views\ChromeFlameGraph\PackedProcessThreadRemapping.cpp">
-      <Filter>Header Files\Views\ChromeFlameGraph</Filter>
-    </ClCompile>
     <ClCompile Include="src\Views\ChromeFlameGraph\ChromeFlameGraphView.cpp">
+      <Filter>Source Files\Views\ChromeFlameGraph</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Views\ChromeFlameGraph\PackedProcessThreadRemapping.cpp">
       <Filter>Source Files\Views\ChromeFlameGraph</Filter>
     </ClCompile>
   </ItemGroup>
@@ -110,10 +110,10 @@
     <ClInclude Include="src\Analyzers\ExecutionHierarchy.h">
       <Filter>Header Files\Analyzers</Filter>
     </ClInclude>
-    <ClInclude Include="src\Views\ChromeFlameGraph\PackedProcessThreadRemapping.h">
-      <Filter>Source Files\Views\ChromeFlameGraph</Filter>
-    </ClInclude>
     <ClInclude Include="src\Views\ChromeFlameGraph\ChromeFlameGraphView.h">
+      <Filter>Header Files\Views\ChromeFlameGraph</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Views\ChromeFlameGraph\PackedProcessThreadRemapping.h">
       <Filter>Header Files\Views\ChromeFlameGraph</Filter>
     </ClInclude>
   </ItemGroup>
