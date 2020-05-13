@@ -32,8 +32,8 @@ void PackedProcessThreadRemapping::CalculateChildrenLocalThreadData(const Execut
         assert(localOffsetsData_.find(entry->Id) == localOffsetsData_.end());
 
         LocalOffsetData& data = localOffsetsData_[entry->Id];
-        data.RawLocalThreadId = 0;  // parent will update this in CalculateChildrenLocalThreadId
-        data.RequiredThreadIdToFitHierarchy = 0;
+        data.RawLocalThreadId = 0UL;  // parent will update this in CalculateChildrenLocalThreadId
+        data.RequiredThreadIdToFitHierarchy = 0UL;
     }
     else
     {
@@ -74,7 +74,7 @@ void PackedProcessThreadRemapping::CalculateChildrenLocalThreadId(const Executio
             }
 
             // calculate first local ThreadId where we don't overlap any sibling
-            unsigned long localThreadId = 0;
+            unsigned long localThreadId = 0UL;
             while (std::find(overlappingLocalThreadIds.begin(), overlappingLocalThreadIds.end(), localThreadId) != overlappingLocalThreadIds.end())
             {
                 ++localThreadId;
@@ -106,7 +106,7 @@ void PackedProcessThreadRemapping::CalculateChildrenExtraThreadIdToFitHierarchy(
     }
 
     // we may end up having all children ignored
-    unsigned long requiredThreadIdToFitHierarchy = 0;
+    unsigned long requiredThreadIdToFitHierarchy = 0UL;
     if (sortedChildrenWithData.size() > 0)
     {
         // sort them by their raw local ThreadId
@@ -120,7 +120,7 @@ void PackedProcessThreadRemapping::CalculateChildrenExtraThreadIdToFitHierarchy(
         // with a different ThreadId as "parallel"
         unsigned long currentLocalThreadId = sortedChildrenWithData[0].second->RawLocalThreadId;
         unsigned long currentExtraThreadToFitHierarchy = 0UL;
-        unsigned long requiredExtraThreadIdToFitHierarchy = 0;
+        unsigned long requiredExtraThreadIdToFitHierarchy = 0UL;
         for (EntryWithOffsetData& data : sortedChildrenWithData)
         {
             // when we iterate into a new local ThreadId, accumulate calculated data for previous "sequential" entries
@@ -158,7 +158,7 @@ void PackedProcessThreadRemapping::CalculateChildrenExtraThreadIdToFitHierarchy(
     // we're a parent, so we're sure we haven't been added to the map yet
     assert(localOffsetsData_.find(entry->Id) == localOffsetsData_.end());
     auto& data = localOffsetsData_[entry->Id];
-    data.RawLocalThreadId = 0;  // our own parent will update this value taking our siblings into account
+    data.RawLocalThreadId = 0UL;  // our own parent will update this value taking our siblings into account
     data.RequiredThreadIdToFitHierarchy = requiredThreadIdToFitHierarchy;
 }
 
@@ -193,7 +193,7 @@ void PackedProcessThreadRemapping::RemapRootsProcessId(const ExecutionHierarchy*
         }
 
         // calculate first ProcessId where we don't overlap with any sibling
-        unsigned long remappedProcessId = 0;
+        unsigned long remappedProcessId = 0UL;
         while (std::find(overlappingProcessIds.begin(), overlappingProcessIds.end(), remappedProcessId) != overlappingProcessIds.end())
         {
             ++remappedProcessId;
