@@ -123,15 +123,6 @@ void PackedProcessThreadRemapping::CalculateChildrenExtraThreadIdToFitHierarchy(
         unsigned long requiredExtraThreadIdToFitHierarchy = 0UL;
         for (EntryWithOffsetData& data : sortedChildrenWithData)
         {
-            // when we iterate into a new local ThreadId, accumulate calculated data for previous "sequential" entries
-            if (currentLocalThreadId != data.second->RawLocalThreadId)
-            {
-                requiredExtraThreadIdToFitHierarchy += currentExtraThreadToFitHierarchy;
-            }
-
-            // calculate the real local ThreadId: the raw one taking previous siblings' requirements into account
-            data.second->CalculatedLocalThreadId = data.second->RawLocalThreadId + requiredExtraThreadIdToFitHierarchy;
-
             // "sequential" entries live in the same ThreadId, so we only need to account for the one that
             // needs more room for its subhierarchy
             if (currentLocalThreadId == data.second->RawLocalThreadId)
@@ -144,9 +135,15 @@ void PackedProcessThreadRemapping::CalculateChildrenExtraThreadIdToFitHierarchy(
             // when we have reached a different ThreadId (moved into a "parallel" entry), prepare for next iteration
             else
             {
+                // accumulate calculated data for previous "sequential" entries
+                requiredExtraThreadIdToFitHierarchy += currentExtraThreadToFitHierarchy;
+
                 currentLocalThreadId = data.second->RawLocalThreadId;
                 currentExtraThreadToFitHierarchy = data.second->RequiredThreadIdToFitHierarchy;
             }
+
+            // calculate the real local ThreadId: the raw one taking previous siblings' requirements into account
+            data.second->CalculatedLocalThreadId = data.second->RawLocalThreadId + requiredExtraThreadIdToFitHierarchy;
         }
 
         // last sequence of entries wasn't accumulated: we didn't iterate into a "next" ThreadId
