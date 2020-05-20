@@ -34,9 +34,11 @@ public:
 private:
 
     void ProcessActivity(const A::Activity& activity);
+    void ProcessFunction(const A::Function& function);
+    void ProcessTemplateInstantiationGroup(const A::TemplateInstantiationGroup& templateInstantiationGroup);
+
     void CalculateChildrenOffsets(const A::Activity& activity);
     void ExportTo(std::ostream& outputStream) const;
-    bool ShouldIgnore(const A::Activity& activity) const;
 
     ExecutionHierarchy* hierarchy_;
     std::filesystem::path outputFile_;

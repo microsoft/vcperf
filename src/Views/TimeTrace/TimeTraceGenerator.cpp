@@ -107,7 +107,9 @@ TimeTraceGenerator::TimeTraceGenerator(ExecutionHierarchy* hierarchy, const std:
 
 BI::AnalysisControl TimeTraceGenerator::OnStopActivity(const BI::EventStack& eventStack)
 {
-    if (MatchEventInMemberFunction(eventStack.Back(), this, &TimeTraceGenerator::ProcessActivity))
+    if (   MatchEventStackInMemberFunction(eventStack, this, &TimeTraceGenerator::ProcessTemplateInstantiationGroup)
+        || MatchEventInMemberFunction(eventStack.Back(), this, &TimeTraceGenerator::ProcessFunction)
+        || MatchEventInMemberFunction(eventStack.Back(), this, &TimeTraceGenerator::ProcessActivity))
     {}
 
     return AnalysisControl::CONTINUE;
@@ -129,12 +131,39 @@ AnalysisControl TimeTraceGenerator::OnEndAnalysis()
 }
 
 void TimeTraceGenerator::ProcessActivity(const Activity& activity)
-{    
-    if (ShouldIgnore(activity)) {
-        ignoredEntries_.emplace(activity.EventInstanceId());
+{
+    CalculateChildrenOffsets(activity);
+}
+
+void TimeTraceGenerator::ProcessFunction(const Function& function)
+{
+    auto durationMs = std::chrono::duration_cast<std::chrono::milliseconds>(function.Duration());
+    if (durationMs < filter_.IgnoreFunctionUnderMs) {
+        ignoredEntries_.emplace(function.EventInstanceId());
     }
     else {
-        CalculateChildrenOffsets(activity);
+        ProcessActivity(function);
+    }
+}
+
+void TimeTraceGenerator::ProcessTemplateInstantiationGroup(const TemplateInstantiationGroup& templateInstantiationGroup)
+{
+    // keep full hierarchy when root TemplateInstantiation passes filter, even if children wouldn't pass
+    if (templateInstantiationGroup.Size() == 1)
+    {
+        // root TemplateInstantiation has completed, we can know its duration now
+        // also, all children have been processed already
+        const TemplateInstantiation& root = templateInstantiationGroup.Front();
+        auto rootDurationMs = std::chrono::duration_cast<std::chrono::milliseconds>(root.Duration());
+        if (!filter_.AnalyzeTemplates || rootDurationMs < filter_.IgnoreTemplateInstantiationUnderMs) {
+            ignoredEntries_.emplace(root.EventInstanceId());
+        }
+        else {
+            ProcessActivity(root);
+        }
+    }
+    else if(filter_.AnalyzeTemplates) {
+        ProcessActivity(templateInstantiationGroup.Back());
     }
 }
 
@@ -162,30 +191,4 @@ void TimeTraceGenerator::ExportTo(std::ostream& outputStream) const
     json["displayTimeUnit"] = "ms";
 
     outputStream << std::setw(2) << json << std::endl;
-}
-
-bool TimeTraceGenerator::ShouldIgnore(const A::Activity& activity) const
-{
-    if (activity.EventId() == EVENT_ID_TEMPLATE_INSTANTIATION)
-    {
-        if (!filter_.AnalyzeTemplates) {
-            return true;
-        }
-
-        auto durationMs = std::chrono::duration_cast<std::chrono::milliseconds>(activity.Duration());
-        if (durationMs < filter_.IgnoreTemplateInstantiationUnderMs)
-        {
-            return true;
-        }
-    }
-
-    if (activity.EventId() == EVENT_ID_FUNCTION)
-    {
-        auto durationMs = std::chrono::duration_cast<std::chrono::milliseconds>(activity.Duration());
-        if (durationMs < filter_.IgnoreFunctionUnderMs) {
-            return true;
-        }
-    }
-
-    return false;
 }
