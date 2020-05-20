@@ -13,7 +13,7 @@
 #include "Views\FunctionsView.h"
 #include "Views\FilesView.h"
 #include "Views\TemplateInstantiationsView.h"
-#include "Views\ChromeFlameGraph\ChromeFlameGraphView.h"
+#include "Views\TimeTrace\TimeTraceFlameGraphView.h"
 
 using namespace Microsoft::Cpp::BuildInsights;
 
@@ -189,14 +189,14 @@ RESULT_CODE StopToWPA(const std::wstring& sessionName, const std::filesystem::pa
         &statistics, analysisPassCount, systemEventsRetentionFlags, analyzerGroup, reloggerGroup);
 }
 
-RESULT_CODE StopToChromeTrace(const std::wstring& sessionName, const std::filesystem::path& outputFile, bool analyzeTemplates,
+RESULT_CODE StopToTimeTrace(const std::wstring& sessionName, const std::filesystem::path& outputFile, bool analyzeTemplates,
     TRACING_SESSION_STATISTICS& statistics)
 {
     ExecutionHierarchy eh;
-    ChromeFlameGraphView::Filter f{ analyzeTemplates,
+    TimeTraceFlameGraphView::Filter f{ analyzeTemplates,
                                     std::chrono::milliseconds(10),
                                     std::chrono::milliseconds(10) };
-    ChromeFlameGraphView cfgv{ &eh, outputFile, f };
+    TimeTraceFlameGraphView cfgv{ &eh, outputFile, f };
 
     auto analyzerGroup = MakeStaticAnalyzerGroup(&eh, &cfgv);
     int analysisPassCount = 1;
@@ -225,13 +225,13 @@ RESULT_CODE AnalyzeToWPA(const std::filesystem::path& inputFile, const std::file
         systemEventsRetentionFlags, analyzerGroup, reloggerGroup);
 }
 
-RESULT_CODE AnalyzeToChromeTrace(const std::filesystem::path& inputFile, const std::filesystem::path& outputFile, bool analyzeTemplates)
+RESULT_CODE AnalyzeToTimeTrace(const std::filesystem::path& inputFile, const std::filesystem::path& outputFile, bool analyzeTemplates)
 {
     ExecutionHierarchy eh;
-    ChromeFlameGraphView::Filter f{ analyzeTemplates,
+    TimeTraceFlameGraphView::Filter f{ analyzeTemplates,
                                     std::chrono::milliseconds(10),
                                     std::chrono::milliseconds(10) };
-    ChromeFlameGraphView cfgv{ &eh, outputFile, f };
+    TimeTraceFlameGraphView cfgv{ &eh, outputFile, f };
 
     auto analyzerGroup = MakeStaticAnalyzerGroup(&eh, &cfgv);
     int analysisPassCount = 1;
@@ -280,19 +280,19 @@ HRESULT DoStart(const std::wstring& sessionName, bool cpuSampling, VerbosityLeve
 }
 
 
-HRESULT DoStop(const std::wstring& sessionName, const std::filesystem::path& outputFile, bool analyzeTemplates, bool generateChromeTrace)
+HRESULT DoStop(const std::wstring& sessionName, const std::filesystem::path& outputFile, bool analyzeTemplates, bool generateTimeTrace)
 {
     std::wcout << L"Stopping and analyzing tracing session " << sessionName << L"..." << std::endl;
 
     TRACING_SESSION_STATISTICS statistics{};
     RESULT_CODE rc;
-    if (!generateChromeTrace)
+    if (!generateTimeTrace)
     {
         rc = StopToWPA(sessionName, outputFile, analyzeTemplates, statistics);
     }
     else
     {
-        rc = StopToChromeTrace(sessionName, outputFile, analyzeTemplates, statistics);
+        rc = StopToTimeTrace(sessionName, outputFile, analyzeTemplates, statistics);
     }
 
     PrintTraceStatistics(statistics);
@@ -335,18 +335,18 @@ HRESULT DoStopNoAnalyze(const std::wstring& sessionName, const std::filesystem::
     return S_OK;
 }
 
-HRESULT DoAnalyze(const std::filesystem::path& inputFile, const std::filesystem::path& outputFile, bool analyzeTemplates, bool generateChromeTrace)
+HRESULT DoAnalyze(const std::filesystem::path& inputFile, const std::filesystem::path& outputFile, bool analyzeTemplates, bool generateTimeTrace)
 {
     std::wcout << L"Analyzing..." << std::endl;
     
     RESULT_CODE rc;
-    if (!generateChromeTrace)
+    if (!generateTimeTrace)
     {
         rc = AnalyzeToWPA(inputFile, outputFile, analyzeTemplates);
     }
     else
     {
-        rc = AnalyzeToChromeTrace(inputFile, outputFile, analyzeTemplates);
+        rc = AnalyzeToTimeTrace(inputFile, outputFile, analyzeTemplates);
     }
 
     if (rc != RESULT_CODE_SUCCESS)

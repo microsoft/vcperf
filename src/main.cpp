@@ -80,18 +80,18 @@ StartSubCommand CheckStartSubCommands(const wchar_t* arg)
 
 
 int ParseStopOrAnalyze(int argc, wchar_t* argv[], const wchar_t* command, const wchar_t* sessionOrInputHelp,
-    std::wstring& firstArg, std::wstring& outputFile, bool& analyzeTemplates, bool& generateChromeTrace)
+    std::wstring& firstArg, std::wstring& outputFile, bool& analyzeTemplates, bool& generateTimeTrace)
 {
     if (argc < 4)
     {
-        std::wcout << L"vcperf.exe " << command << " [/templates] [/chrometrace] " << sessionOrInputHelp << " outputFile.etl" << std::endl;
+        std::wcout << L"vcperf.exe " << command << " [/templates] [/timetrace] " << sessionOrInputHelp << " outputFile.etl" << std::endl;
         return E_FAIL;
     }
 
     int curArgc = 2;
 
     analyzeTemplates = false;
-    generateChromeTrace = false;
+    generateTimeTrace = false;
     std::wstring arg = argv[curArgc++];
     firstArg = arg;
 
@@ -103,31 +103,31 @@ int ParseStopOrAnalyze(int argc, wchar_t* argv[], const wchar_t* command, const 
 
     if (analyzeTemplates && argc < 5)
     {
-        std::wcout << L"vcperf.exe " << command << " [/templates] [/chrometrace] " << sessionOrInputHelp << " outputFile.etl" << std::endl;
+        std::wcout << L"vcperf.exe " << command << " [/templates] [/timetrace] " << sessionOrInputHelp << " outputFile.etl" << std::endl;
         return E_FAIL;
     }
 
-    if (CheckCommand(firstArg, L"chrometrace"))
+    if (CheckCommand(firstArg, L"timetrace"))
     {
         firstArg = argv[curArgc++];
-        generateChromeTrace = true;
+        generateTimeTrace = true;
     }
 
-    if (generateChromeTrace && argc < 5)
+    if (generateTimeTrace && argc < 5)
     {
-        std::wcout << L"vcperf.exe " << command << " [/templates] [/chrometrace] " << sessionOrInputHelp << " outputFile.etl" << std::endl;
+        std::wcout << L"vcperf.exe " << command << " [/templates] [/timetrace] " << sessionOrInputHelp << " outputFile.etl" << std::endl;
         return E_FAIL;
     }
 
-    if (analyzeTemplates && generateChromeTrace && argc < 6)
+    if (analyzeTemplates && generateTimeTrace && argc < 6)
     {
-        std::wcout << L"vcperf.exe " << command << " [/templates] [/chrometrace] " << sessionOrInputHelp << " outputFile.etl" << std::endl;
+        std::wcout << L"vcperf.exe " << command << " [/templates] [/timetrace] " << sessionOrInputHelp << " outputFile.etl" << std::endl;
         return E_FAIL;
     }
 
     outputFile = argv[curArgc++];
 
-    if (!ValidateFile(outputFile, false, generateChromeTrace ? L".json" : L".etl")) {
+    if (!ValidateFile(outputFile, false, generateTimeTrace ? L".json" : L".etl")) {
         return E_FAIL;
     }
 
@@ -150,9 +150,9 @@ int wmain(int argc, wchar_t* argv[])
         std::wcout << std::endl;
         std::wcout << L"USAGE:" << std::endl;
         std::wcout << L"vcperf.exe /start [/nocpusampling] [/level1 | /level2 | /level3] sessionName" << std::endl;
-        std::wcout << L"vcperf.exe /stop [/templates] [/chrometrace] sessionName outputFile.etl" << std::endl;
+        std::wcout << L"vcperf.exe /stop [/templates] [/timetrace] sessionName outputFile.etl" << std::endl;
         std::wcout << L"vcperf.exe /stopnoanalyze sessionName outputRawFile.etl" << std::endl;
-        std::wcout << L"vcperf.exe /analyze [/templates] [/chrometrace] inputRawFile.etl output.etl" << std::endl;
+        std::wcout << L"vcperf.exe /analyze [/templates] [/timetrace] inputRawFile.etl output.etl" << std::endl;
 
         std::wcout << std::endl;
 
@@ -237,13 +237,13 @@ int wmain(int argc, wchar_t* argv[])
     else if (CheckCommand(argv[1], L"stop")) 
     {
         std::wstring sessionName, outputFile;
-        bool analyzeTemplates, generateChromeTrace;
+        bool analyzeTemplates, generateTimeTrace;
 
-        if (S_OK != ParseStopOrAnalyze(argc, argv, L"/stop", L"sessionName", sessionName, outputFile, analyzeTemplates, generateChromeTrace)) {
+        if (S_OK != ParseStopOrAnalyze(argc, argv, L"/stop", L"sessionName", sessionName, outputFile, analyzeTemplates, generateTimeTrace)) {
             return E_FAIL;
         }
 
-        return DoStop(sessionName, outputFile, analyzeTemplates, generateChromeTrace);
+        return DoStop(sessionName, outputFile, analyzeTemplates, generateTimeTrace);
     }
     else if (CheckCommand(argv[1], L"stopnoanalyze")) 
     {
@@ -265,9 +265,9 @@ int wmain(int argc, wchar_t* argv[])
     else if (CheckCommand(argv[1], L"analyze")) 
     {
         std::wstring inputFile, outputFile;
-        bool analyzeTemplates, generateChromeTrace;
+        bool analyzeTemplates, generateTimeTrace;
 
-        if (S_OK != ParseStopOrAnalyze(argc, argv, L"/analyze", L"input.etl", inputFile, outputFile, analyzeTemplates, generateChromeTrace)) {
+        if (S_OK != ParseStopOrAnalyze(argc, argv, L"/analyze", L"input.etl", inputFile, outputFile, analyzeTemplates, generateTimeTrace)) {
             return E_FAIL;
         }
 
@@ -275,7 +275,7 @@ int wmain(int argc, wchar_t* argv[])
             return E_FAIL;
         }
 
-        return DoAnalyze(inputFile, outputFile, analyzeTemplates, generateChromeTrace);
+        return DoAnalyze(inputFile, outputFile, analyzeTemplates, generateTimeTrace);
     }
     else 
     {

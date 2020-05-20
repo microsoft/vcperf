@@ -6,16 +6,16 @@
 
 #include "VcperfBuildInsights.h"
 #include "Analyzers\ExecutionHierarchy.h"
-#include "Views\ChromeFlameGraph\PackedProcessThreadRemapping.h"
+#include "Views\TimeTrace\PackedProcessThreadRemapping.h"
 
 namespace vcperf
 {
 
-class ChromeFlameGraphView : public BI::IAnalyzer
+class TimeTraceFlameGraphView : public BI::IAnalyzer
 {
 public:
 
-    // controls which subhierarchies get ignored (check ChromeFlameGraphView::ShouldIgnore)
+    // controls which subhierarchies get ignored (check TimeTraceFlameGraphView::ShouldIgnore)
     struct Filter
     {
         bool AnalyzeTemplates = false;
@@ -25,7 +25,7 @@ public:
 
 public:
 
-    ChromeFlameGraphView(ExecutionHierarchy* hierarchy, const std::filesystem::path& outputFile,
+    TimeTraceFlameGraphView(ExecutionHierarchy* hierarchy, const std::filesystem::path& outputFile,
                          Filter filter);
 
     BI::AnalysisControl OnStopActivity(const BI::EventStack& eventStack) override;

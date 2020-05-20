@@ -1,4 +1,4 @@
-#include "ChromeFlameGraphView.h"
+#include "TimeTraceFlameGraphView.h"
 
 #include <fstream>
 #include <nlohmann\json.hpp>
@@ -96,7 +96,7 @@ void AddEntry(const ExecutionHierarchy::Entry* entry, nlohmann::json& traceEvent
 
 }  // anonymous namespace
 
-ChromeFlameGraphView::ChromeFlameGraphView(ExecutionHierarchy* hierarchy, const std::filesystem::path& outputFile,
+TimeTraceFlameGraphView::TimeTraceFlameGraphView(ExecutionHierarchy* hierarchy, const std::filesystem::path& outputFile,
                                            Filter filter) :
     hierarchy_{hierarchy},
     outputFile_{outputFile},
@@ -106,15 +106,15 @@ ChromeFlameGraphView::ChromeFlameGraphView(ExecutionHierarchy* hierarchy, const 
 {
 }
 
-BI::AnalysisControl ChromeFlameGraphView::OnStopActivity(const BI::EventStack& eventStack)
+BI::AnalysisControl TimeTraceFlameGraphView::OnStopActivity(const BI::EventStack& eventStack)
 {
-    if (MatchEventInMemberFunction(eventStack.Back(), this, &ChromeFlameGraphView::ProcessActivity))
+    if (MatchEventInMemberFunction(eventStack.Back(), this, &TimeTraceFlameGraphView::ProcessActivity))
     {}
 
     return AnalysisControl::CONTINUE;
 }
 
-AnalysisControl ChromeFlameGraphView::OnEndAnalysis()
+AnalysisControl TimeTraceFlameGraphView::OnEndAnalysis()
 {
     remappings_.Calculate(hierarchy_);
 
@@ -130,7 +130,7 @@ AnalysisControl ChromeFlameGraphView::OnEndAnalysis()
     return AnalysisControl::CONTINUE;
 }
 
-void ChromeFlameGraphView::ProcessActivity(const Activity& activity)
+void TimeTraceFlameGraphView::ProcessActivity(const Activity& activity)
 {    
     if (ShouldIgnore(activity))
     {
@@ -142,7 +142,7 @@ void ChromeFlameGraphView::ProcessActivity(const Activity& activity)
     }
 }
 
-void ChromeFlameGraphView::CalculateChildrenOffsets(const Activity& activity)
+void TimeTraceFlameGraphView::CalculateChildrenOffsets(const Activity& activity)
 {
     const ExecutionHierarchy::Entry* entry = hierarchy_->GetEntry(activity.EventInstanceId());
     assert(entry != nullptr);
@@ -150,7 +150,7 @@ void ChromeFlameGraphView::CalculateChildrenOffsets(const Activity& activity)
     remappings_.CalculateChildrenLocalThreadData(entry);
 }
 
-void ChromeFlameGraphView::ExportTo(std::ostream& outputStream) const
+void TimeTraceFlameGraphView::ExportTo(std::ostream& outputStream) const
 {
     nlohmann::json json = nlohmann::json::object();
 
@@ -168,7 +168,7 @@ void ChromeFlameGraphView::ExportTo(std::ostream& outputStream) const
     outputStream << std::setw(2) << json << std::endl;
 }
 
-bool ChromeFlameGraphView::ShouldIgnore(const A::Activity& activity) const
+bool TimeTraceFlameGraphView::ShouldIgnore(const A::Activity& activity) const
 {
     if (activity.EventId() == EVENT_ID_TEMPLATE_INSTANTIATION)
     {

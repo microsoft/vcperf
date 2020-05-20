@@ -73,8 +73,8 @@ Viewing vcperf traces in WPA requires the C++ Build Insights WPA add-in. Install
 |------------------|---------------------------|
 | `/start`         | `[/nocpusampling]` `[/level1 \| /level2 \| /level3]` `<sessionName>` |
 |                  | Tells *vcperf.exe* to start a trace under the given session name. There can only be one active session at a time on a given machine. <br/><br/> If the `/nocpusampling` option is specified, *vcperf.exe* doesn't collect CPU samples. It prevents the use of the CPU Usage (Sampled) view in Windows Performance Analyzer, but makes the collected traces smaller. <br/><br/>The `/level1`, `/level2`, or `/level3` option is used to specify which MSVC events to collect, in increasing level of information. Level 3 includes all events. Level 2 includes all events except template instantiation events. Level 1 includes all events except template instantiation, function, and file events. If unspecified, `/level2` is selected by default.<br/><br/>Once tracing is started, *vcperf.exe* returns immediately. Events are collected system-wide for all processes running on the machine. That means that you don't need to build your project from the same command prompt as the one you used to run *vcperf.exe*. For example, you can build your project from Visual Studio. |
-| `/stop`          | `[/templates]` `[/chrometrace]` `<sessionName>` `<outputFile.etl>` |
-|                  | Stops the trace identified by the given session name. Runs a post-processing step on the trace to generate a file viewable in Windows Performance Analyzer (WPA). The `<outputFile.etl>` parameter specifies where to save the output file.<br/><br/>If the `/chrometrace` option is present, it will instead generate a trace viewable in Google Chrome's trace viewer ([chrome://tracing](chrome://tracing)). It's required the output file has `.json` extension.<br/><br/>If the `/templates` option is specified, also analyze template instantiation events. |
+| `/stop`          | `[/templates]` `[/timetrace]` `<sessionName>` `<outputFile.etl>` |
+|                  | Stops the trace identified by the given session name. Runs a post-processing step on the trace to generate a file viewable in Windows Performance Analyzer (WPA). The `<outputFile.etl>` parameter specifies where to save the output file.<br/><br/>If the `/timetrace` option is present, it will instead generate a trace viewable in Microsoft Edge's trace viewer ([edge://tracing](edge://tracing)). It's required the output file has `.json` extension.<br/><br/>If the `/templates` option is specified, also analyze template instantiation events. |
 | `/stopnoanalyze` | `<sessionName>` `<rawOutputFile.etl>` |
 |                  | Stops the trace identified by the given session name and writes the raw, unprocessed data in the specified output file. The resulting file isn't meant to be viewed in WPA. <br/><br/> The post-processing step involved in the `/stop` command can sometimes be lengthy. You can use the `/stopnoanalyze` command to delay this post-processing step. Use the `/analyze` command when you're ready to produce a file viewable in Windows Performance Analyzer. |
 
@@ -82,8 +82,8 @@ Viewing vcperf traces in WPA requires the C++ Build Insights WPA add-in. Install
 
 | Option     | Arguments and description |
 |------------|---------------------------|
-| `/analyze` | `[/templates]` `[/chrometrace]` `<rawInputFile.etl> <outputFile.etl>` |
-|            | Accepts a raw trace file produced by the `/stopnoanalyze` command. Runs a post-processing step on this trace to generate a file viewable in Windows Performance Analyzer.<br/><br/>If the `/chrometrace` option is present, it will instead generate a trace viewable in Google Chrome's trace viewer ([chrome://tracing](chrome://tracing)). It's required the output file has `.json` extension.<br/><br/>If the `/templates` option is specified, also analyze template instantiation events. |
+| `/analyze` | `[/templates]` `[/timetrace]` `<rawInputFile.etl> <outputFile.etl>` |
+|            | Accepts a raw trace file produced by the `/stopnoanalyze` command. Runs a post-processing step on this trace to generate a file viewable in Windows Performance Analyzer.<br/><br/>If the `/timetrace` option is present, it will instead generate a trace viewable in Microsoft Edge's trace viewer ([edge://tracing](edge://tracing)). It's required the output file has `.json` extension.<br/><br/>If the `/templates` option is specified, also analyze template instantiation events. |
 
 ## Overview of the code
 
@@ -94,13 +94,13 @@ This section briefly describes the source files found in the `src` directory.
 |Analyzers\ContextBuilder.cpp/.h|Analyzer that determines important information about every event, such as which *cl* or *link* invocation it comes from. This data is used by all *View* components when writing their events in the relogged trace.|
 |Analyzers\ExpensiveTemplateInstantiationCache.cpp/.h|Analyzer that pre-computes the templates with the longest instantiation times. This data is later consumed by *TemplateInstantiationsView*.|
 |Analyzers\MiscellaneousCache.h|Analyzer that can be used to cache miscellaneous data about a trace.|
-|Analyzers\ExecutionHierarchy.cpp/.h|Analyzer that creates a number of hierarchies out of a trace. Its data is later consumed by *ChromeFlameGraphView*.|
+|Analyzers\ExecutionHierarchy.cpp/.h|Analyzer that creates a number of hierarchies out of a trace. Its data is later consumed by *TimeTraceFlameGraphView*.|
 |Views\BuildExplorerView.cpp/.h|Component that builds the view responsible for showing overall build times in WPA.|
 |Views\FilesView.cpp/.h|Component that builds the view responsible for showing file parsing times in WPA.|
 |Views\FunctionsView.cpp/.h|Component that builds the view responsible for showing function code generation times in WPA.|
 |Views\TemplateInstantiationsView.cpp/.h|Component that builds the view responsible for showing template instantiation times in WPA.|
-|Views\ChromeFlameGraph\ChromeFlameGraphView.cpp/.h|Component that creates and outputs a `.json` trace viewable in Google Chrome's trace viewer.|
-|Views\ChromeFlameGraph\PackedProcessThreadRemapping.cpp/.h|Component that attempts to keep entries on each hierarchy as close as possible by giving a more *logical distribution* of processes and threads.|
+|Views\TimeTrace\TimeTraceFlameGraphView.cpp/.h|Component that creates and outputs a `.json` trace viewable in Microsoft Edge's trace viewer.|
+|Views\TimeTraceFlameGraph\PackedProcessThreadRemapping.cpp/.h|Component that attempts to keep entries on each hierarchy as close as possible by giving a more *logical distribution* of processes and threads.|
 |Commands.cpp/.h|Implements all commands available in vcperf.|
 |GenericFields.cpp/.h|Implements the generic field support, used to add custom columns to the views.|
 |main.cpp|The program's starting point. This file parses the command line and redirects control to a command in the Commands.cpp/.h file.|
