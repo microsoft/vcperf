@@ -191,7 +191,7 @@
     <ClCompile Include="src\GenericFields.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Views\TimeTrace\PackedProcessThreadRemapping.cpp" />
-    <ClCompile Include="src\Views\TimeTrace\TimeTraceFlameGraphView.cpp" />
+    <ClCompile Include="src\Views\TimeTrace\TimeTraceGenerator.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Analyzers\ContextBuilder.h" />
@@ -208,7 +208,7 @@
     <ClInclude Include="src\PayloadBuilder.h" />
     <ClInclude Include="src\Utility.h" />
     <ClInclude Include="src\Views\TimeTrace\PackedProcessThreadRemapping.h" />
-    <ClInclude Include="src\Views\TimeTrace\TimeTraceFlameGraphView.h" />
+    <ClInclude Include="src\Views\TimeTrace\TimeTraceGenerator.h" />
   </ItemGroup>
   <ItemGroup>
     <Xml Include="src\CppBuildInsightsEtw.xml">

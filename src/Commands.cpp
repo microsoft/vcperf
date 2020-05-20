@@ -13,7 +13,7 @@
 #include "Views\FunctionsView.h"
 #include "Views\FilesView.h"
 #include "Views\TemplateInstantiationsView.h"
-#include "Views\TimeTrace\TimeTraceFlameGraphView.h"
+#include "Views\TimeTrace\TimeTraceGenerator.h"
 
 using namespace Microsoft::Cpp::BuildInsights;
 
@@ -193,10 +193,10 @@ RESULT_CODE StopToTimeTrace(const std::wstring& sessionName, const std::filesyst
     TRACING_SESSION_STATISTICS& statistics)
 {
     ExecutionHierarchy eh;
-    TimeTraceFlameGraphView::Filter f{ analyzeTemplates,
-                                    std::chrono::milliseconds(10),
-                                    std::chrono::milliseconds(10) };
-    TimeTraceFlameGraphView cfgv{ &eh, outputFile, f };
+    TimeTraceGenerator::Filter f{ analyzeTemplates,
+                                  std::chrono::milliseconds(10),
+                                  std::chrono::milliseconds(10) };
+    TimeTraceGenerator cfgv{ &eh, outputFile, f };
 
     auto analyzerGroup = MakeStaticAnalyzerGroup(&eh, &cfgv);
     int analysisPassCount = 1;
@@ -228,10 +228,10 @@ RESULT_CODE AnalyzeToWPA(const std::filesystem::path& inputFile, const std::file
 RESULT_CODE AnalyzeToTimeTrace(const std::filesystem::path& inputFile, const std::filesystem::path& outputFile, bool analyzeTemplates)
 {
     ExecutionHierarchy eh;
-    TimeTraceFlameGraphView::Filter f{ analyzeTemplates,
-                                    std::chrono::milliseconds(10),
-                                    std::chrono::milliseconds(10) };
-    TimeTraceFlameGraphView cfgv{ &eh, outputFile, f };
+    TimeTraceGenerator::Filter f{ analyzeTemplates,
+                                  std::chrono::milliseconds(10),
+                                  std::chrono::milliseconds(10) };
+    TimeTraceGenerator cfgv{ &eh, outputFile, f };
 
     auto analyzerGroup = MakeStaticAnalyzerGroup(&eh, &cfgv);
     int analysisPassCount = 1;

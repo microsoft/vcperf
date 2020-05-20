@@ -1,4 +1,4 @@
-#include "TimeTraceFlameGraphView.h"
+#include "TimeTraceGenerator.h"
 
 #include <fstream>
 #include <nlohmann\json.hpp>
@@ -96,7 +96,7 @@ void AddEntry(const ExecutionHierarchy::Entry* entry, nlohmann::json& traceEvent
 
 }  // anonymous namespace
 
-TimeTraceFlameGraphView::TimeTraceFlameGraphView(ExecutionHierarchy* hierarchy, const std::filesystem::path& outputFile,
+TimeTraceGenerator::TimeTraceGenerator(ExecutionHierarchy* hierarchy, const std::filesystem::path& outputFile,
                                            Filter filter) :
     hierarchy_{hierarchy},
     outputFile_{outputFile},
@@ -106,15 +106,15 @@ TimeTraceFlameGraphView::TimeTraceFlameGraphView(ExecutionHierarchy* hierarchy, 
 {
 }
 
-BI::AnalysisControl TimeTraceFlameGraphView::OnStopActivity(const BI::EventStack& eventStack)
+BI::AnalysisControl TimeTraceGenerator::OnStopActivity(const BI::EventStack& eventStack)
 {
-    if (MatchEventInMemberFunction(eventStack.Back(), this, &TimeTraceFlameGraphView::ProcessActivity))
+    if (MatchEventInMemberFunction(eventStack.Back(), this, &TimeTraceGenerator::ProcessActivity))
     {}
 
     return AnalysisControl::CONTINUE;
 }
 
-AnalysisControl TimeTraceFlameGraphView::OnEndAnalysis()
+AnalysisControl TimeTraceGenerator::OnEndAnalysis()
 {
     remappings_.Calculate(hierarchy_);
 
@@ -130,7 +130,7 @@ AnalysisControl TimeTraceFlameGraphView::OnEndAnalysis()
     return AnalysisControl::CONTINUE;
 }
 
-void TimeTraceFlameGraphView::ProcessActivity(const Activity& activity)
+void TimeTraceGenerator::ProcessActivity(const Activity& activity)
 {    
     if (ShouldIgnore(activity))
     {
@@ -142,7 +142,7 @@ void TimeTraceFlameGraphView::ProcessActivity(const Activity& activity)
     }
 }
 
-void TimeTraceFlameGraphView::CalculateChildrenOffsets(const Activity& activity)
+void TimeTraceGenerator::CalculateChildrenOffsets(const Activity& activity)
 {
     const ExecutionHierarchy::Entry* entry = hierarchy_->GetEntry(activity.EventInstanceId());
     assert(entry != nullptr);
@@ -150,7 +150,7 @@ void TimeTraceFlameGraphView::CalculateChildrenOffsets(const Activity& activity)
     remappings_.CalculateChildrenLocalThreadData(entry);
 }
 
-void TimeTraceFlameGraphView::ExportTo(std::ostream& outputStream) const
+void TimeTraceGenerator::ExportTo(std::ostream& outputStream) const
 {
     nlohmann::json json = nlohmann::json::object();
 
@@ -168,7 +168,7 @@ void TimeTraceFlameGraphView::ExportTo(std::ostream& outputStream) const
     outputStream << std::setw(2) << json << std::endl;
 }
 
-bool TimeTraceFlameGraphView::ShouldIgnore(const A::Activity& activity) const
+bool TimeTraceGenerator::ShouldIgnore(const A::Activity& activity) const
 {
     if (activity.EventId() == EVENT_ID_TEMPLATE_INSTANTIATION)
     {

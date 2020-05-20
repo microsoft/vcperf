@@ -11,11 +11,11 @@
 namespace vcperf
 {
 
-class TimeTraceFlameGraphView : public BI::IAnalyzer
+class TimeTraceGenerator : public BI::IAnalyzer
 {
 public:
 
-    // controls which subhierarchies get ignored (check TimeTraceFlameGraphView::ShouldIgnore)
+    // controls which subhierarchies get ignored (check TimeTraceGenerator::ShouldIgnore)
     struct Filter
     {
         bool AnalyzeTemplates = false;
@@ -25,7 +25,7 @@ public:
 
 public:
 
-    TimeTraceFlameGraphView(ExecutionHierarchy* hierarchy, const std::filesystem::path& outputFile,
+    TimeTraceGenerator(ExecutionHierarchy* hierarchy, const std::filesystem::path& outputFile,
                          Filter filter);
 
     BI::AnalysisControl OnStopActivity(const BI::EventStack& eventStack) override;

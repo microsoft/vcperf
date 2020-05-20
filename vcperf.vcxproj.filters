@@ -66,7 +66,7 @@
     <ClCompile Include="src\Views\TimeTrace\PackedProcessThreadRemapping.cpp">
       <Filter>Source Files\Views\TimeTrace</Filter>
     </ClCompile>
-    <ClCompile Include="src\Views\TimeTrace\TimeTraceFlameGraphView.cpp">
+    <ClCompile Include="src\Views\TimeTrace\TimeTraceGenerator.cpp">
       <Filter>Source Files\Views\TimeTrace</Filter>
     </ClCompile>
   </ItemGroup>
@@ -113,7 +113,7 @@
     <ClInclude Include="src\Views\TimeTrace\PackedProcessThreadRemapping.h">
       <Filter>Header Files\Views\TimeTrace</Filter>
     </ClInclude>
-    <ClInclude Include="src\Views\TimeTrace\TimeTraceFlameGraphView.h">
+    <ClInclude Include="src\Views\TimeTrace\TimeTraceGenerator.h">
       <Filter>Header Files\Views\TimeTrace</Filter>
     </ClInclude>
   </ItemGroup>
