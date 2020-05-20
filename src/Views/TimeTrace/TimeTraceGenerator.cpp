@@ -41,7 +41,7 @@ void AddEntry(const ExecutionHierarchy::Entry* entry, nlohmann::json& traceEvent
         if (!entry->Properties.empty())
         {
             nlohmann::json args = nlohmann::json::object();
-            for (auto pair : entry->Properties)
+            for (auto& pair : entry->Properties)
             {
                 args[pair.first] = pair.second;
             }
@@ -67,7 +67,7 @@ void AddEntry(const ExecutionHierarchy::Entry* entry, nlohmann::json& traceEvent
         if (!entry->Properties.empty())
         {
             nlohmann::json args = nlohmann::json::object();
-            for (auto pair : entry->Properties)
+            for (auto& pair : entry->Properties)
             {
                 args[pair.first] = pair.second;
             }
