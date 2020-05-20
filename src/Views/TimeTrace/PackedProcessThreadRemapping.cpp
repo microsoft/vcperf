@@ -67,8 +67,7 @@ void PackedProcessThreadRemapping::CalculateChildrenLocalThreadId(const Executio
                 {
                     // preceding sibling has been processed already, if its data is missing it means it's ignored
                     auto it = localOffsetsData_.find(precedingSibling->Id);
-                    if (it != localOffsetsData_.end())
-                    {
+                    if (it != localOffsetsData_.end()) {
                         overlappingLocalThreadIds.push_back(it->second.RawLocalThreadId);
                     }
                 }
@@ -100,8 +99,7 @@ void PackedProcessThreadRemapping::CalculateChildrenExtraThreadIdToFitHierarchy(
         auto it = localOffsetsData_.find(child->Id);
 
         // if data is missing, it means child is ignored
-        if (it != localOffsetsData_.end())
-        {
+        if (it != localOffsetsData_.end()) {
             sortedChildrenWithData.emplace_back(child, &it->second);
         }
     }
@@ -128,8 +126,7 @@ void PackedProcessThreadRemapping::CalculateChildrenExtraThreadIdToFitHierarchy(
             // needs more room for its subhierarchy
             if (currentLocalThreadId == data.second->RawLocalThreadId)
             {
-                if (data.second->RequiredThreadIdToFitHierarchy > currentExtraThreadToFitHierarchy)
-                {
+                if (data.second->RequiredThreadIdToFitHierarchy > currentExtraThreadToFitHierarchy) {
                     currentExtraThreadToFitHierarchy = data.second->RequiredThreadIdToFitHierarchy;
                 }
             }

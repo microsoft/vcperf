@@ -286,12 +286,10 @@ HRESULT DoStop(const std::wstring& sessionName, const std::filesystem::path& out
 
     TRACING_SESSION_STATISTICS statistics{};
     RESULT_CODE rc;
-    if (!generateTimeTrace)
-    {
+    if (!generateTimeTrace) {
         rc = StopToWPA(sessionName, outputFile, analyzeTemplates, statistics);
     }
-    else
-    {
+    else {
         rc = StopToTimeTrace(sessionName, outputFile, analyzeTemplates, statistics);
     }
 
@@ -340,12 +338,10 @@ HRESULT DoAnalyze(const std::filesystem::path& inputFile, const std::filesystem:
     std::wcout << L"Analyzing..." << std::endl;
     
     RESULT_CODE rc;
-    if (!generateTimeTrace)
-    {
+    if (!generateTimeTrace) {
         rc = AnalyzeToWPA(inputFile, outputFile, analyzeTemplates);
     }
-    else
-    {
+    else {
         rc = AnalyzeToTimeTrace(inputFile, outputFile, analyzeTemplates);
     }
 

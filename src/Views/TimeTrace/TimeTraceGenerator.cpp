@@ -14,8 +14,7 @@ namespace
 void AddEntry(const ExecutionHierarchy::Entry* entry, nlohmann::json& traceEvents,
                 const PackedProcessThreadRemapping& remappings, const std::unordered_set<unsigned long long>& ignoredEntries)
 {
-    if (ignoredEntries.find(entry->Id) != ignoredEntries.end())
-    {
+    if (ignoredEntries.find(entry->Id) != ignoredEntries.end()) {
         return;
     }
 
@@ -119,8 +118,7 @@ AnalysisControl TimeTraceGenerator::OnEndAnalysis()
     remappings_.Calculate(hierarchy_);
 
     std::ofstream outputStream(outputFile_);
-    if (!outputStream)
-    {
+    if (!outputStream) {
         return AnalysisControl::FAILURE;
     }
 
@@ -132,12 +130,10 @@ AnalysisControl TimeTraceGenerator::OnEndAnalysis()
 
 void TimeTraceGenerator::ProcessActivity(const Activity& activity)
 {    
-    if (ShouldIgnore(activity))
-    {
+    if (ShouldIgnore(activity)) {
         ignoredEntries_.emplace(activity.EventInstanceId());
     }
-    else
-    {
+    else {
         CalculateChildrenOffsets(activity);
     }
 }
@@ -172,8 +168,7 @@ bool TimeTraceGenerator::ShouldIgnore(const A::Activity& activity) const
 {
     if (activity.EventId() == EVENT_ID_TEMPLATE_INSTANTIATION)
     {
-        if (!filter_.AnalyzeTemplates)
-        {
+        if (!filter_.AnalyzeTemplates) {
             return true;
         }
 
@@ -187,8 +182,7 @@ bool TimeTraceGenerator::ShouldIgnore(const A::Activity& activity) const
     if (activity.EventId() == EVENT_ID_FUNCTION)
     {
         auto durationMs = std::chrono::duration_cast<std::chrono::milliseconds>(activity.Duration());
-        if (durationMs < filter_.IgnoreFunctionUnderMs)
-        {
+        if (durationMs < filter_.IgnoreFunctionUnderMs) {
             return true;
         }
     }
