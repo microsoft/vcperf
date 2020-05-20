@@ -57,6 +57,8 @@ private:
     void OnSymbolName(const SE::SymbolName& symbolName);
     void OnCommandLine(const A::Activity& parent, const SE::CommandLine& commandLine);
     void OnEnvironmentVariable(const A::Activity& parent, const SE::EnvironmentVariable& environmentVariable);
+    void OnFileInput(const A::Activity& parent, const SE::FileInput& fileInput);
+    void OnFileOutput(const A::Activity& parent, const SE::FileOutput& fileOutput);
 
     std::unordered_map<unsigned long long, Entry> entries_;
     TRoots roots_;

@@ -72,7 +72,9 @@ AnalysisControl ExecutionHierarchy::OnSimpleEvent(const EventStack& eventStack)
 {
     if (   MatchEventInMemberFunction(eventStack.Back(), this, &ExecutionHierarchy::OnSymbolName)
         || MatchEventStackInMemberFunction(eventStack, this, &ExecutionHierarchy::OnCommandLine)
-        || MatchEventStackInMemberFunction(eventStack, this, &ExecutionHierarchy::OnEnvironmentVariable))
+        || MatchEventStackInMemberFunction(eventStack, this, &ExecutionHierarchy::OnEnvironmentVariable)
+        || MatchEventStackInMemberFunction(eventStack, this, &ExecutionHierarchy::OnFileInput)
+        || MatchEventStackInMemberFunction(eventStack, this, &ExecutionHierarchy::OnFileOutput))
     {}
 
     return AnalysisControl::CONTINUE;
@@ -229,4 +231,20 @@ void ExecutionHierarchy::OnEnvironmentVariable(const A::Activity& parent, const 
         
         it->second.Properties.try_emplace("Env Var: " + ToString(environmentVariable.Name()), ToString(environmentVariable.Value()));
     }
+}
+
+void ExecutionHierarchy::OnFileInput(const A::Activity& parent, const SE::FileInput& fileInput)
+{
+    auto it = entries_.find(parent.EventInstanceId());
+    assert(it != entries_.end());
+
+    it->second.Properties.try_emplace("File Input", ToString(fileInput.Path()));
+}
+
+void ExecutionHierarchy::OnFileOutput(const A::Activity& parent, const SE::FileOutput& fileOutput)
+{
+    auto it = entries_.find(parent.EventInstanceId());
+    assert(it != entries_.end());
+
+    it->second.Properties.try_emplace("File Output", ToString(fileOutput.Path()));
 }
