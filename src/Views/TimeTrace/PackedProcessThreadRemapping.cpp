@@ -48,9 +48,10 @@ void PackedProcessThreadRemapping::CalculateChildrenLocalThreadId(const Executio
 
     const std::vector<ExecutionHierarchy::Entry*>& children = entry->Children;
     std::vector<unsigned long> overlappingLocalThreadIds;
-    for (int childIndex = 0; childIndex < children.size(); ++childIndex)
+
+    for (auto itChild = children.begin(); itChild != children.end(); ++itChild)
     {
-        const ExecutionHierarchy::Entry* child = children[childIndex];
+        const ExecutionHierarchy::Entry* child = *itChild;
         auto itLocalOffsetData = localOffsetsData_.find(child->Id);
 
         // not finding it means it's been ignored, so we don't need to perform any calculations for it
@@ -58,9 +59,9 @@ void PackedProcessThreadRemapping::CalculateChildrenLocalThreadId(const Executio
         {
             // children are sorted by start time, so we only have to check previous siblings for overlaps
             overlappingLocalThreadIds.clear();
-            for (int precedingSiblingIndex = childIndex - 1; precedingSiblingIndex >= 0; --precedingSiblingIndex)
+            for(auto itPrecedingSibling = std::make_reverse_iterator(itChild); itPrecedingSibling != children.rend(); ++itPrecedingSibling)
             {
-                const ExecutionHierarchy::Entry* precedingSibling = children[precedingSiblingIndex];
+                const ExecutionHierarchy::Entry* precedingSibling = *itPrecedingSibling;
 
                 if (child->OverlapsWith(precedingSibling))
                 {
@@ -169,15 +170,15 @@ void PackedProcessThreadRemapping::RemapRootsProcessId(const ExecutionHierarchy*
 {
     const ExecutionHierarchy::TRoots& roots = hierarchy->GetRoots();
     std::vector<unsigned long> overlappingProcessIds;
-    for (int rootIndex = 0; rootIndex < roots.size(); ++rootIndex)
+    for (auto itRoot = roots.begin(); itRoot != roots.end(); ++itRoot)
     {
-        const ExecutionHierarchy::Entry* root = roots[rootIndex];
+        const ExecutionHierarchy::Entry* root = *itRoot;
 
         // entries are sorted by start time, so we only have to check previous siblings for overlaps
         overlappingProcessIds.clear();
-        for (int precedingSiblingIndex = rootIndex - 1; precedingSiblingIndex >= 0; --precedingSiblingIndex)
+        for (auto itPrecedingSibling = std::make_reverse_iterator(itRoot); itPrecedingSibling != roots.rend(); ++itPrecedingSibling)
         {
-            const ExecutionHierarchy::Entry* precedingSibling = roots[precedingSiblingIndex];
+            const ExecutionHierarchy::Entry* precedingSibling = *itPrecedingSibling;
 
             if (root->OverlapsWith(precedingSibling))
             {
