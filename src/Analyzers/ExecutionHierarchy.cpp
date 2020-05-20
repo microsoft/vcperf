@@ -195,7 +195,7 @@ void ExecutionHierarchy::OnSymbolName(const SymbolName& symbolName)
     }
 }
 
-void ExecutionHierarchy::OnCommandLine(const A::Activity& parent, const CommandLine& commandLine)
+void ExecutionHierarchy::OnCommandLine(const Activity& parent, const CommandLine& commandLine)
 {
     auto it = entries_.find(parent.EventInstanceId());
     assert(it != entries_.end());
@@ -203,7 +203,7 @@ void ExecutionHierarchy::OnCommandLine(const A::Activity& parent, const CommandL
     it->second.Properties.try_emplace("Command Line", ToString(commandLine.Value()));
 }
 
-void ExecutionHierarchy::OnEnvironmentVariable(const A::Activity& parent, const EnvironmentVariable& environmentVariable)
+void ExecutionHierarchy::OnEnvironmentVariable(const Activity& parent, const EnvironmentVariable& environmentVariable)
 {
     // we're not interested in all of them, only the ones that impact the build process
     bool process = false;
@@ -233,7 +233,7 @@ void ExecutionHierarchy::OnEnvironmentVariable(const A::Activity& parent, const 
     }
 }
 
-void ExecutionHierarchy::OnFileInput(const A::Activity& parent, const SE::FileInput& fileInput)
+void ExecutionHierarchy::OnFileInput(const Activity& parent, const FileInput& fileInput)
 {
     auto it = entries_.find(parent.EventInstanceId());
     assert(it != entries_.end());
@@ -241,7 +241,7 @@ void ExecutionHierarchy::OnFileInput(const A::Activity& parent, const SE::FileIn
     it->second.Properties.try_emplace("File Input", ToString(fileInput.Path()));
 }
 
-void ExecutionHierarchy::OnFileOutput(const A::Activity& parent, const SE::FileOutput& fileOutput)
+void ExecutionHierarchy::OnFileOutput(const Activity& parent, const FileOutput& fileOutput)
 {
     auto it = entries_.find(parent.EventInstanceId());
     assert(it != entries_.end());
