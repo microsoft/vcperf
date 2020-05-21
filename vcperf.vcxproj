@@ -180,35 +180,35 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\Analyzers\ContextBuilder.cpp" />
-    <ClCompile Include="src\Analyzers\ExecutionHierarchy.cpp" />
-    <ClCompile Include="src\Analyzers\ExpensiveTemplateInstantiationCache.cpp" />
-    <ClCompile Include="src\Views\BuildExplorerView.cpp" />
-    <ClCompile Include="src\Views\FilesView.cpp" />
-    <ClCompile Include="src\Views\FunctionsView.cpp" />
-    <ClCompile Include="src\Views\TemplateInstantiationsView.cpp" />
+    <ClCompile Include="src\WPA\Analyzers\ContextBuilder.cpp" />
+    <ClCompile Include="src\WPA\Analyzers\ExpensiveTemplateInstantiationCache.cpp" />
+    <ClCompile Include="src\WPA\Views\BuildExplorerView.cpp" />
+    <ClCompile Include="src\WPA\Views\FilesView.cpp" />
+    <ClCompile Include="src\WPA\Views\FunctionsView.cpp" />
+    <ClCompile Include="src\WPA\Views\TemplateInstantiationsView.cpp" />
     <ClCompile Include="src\Commands.cpp" />
     <ClCompile Include="src\GenericFields.cpp" />
     <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\Views\TimeTrace\PackedProcessThreadRemapping.cpp" />
-    <ClCompile Include="src\Views\TimeTrace\TimeTraceGenerator.cpp" />
+    <ClCompile Include="src\TimeTrace\PackedProcessThreadRemapping.cpp" />
+    <ClCompile Include="src\TimeTrace\TimeTraceGenerator.cpp" />
+    <ClCompile Include="src\TimeTrace\ExecutionHierarchy.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\Analyzers\ContextBuilder.h" />
-    <ClInclude Include="src\Analyzers\ExecutionHierarchy.h" />
-    <ClInclude Include="src\Analyzers\MiscellaneousCache.h" />
-    <ClInclude Include="src\Analyzers\ExpensiveTemplateInstantiationCache.h" />
+    <ClInclude Include="src\WPA\Analyzers\ContextBuilder.h" />
+    <ClInclude Include="src\WPA\Analyzers\MiscellaneousCache.h" />
+    <ClInclude Include="src\WPA\Analyzers\ExpensiveTemplateInstantiationCache.h" />
     <ClInclude Include="src\VcperfBuildInsights.h" />
-    <ClInclude Include="src\Views\BuildExplorerView.h" />
-    <ClInclude Include="src\Views\FilesView.h" />
-    <ClInclude Include="src\Views\FunctionsView.h" />
-    <ClInclude Include="src\Views\TemplateInstantiationsView.h" />
+    <ClInclude Include="src\WPA\Views\BuildExplorerView.h" />
+    <ClInclude Include="src\WPA\Views\FilesView.h" />
+    <ClInclude Include="src\WPA\Views\FunctionsView.h" />
+    <ClInclude Include="src\WPA\Views\TemplateInstantiationsView.h" />
     <ClInclude Include="src\Commands.h" />
     <ClInclude Include="src\GenericFields.h" />
     <ClInclude Include="src\PayloadBuilder.h" />
     <ClInclude Include="src\Utility.h" />
-    <ClInclude Include="src\Views\TimeTrace\PackedProcessThreadRemapping.h" />
-    <ClInclude Include="src\Views\TimeTrace\TimeTraceGenerator.h" />
+    <ClInclude Include="src\TimeTrace\PackedProcessThreadRemapping.h" />
+    <ClInclude Include="src\TimeTrace\TimeTraceGenerator.h" />
+    <ClInclude Include="src\TimeTrace\ExecutionHierarchy.h" />
   </ItemGroup>
   <ItemGroup>
     <Xml Include="src\CppBuildInsightsEtw.xml">

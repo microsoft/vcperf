@@ -3,8 +3,6 @@
 #include <assert.h>
 #include <algorithm>
 
-#include "Analyzers\ExecutionHierarchy.h"
-
 using namespace vcperf;
 
 PackedProcessThreadRemapping::PackedProcessThreadRemapping() :

@@ -2,7 +2,7 @@
 
 #include <unordered_map>
 
-#include "Analyzers\ExecutionHierarchy.h"
+#include "TimeTrace\ExecutionHierarchy.h"
 
 namespace vcperf
 {

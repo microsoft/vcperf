@@ -5,8 +5,8 @@
 #include <unordered_set>
 
 #include "VcperfBuildInsights.h"
-#include "Analyzers\ExecutionHierarchy.h"
-#include "Views\TimeTrace\PackedProcessThreadRemapping.h"
+#include "TimeTrace\ExecutionHierarchy.h"
+#include "TimeTrace\PackedProcessThreadRemapping.h"
 
 namespace vcperf
 {

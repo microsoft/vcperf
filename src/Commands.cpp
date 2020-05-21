@@ -5,15 +5,15 @@
 
 #include "VcperfBuildInsights.h"
 
-#include "Analyzers\ExpensiveTemplateInstantiationCache.h"
-#include "Analyzers\ContextBuilder.h"
-#include "Analyzers\MiscellaneousCache.h"
-#include "Analyzers\ExecutionHierarchy.h"
-#include "Views\BuildExplorerView.h"
-#include "Views\FunctionsView.h"
-#include "Views\FilesView.h"
-#include "Views\TemplateInstantiationsView.h"
-#include "Views\TimeTrace\TimeTraceGenerator.h"
+#include "WPA\Analyzers\ExpensiveTemplateInstantiationCache.h"
+#include "WPA\Analyzers\ContextBuilder.h"
+#include "WPA\Analyzers\MiscellaneousCache.h"
+#include "WPA\Views\BuildExplorerView.h"
+#include "WPA\Views\FunctionsView.h"
+#include "WPA\Views\FilesView.h"
+#include "WPA\Views\TemplateInstantiationsView.h"
+#include "TimeTrace\ExecutionHierarchy.h"
+#include "TimeTrace\TimeTraceGenerator.h"
 
 using namespace Microsoft::Cpp::BuildInsights;
 
