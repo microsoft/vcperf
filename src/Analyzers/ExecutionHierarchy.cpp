@@ -1,6 +1,7 @@
 #include "ExecutionHierarchy.h"
 
 #include <assert.h>
+#include <string>
 
 using namespace Microsoft::Cpp::BuildInsights;
 using namespace Activities;
@@ -142,6 +143,13 @@ void ExecutionHierarchy::OnInvocation(const Invocation& invocation)
 
     it->second.Properties.try_emplace("Working Directory", ToString(invocation.WorkingDirectory()));
     it->second.Properties.try_emplace("Tool Version", invocation.ToolVersionString());
+
+    if (invocation.EventId() == EVENT_ID_COMPILER) {
+        it->second.Name = "CL Invocation " + std::to_string(invocation.InvocationId());
+    }
+    else if (invocation.EventId() == EVENT_ID_LINKER) {
+        it->second.Name = "Link Invocation " + std::to_string(invocation.InvocationId());
+    }
 }
 
 void ExecutionHierarchy::OnFrontEndFile(const FrontEndFile& frontEndFile)
