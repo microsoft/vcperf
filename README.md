@@ -6,6 +6,10 @@ vcperf is a C++ build analysis tool for the MSVC toolchain. It is built on top o
 
 ![Overview of what a vcperf trace looks like when viewed in WPA.](media/vcperf-wpa-overview.gif)
 
+vcperf can also generate flame graphs viewable in Microsoft Edge's trace viewer, as shown below:
+
+![Overview of what a vcperf trace looks like when viewed in Microsoft Edge.](media/vcperf-timetrace-overview.png)
+
 ## How vcperf works
 
 vcperf makes use of the [Event Tracing for Windows](https://docs.microsoft.com/windows/win32/etw/about-event-tracing) (ETW) relogging interface available in the [C++ Build Insights SDK](https://docs.microsoft.com/cpp/build-insights/reference/sdk/overview?view=vs-2019). This interface allows vcperf to translate an MSVC build trace into a new, customized ETW event format that is suitable for viewing in WPA. The translation process involves determining the context of each event, and emiting new events that include this information. For example, when vcperf emits an event for the code generation time of a function, it also includes the compiler or linker invocation in which the code generation took place. Having this context available allows gaining more insight from the data, such as determining the functions that took longest to generate for one particular invocation.
