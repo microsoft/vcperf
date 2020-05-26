@@ -25,9 +25,21 @@ namespace
         return convertedString;
     }
 
+    long long ConvertTickPrecision(long long ticks, long long fromFreq, long long toFreq)
+    {
+        if (fromFreq <= 0) {
+            return 0;
+        }
+
+        long long p1 = (ticks / fromFreq) * toFreq;
+        long long p2 = (ticks % fromFreq) * toFreq / fromFreq;
+
+        return p1 + p2;
+    }
+
     std::chrono::nanoseconds ConvertTime(long long ticks, long long frequency)
     {
-        return std::chrono::nanoseconds{ Internal::ConvertTickPrecision(ticks, frequency, std::chrono::nanoseconds::period::den) };
+        return std::chrono::nanoseconds{ ConvertTickPrecision(ticks, frequency, std::chrono::nanoseconds::period::den) };
     }
 
 }  // anonymous namespace
