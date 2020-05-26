@@ -137,7 +137,7 @@ void ExecutionHierarchy::OnInvocation(const Invocation& invocation)
     assert(it != entries_.end());
 
     // may not be present, as it's not available in earlier versions of the toolset
-    if (invocation.ToolPath() != nullptr) {
+    if (invocation.ToolPath()) {
         it->second.Properties.try_emplace("Tool Path", ToString(invocation.ToolPath()));
     }
 
