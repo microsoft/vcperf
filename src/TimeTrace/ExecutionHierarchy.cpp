@@ -179,12 +179,6 @@ void ExecutionHierarchy::OnFunction(const Function& function)
 
 void ExecutionHierarchy::OnTemplateInstantiation(const TemplateInstantiation& templateInstantiation)
 {
-    // SymbolName events get executed after all TemplateInstantiation in the same FrontEndPass take place
-    // and we're sure to have exclusive keys for these symbols (they may have matching names between
-    // FrontEndPass activities, but their key is unique for the trace)
-    assert(symbolNames_.find(templateInstantiation.SpecializationSymbolKey()) == symbolNames_.end());
-    auto itSymbol = symbolNames_.find(templateInstantiation.SpecializationSymbolKey());
-
     // get us subscribed for name resolution (may already have some other activities following)
     auto result = unresolvedTemplateInstantiationsPerSymbol_.try_emplace(templateInstantiation.SpecializationSymbolKey(),
                                                                             TUnresolvedTemplateInstantiationNames());
