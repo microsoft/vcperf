@@ -78,13 +78,18 @@ StartSubCommand CheckStartSubCommands(const wchar_t* arg)
     return StartSubCommand::NONE;
 }
 
+void PrintStopOrAnalyzeCommandLineHint(const wchar_t* command, const wchar_t* sessionOrInputHelp)
+{
+    std::wcout << L"vcperf.exe " << command << " [/templates] " << sessionOrInputHelp << " outputFile.etl" << std::endl;
+    std::wcout << L"vcperf.exe " << command << " [/templates] " << sessionOrInputHelp << " /timetrace outputFile.json" << std::endl;
+}
 
 int ParseStopOrAnalyze(int argc, wchar_t* argv[], const wchar_t* command, const wchar_t* sessionOrInputHelp,
     std::wstring& firstArg, std::wstring& outputFile, bool& analyzeTemplates, bool& generateTimeTrace)
 {
     if (argc < 4)
     {
-        std::wcout << L"vcperf.exe " << command << " [/templates] " << sessionOrInputHelp << " [/timetrace] outputFile.etl" << std::endl;
+        PrintStopOrAnalyzeCommandLineHint(command, sessionOrInputHelp);
         return E_FAIL;
     }
 
@@ -103,7 +108,7 @@ int ParseStopOrAnalyze(int argc, wchar_t* argv[], const wchar_t* command, const 
 
         if (argc < 5)
         {
-            std::wcout << L"vcperf.exe " << command << " [/templates] " << sessionOrInputHelp << " [/timetrace] outputFile.etl" << std::endl;
+            PrintStopOrAnalyzeCommandLineHint(command, sessionOrInputHelp);
             return E_FAIL;
         }
     }
@@ -118,7 +123,7 @@ int ParseStopOrAnalyze(int argc, wchar_t* argv[], const wchar_t* command, const 
     {
         if (argc < 5)
         {
-            std::wcout << L"vcperf.exe " << command << " [/templates] " << sessionOrInputHelp << " [/timetrace] outputFile.etl" << std::endl;
+            PrintStopOrAnalyzeCommandLineHint(command, sessionOrInputHelp);
             return E_FAIL;
         }
 
@@ -128,7 +133,7 @@ int ParseStopOrAnalyze(int argc, wchar_t* argv[], const wchar_t* command, const 
 
     if (analyzeTemplates && generateTimeTrace && argc < 6)
     {
-        std::wcout << L"vcperf.exe " << command << " [/templates] " << sessionOrInputHelp << " [/timetrace] outputFile.etl" << std::endl;
+        PrintStopOrAnalyzeCommandLineHint(command, sessionOrInputHelp);
         return E_FAIL;
     }
 
@@ -136,7 +141,7 @@ int ParseStopOrAnalyze(int argc, wchar_t* argv[], const wchar_t* command, const 
     outputFile = arg;
 
     if (!ValidateFile(outputFile, false, generateTimeTrace ? L".json" : L".etl")) {
-        std::wcout << L"vcperf.exe " << command << " [/templates] " << sessionOrInputHelp << " [/timetrace] outputFile" << (generateTimeTrace ? L".json" : L".etl") << std::endl;
+        PrintStopOrAnalyzeCommandLineHint(command, sessionOrInputHelp);
         return E_FAIL;
     }
 
@@ -159,9 +164,11 @@ int wmain(int argc, wchar_t* argv[])
         std::wcout << std::endl;
         std::wcout << L"USAGE:" << std::endl;
         std::wcout << L"vcperf.exe /start [/nocpusampling] [/level1 | /level2 | /level3] sessionName" << std::endl;
-        std::wcout << L"vcperf.exe /stop [/templates] sessionName [/timetrace] outputFile.etl" << std::endl;
+        std::wcout << L"vcperf.exe /stop [/templates] sessionName outputFile.etl" << std::endl;
+        std::wcout << L"vcperf.exe /stop [/templates] sessionName /timetrace outputFile.json" << std::endl;
         std::wcout << L"vcperf.exe /stopnoanalyze sessionName outputRawFile.etl" << std::endl;
-        std::wcout << L"vcperf.exe /analyze [/templates] inputRawFile.etl [/timetrace] output.etl" << std::endl;
+        std::wcout << L"vcperf.exe /analyze [/templates] inputRawFile.etl output.etl" << std::endl;
+        std::wcout << L"vcperf.exe /analyze [/templates] inputRawFile.etl /timetrace output.json" << std::endl;
 
         std::wcout << std::endl;
 
