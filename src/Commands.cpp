@@ -196,9 +196,9 @@ RESULT_CODE StopToTimeTrace(const std::wstring& sessionName, const std::filesyst
     TimeTraceGenerator::Filter f{ analyzeTemplates,
                                   std::chrono::milliseconds(10),
                                   std::chrono::milliseconds(10) };
-    TimeTraceGenerator cfgv{ &eh, outputFile, f };
+    TimeTraceGenerator ttg{ &eh, outputFile, f };
 
-    auto analyzerGroup = MakeStaticAnalyzerGroup(&eh, &cfgv);
+    auto analyzerGroup = MakeStaticAnalyzerGroup(&eh, &ttg);
     int analysisPassCount = 1;
 
     return StopAndAnalyzeTracingSession(sessionName.c_str(), analysisPassCount, &statistics, analyzerGroup);
@@ -231,9 +231,9 @@ RESULT_CODE AnalyzeToTimeTrace(const std::filesystem::path& inputFile, const std
     TimeTraceGenerator::Filter f{ analyzeTemplates,
                                   std::chrono::milliseconds(10),
                                   std::chrono::milliseconds(10) };
-    TimeTraceGenerator cfgv{ &eh, outputFile, f };
+    TimeTraceGenerator ttg{ &eh, outputFile, f };
 
-    auto analyzerGroup = MakeStaticAnalyzerGroup(&eh, &cfgv);
+    auto analyzerGroup = MakeStaticAnalyzerGroup(&eh, &ttg);
     int analysisPassCount = 1;
 
     return Analyze(inputFile.c_str(), analysisPassCount, analyzerGroup);
