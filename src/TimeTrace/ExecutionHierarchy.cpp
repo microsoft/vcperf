@@ -63,8 +63,7 @@ AnalysisControl ExecutionHierarchy::OnStartActivity(const EventStack& eventStack
 
 AnalysisControl ExecutionHierarchy::OnStopActivity(const EventStack& eventStack)
 {
-    if (MatchEventInMemberFunction(eventStack.Back(), this, &ExecutionHierarchy::OnFinishActivity))
-    {}
+    MatchEventInMemberFunction(eventStack.Back(), this, &ExecutionHierarchy::OnFinishActivity);
 
     return AnalysisControl::CONTINUE;
 }
