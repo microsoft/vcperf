@@ -15,7 +15,7 @@ namespace
     {
         assert(!wstring.empty());
 
-        const UINT codePage = CP_ACP;
+        const UINT codePage = CP_UTF8;
         int requiredSize = WideCharToMultiByte(codePage, 0, wstring.c_str(), static_cast<int>(wstring.size()),
                                                NULL, 0, NULL, NULL);
         std::string convertedString = std::string(requiredSize, '\0');
