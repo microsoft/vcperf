@@ -192,11 +192,11 @@ RESULT_CODE StopToWPA(const std::wstring& sessionName, const std::filesystem::pa
 RESULT_CODE StopToTimeTrace(const std::wstring& sessionName, const std::filesystem::path& outputFile, bool analyzeTemplates,
     TRACING_SESSION_STATISTICS& statistics)
 {
-    ExecutionHierarchy eh;
-    TimeTraceGenerator::Filter f{ analyzeTemplates,
+    ExecutionHierarchy::Filter f{ analyzeTemplates,
                                   std::chrono::milliseconds(10),
                                   std::chrono::milliseconds(10) };
-    TimeTraceGenerator ttg{ &eh, outputFile, f };
+    ExecutionHierarchy eh{ f };
+    TimeTraceGenerator ttg{ &eh, outputFile };
 
     auto analyzerGroup = MakeStaticAnalyzerGroup(&eh, &ttg);
     int analysisPassCount = 1;
@@ -227,11 +227,11 @@ RESULT_CODE AnalyzeToWPA(const std::filesystem::path& inputFile, const std::file
 
 RESULT_CODE AnalyzeToTimeTrace(const std::filesystem::path& inputFile, const std::filesystem::path& outputFile, bool analyzeTemplates)
 {
-    ExecutionHierarchy eh;
-    TimeTraceGenerator::Filter f{ analyzeTemplates,
+    ExecutionHierarchy::Filter f{ analyzeTemplates,
                                   std::chrono::milliseconds(10),
                                   std::chrono::milliseconds(10) };
-    TimeTraceGenerator ttg{ &eh, outputFile, f };
+    ExecutionHierarchy eh{ f };
+    TimeTraceGenerator ttg{ &eh, outputFile };
 
     auto analyzerGroup = MakeStaticAnalyzerGroup(&eh, &ttg);
     int analysisPassCount = 1;

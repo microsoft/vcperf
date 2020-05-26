@@ -13,13 +13,21 @@ class ExecutionHierarchy : public BI::IAnalyzer
 {
 public:
 
+    // controls which activities get ignored
+    struct Filter
+    {
+        bool AnalyzeTemplates = false;
+        std::chrono::milliseconds IgnoreTemplateInstantiationUnderMs = std::chrono::milliseconds(0);
+        std::chrono::milliseconds IgnoreFunctionUnderMs = std::chrono::milliseconds(0);
+    };
+
     struct Entry
     {
-        unsigned long long Id;
-        unsigned long ProcessId;
-        unsigned long ThreadId;
-        std::chrono::nanoseconds StartTimestamp;
-        std::chrono::nanoseconds StopTimestamp;
+        unsigned long long Id = 0L;
+        unsigned long ProcessId = 0L;
+        unsigned long ThreadId = 0L;
+        std::chrono::nanoseconds StartTimestamp = std::chrono::nanoseconds(0);
+        std::chrono::nanoseconds StopTimestamp = std::chrono::nanoseconds(0);
         std::string Name;
 
         std::vector<Entry*> Children;
@@ -32,7 +40,7 @@ public:
 
 public:
 
-    ExecutionHierarchy();
+    ExecutionHierarchy(const Filter& filter);
 
     BI::AnalysisControl OnStartActivity(const BI::EventStack& eventStack) override;
     BI::AnalysisControl OnStopActivity(const BI::EventStack& eventStack) override;
@@ -51,8 +59,11 @@ private:
 
     void OnInvocation(const A::Invocation& invocation);
     void OnFrontEndFile(const A::FrontEndFile& frontEndFile);
-    void OnFunction(const A::Function& function);
-    void OnTemplateInstantiation(const A::TemplateInstantiation& templateInstantiation);
+
+    void OnFinishFunction(const A::Activity& parent, const A::Function& function);
+    void OnFinishRootTemplateInstantiation(const A::Activity& parent, const A::TemplateInstantiation& templateInstantiation);
+    void OnFinishNestedTemplateInstantiation(const A::TemplateInstantiationGroup& templateInstantiationGroup,
+                                             const A::TemplateInstantiation& templateInstantiation);
 
     void OnSymbolName(const SE::SymbolName& symbolName);
     void OnCommandLine(const A::Activity& parent, const SE::CommandLine& commandLine);
@@ -60,8 +71,12 @@ private:
     void OnFileInput(const A::Activity& parent, const SE::FileInput& fileInput);
     void OnFileOutput(const A::Activity& parent, const SE::FileOutput& fileOutput);
 
+    void IgnoreEntry(unsigned long long id, unsigned long long parentId);
+    void IgnoreEntry(unsigned long long id);
+
     std::unordered_map<unsigned long long, Entry> entries_;
     TRoots roots_;
+    Filter filter_;
 
     typedef unsigned long long TSymbolKey;
     std::unordered_map<TSymbolKey, std::string> symbolNames_;

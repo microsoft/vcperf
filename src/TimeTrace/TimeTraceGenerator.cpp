@@ -11,13 +11,8 @@ using namespace vcperf;
 namespace
 {
 
-void AddEntry(const ExecutionHierarchy::Entry* entry, nlohmann::json& traceEvents,
-                const PackedProcessThreadRemapping& remappings, const std::unordered_set<unsigned long long>& ignoredEntries)
+void AddEntry(const ExecutionHierarchy::Entry* entry, nlohmann::json& traceEvents, const PackedProcessThreadRemapping& remappings)
 {
-    if (ignoredEntries.find(entry->Id) != ignoredEntries.end()) {
-        return;
-    }
-
     const PackedProcessThreadRemapping::Remap* remap = remappings.GetRemapFor(entry->Id);
     unsigned long processId = remap != nullptr ? remap->ProcessId : entry->ProcessId;
     unsigned long threadId = remap != nullptr ? remap->ThreadId : entry->ThreadId;
@@ -78,7 +73,7 @@ void AddEntry(const ExecutionHierarchy::Entry* entry, nlohmann::json& traceEvent
 
         for (const ExecutionHierarchy::Entry* child : entry->Children)
         {
-            AddEntry(child, traceEvents, remappings, ignoredEntries);
+            AddEntry(child, traceEvents, remappings);
         }
 
         auto stopTimestamp = std::chrono::duration_cast<std::chrono::microseconds>(entry->StopTimestamp);
@@ -95,22 +90,16 @@ void AddEntry(const ExecutionHierarchy::Entry* entry, nlohmann::json& traceEvent
 
 }  // anonymous namespace
 
-TimeTraceGenerator::TimeTraceGenerator(ExecutionHierarchy* hierarchy, const std::filesystem::path& outputFile,
-                                           Filter filter) :
+TimeTraceGenerator::TimeTraceGenerator(ExecutionHierarchy* hierarchy, const std::filesystem::path& outputFile) :
     hierarchy_{hierarchy},
     outputFile_{outputFile},
-    remappings_{},
-    ignoredEntries_{},
-    filter_{filter}
+    remappings_{}
 {
 }
 
 BI::AnalysisControl TimeTraceGenerator::OnStopActivity(const BI::EventStack& eventStack)
 {
-    if (   MatchEventStackInMemberFunction(eventStack, this, &TimeTraceGenerator::ProcessTemplateInstantiationGroup)
-        || MatchEventInMemberFunction(eventStack.Back(), this, &TimeTraceGenerator::ProcessFunction)
-        || MatchEventInMemberFunction(eventStack.Back(), this, &TimeTraceGenerator::ProcessActivity))
-    {}
+    MatchEventInMemberFunction(eventStack.Back(), this, &TimeTraceGenerator::ProcessActivity);
 
     return AnalysisControl::CONTINUE;
 }
@@ -135,44 +124,15 @@ void TimeTraceGenerator::ProcessActivity(const Activity& activity)
     CalculateChildrenOffsets(activity);
 }
 
-void TimeTraceGenerator::ProcessFunction(const Function& function)
-{
-    auto durationMs = std::chrono::duration_cast<std::chrono::milliseconds>(function.Duration());
-    if (durationMs < filter_.IgnoreFunctionUnderMs) {
-        ignoredEntries_.emplace(function.EventInstanceId());
-    }
-    else {
-        ProcessActivity(function);
-    }
-}
-
-void TimeTraceGenerator::ProcessTemplateInstantiationGroup(const TemplateInstantiationGroup& templateInstantiationGroup)
-{
-    // keep full hierarchy when root TemplateInstantiation passes filter, even if children wouldn't pass
-    if (templateInstantiationGroup.Size() == 1)
-    {
-        // root TemplateInstantiation has completed, we can know its duration now
-        // also, all children have been processed already
-        const TemplateInstantiation& root = templateInstantiationGroup.Front();
-        auto rootDurationMs = std::chrono::duration_cast<std::chrono::milliseconds>(root.Duration());
-        if (!filter_.AnalyzeTemplates || rootDurationMs < filter_.IgnoreTemplateInstantiationUnderMs) {
-            ignoredEntries_.emplace(root.EventInstanceId());
-        }
-        else {
-            ProcessActivity(root);
-        }
-    }
-    else if(filter_.AnalyzeTemplates) {
-        ProcessActivity(templateInstantiationGroup.Back());
-    }
-}
-
 void TimeTraceGenerator::CalculateChildrenOffsets(const Activity& activity)
 {
     const ExecutionHierarchy::Entry* entry = hierarchy_->GetEntry(activity.EventInstanceId());
-    assert(entry != nullptr);
-
-    remappings_.CalculateChildrenLocalThreadData(entry);
+    
+    // may've been filtered out!
+    if (entry != nullptr)
+    {
+        remappings_.CalculateChildrenLocalThreadData(entry);
+    }
 }
 
 void TimeTraceGenerator::ExportTo(std::ostream& outputStream) const
@@ -183,7 +143,7 @@ void TimeTraceGenerator::ExportTo(std::ostream& outputStream) const
     nlohmann::json traceEvents = nlohmann::json::array();
     for (const ExecutionHierarchy::Entry* root : hierarchy_->GetRoots())
     {
-        AddEntry(root, traceEvents, remappings_, ignoredEntries_);
+        AddEntry(root, traceEvents, remappings_);
     }
     json["traceEvents"] = traceEvents;
 

@@ -50,9 +50,10 @@ bool ExecutionHierarchy::Entry::OverlapsWith(const Entry* other) const
            other->StartTimestamp < StopTimestamp;
 }
 
-ExecutionHierarchy::ExecutionHierarchy() :
+ExecutionHierarchy::ExecutionHierarchy(const Filter& filter) :
     entries_{},
     roots_{},
+    filter_{filter},
     symbolNames_{},
     unresolvedTemplateInstantiationsPerSymbol_{}
 {
@@ -65,9 +66,7 @@ AnalysisControl ExecutionHierarchy::OnStartActivity(const EventStack& eventStack
     {}
 
     if (   MatchEventInMemberFunction(eventStack.Back(), this, &ExecutionHierarchy::OnInvocation)
-        || MatchEventInMemberFunction(eventStack.Back(), this, &ExecutionHierarchy::OnFrontEndFile)
-        || MatchEventInMemberFunction(eventStack.Back(), this, &ExecutionHierarchy::OnFunction)
-        || MatchEventInMemberFunction(eventStack.Back(), this, &ExecutionHierarchy::OnTemplateInstantiation))
+        || MatchEventInMemberFunction(eventStack.Back(), this, &ExecutionHierarchy::OnFrontEndFile))
     {}
 
     return AnalysisControl::CONTINUE;
@@ -76,6 +75,12 @@ AnalysisControl ExecutionHierarchy::OnStartActivity(const EventStack& eventStack
 AnalysisControl ExecutionHierarchy::OnStopActivity(const EventStack& eventStack)
 {
     MatchEventInMemberFunction(eventStack.Back(), this, &ExecutionHierarchy::OnFinishActivity);
+
+    // apply filtering
+    if (   MatchEventStackInMemberFunction(eventStack, this, &ExecutionHierarchy::OnFinishFunction)
+        || MatchEventStackInMemberFunction(eventStack, this, &ExecutionHierarchy::OnFinishNestedTemplateInstantiation)
+        || MatchEventStackInMemberFunction(eventStack, this, &ExecutionHierarchy::OnFinishRootTemplateInstantiation))
+    {}
 
     return AnalysisControl::CONTINUE;
 }
@@ -170,19 +175,58 @@ void ExecutionHierarchy::OnFrontEndFile(const FrontEndFile& frontEndFile)
     it->second.Name = frontEndFile.Path();
 }
 
-void ExecutionHierarchy::OnFunction(const Function& function)
+void ExecutionHierarchy::OnFinishFunction(const Activity& parent, const Function& function)
 {
-    auto it = entries_.find(function.EventInstanceId());
-    assert(it != entries_.end());
-    it->second.Name = function.Name();
+    // filter by duration
+    auto durationMs = std::chrono::duration_cast<std::chrono::milliseconds>(function.Duration());
+    if (durationMs < filter_.IgnoreFunctionUnderMs) {
+        IgnoreEntry(function.EventInstanceId(), parent.EventInstanceId());
+    }
+    else
+    {
+        auto it = entries_.find(function.EventInstanceId());
+        assert(it != entries_.end());
+        it->second.Name = function.Name();
+    }
 }
 
-void ExecutionHierarchy::OnTemplateInstantiation(const TemplateInstantiation& templateInstantiation)
+void ExecutionHierarchy::OnFinishRootTemplateInstantiation(const Activity& parent, const TemplateInstantiation& templateInstantiation)
 {
-    // get us subscribed for name resolution (may already have some other activities following)
-    auto result = unresolvedTemplateInstantiationsPerSymbol_.try_emplace(templateInstantiation.SpecializationSymbolKey(),
-                                                                            TUnresolvedTemplateInstantiationNames());
-    result.first->second.push_back(templateInstantiation.EventInstanceId());
+    if (!filter_.AnalyzeTemplates) {
+        IgnoreEntry(templateInstantiation.EventInstanceId(), parent.EventInstanceId());
+    }
+    else
+    {
+        // keep full hierarchy when root TemplateInstantiation passes filter, even if children wouldn't pass
+        auto rootDurationMs = std::chrono::duration_cast<std::chrono::milliseconds>(templateInstantiation.Duration());
+        if (rootDurationMs < filter_.IgnoreTemplateInstantiationUnderMs) {
+            IgnoreEntry(templateInstantiation.EventInstanceId(), parent.EventInstanceId());
+        }
+        else
+        {
+            // get us subscribed for name resolution (may already have some other activities following)
+            auto result = unresolvedTemplateInstantiationsPerSymbol_.try_emplace(templateInstantiation.SpecializationSymbolKey(),
+                                                                                 TUnresolvedTemplateInstantiationNames());
+            result.first->second.push_back(templateInstantiation.EventInstanceId());
+        }
+    }
+}
+
+void ExecutionHierarchy::OnFinishNestedTemplateInstantiation(const TemplateInstantiationGroup& templateInstantiationGroup,
+                                                             const TemplateInstantiation& templateInstantiation)
+{
+    assert(templateInstantiationGroup.Size() > 0);
+
+    if (!filter_.AnalyzeTemplates) {
+        IgnoreEntry(templateInstantiation.EventInstanceId(), templateInstantiationGroup.Back().EventInstanceId());
+    }
+    else
+    {
+        // get us subscribed for name resolution (may already have some other activities following)
+        auto result = unresolvedTemplateInstantiationsPerSymbol_.try_emplace(templateInstantiation.SpecializationSymbolKey(),
+                                                                                TUnresolvedTemplateInstantiationNames());
+        result.first->second.push_back(templateInstantiation.EventInstanceId());
+    }
 }
 
 void ExecutionHierarchy::OnSymbolName(const SymbolName& symbolName)
@@ -201,8 +245,12 @@ void ExecutionHierarchy::OnSymbolName(const SymbolName& symbolName)
         for (unsigned long long id : itSubscribedForSymbol->second)
         {
             auto itEntry = entries_.find(id);
-            assert(itEntry != entries_.end());
-            itEntry->second.Name = name;
+            
+            // may've been filtered out (didn't clean up the subscription as we're cleaning them all in a bit)
+            if (itEntry != entries_.end())
+            {
+                itEntry->second.Name = name;
+            }
         }
         itSubscribedForSymbol->second.clear();
     }
@@ -260,4 +308,35 @@ void ExecutionHierarchy::OnFileOutput(const Activity& parent, const FileOutput& 
     assert(it != entries_.end());
 
     it->second.Properties.try_emplace("File Output", ToString(fileOutput.Path()));
+}
+
+void ExecutionHierarchy::IgnoreEntry(unsigned long long id, unsigned long long parentId)
+{
+    // ensure parent no longer points to it
+    auto itParent = entries_.find(parentId);
+    assert(itParent != entries_.end());
+
+    std::vector<Entry*>& children = itParent->second.Children;
+    auto itEntryAsChildren = std::find_if(children.begin(), children.end(), [&id](const Entry* child) {
+        return child->Id == id;
+    });
+    assert(itEntryAsChildren != children.end());
+
+    children.erase(itEntryAsChildren);
+
+    // ignore it and its children (no need to let intermediate parents know, as they'll be erased as well)
+    IgnoreEntry(id);
+}
+
+void ExecutionHierarchy::IgnoreEntry(unsigned long long id)
+{
+    auto itEntry = entries_.find(id);
+    if (itEntry != entries_.end())
+    {
+        for (const Entry* child : itEntry->second.Children) {
+            IgnoreEntry(child->Id);
+        }
+
+        entries_.erase(itEntry);
+    }
 }
