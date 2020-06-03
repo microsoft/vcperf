@@ -66,7 +66,8 @@ AnalysisControl ExecutionHierarchy::OnStartActivity(const EventStack& eventStack
     {}
 
     if (   MatchEventInMemberFunction(eventStack.Back(), this, &ExecutionHierarchy::OnInvocation)
-        || MatchEventInMemberFunction(eventStack.Back(), this, &ExecutionHierarchy::OnFrontEndFile))
+        || MatchEventInMemberFunction(eventStack.Back(), this, &ExecutionHierarchy::OnFrontEndFile)
+        || MatchEventStackInMemberFunction(eventStack, this, &ExecutionHierarchy::OnThread))
     {}
 
     return AnalysisControl::CONTINUE;
@@ -173,6 +174,13 @@ void ExecutionHierarchy::OnFrontEndFile(const FrontEndFile& frontEndFile)
     auto it = entries_.find(frontEndFile.EventInstanceId());
     assert(it != entries_.end());
     it->second.Name = frontEndFile.Path();
+}
+
+void ExecutionHierarchy::OnThread(const Activity& parent, const Thread& thread)
+{
+    auto it = entries_.find(thread.EventInstanceId());
+    assert(it != entries_.end());
+    it->second.Name = std::string(parent.EventName()) + std::string(thread.EventName());
 }
 
 void ExecutionHierarchy::OnFinishFunction(const Activity& parent, const Function& function)

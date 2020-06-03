@@ -59,6 +59,7 @@ private:
 
     void OnInvocation(const A::Invocation& invocation);
     void OnFrontEndFile(const A::FrontEndFile& frontEndFile);
+    void OnThread(const A::Activity& parent, const A::Thread& thread);
 
     void OnFinishFunction(const A::Activity& parent, const A::Function& function);
     void OnFinishRootTemplateInstantiation(const A::Activity& parent, const A::TemplateInstantiation& templateInstantiation);
