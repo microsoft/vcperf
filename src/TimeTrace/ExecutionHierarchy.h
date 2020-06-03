@@ -61,6 +61,7 @@ private:
     void OnFrontEndFile(const A::FrontEndFile& frontEndFile);
     void OnThread(const A::Activity& parent, const A::Thread& thread);
 
+    void OnFinishInvocation(const A::Invocation& invocation);
     void OnFinishFunction(const A::Activity& parent, const A::Function& function);
     void OnFinishRootTemplateInstantiation(const A::Activity& parent, const A::TemplateInstantiation& templateInstantiation);
     void OnFinishNestedTemplateInstantiation(const A::TemplateInstantiationGroup& templateInstantiationGroup,
@@ -69,8 +70,8 @@ private:
     void OnSymbolName(const SE::SymbolName& symbolName);
     void OnCommandLine(const A::Activity& parent, const SE::CommandLine& commandLine);
     void OnEnvironmentVariable(const A::Activity& parent, const SE::EnvironmentVariable& environmentVariable);
-    void OnFileInput(const A::Activity& parent, const SE::FileInput& fileInput);
-    void OnFileOutput(const A::Activity& parent, const SE::FileOutput& fileOutput);
+    void OnFileInput(const A::Invocation& parent, const SE::FileInput& fileInput);
+    void OnFileOutput(const A::Invocation& parent, const SE::FileOutput& fileOutput);
 
     void IgnoreEntry(unsigned long long id, unsigned long long parentId);
     void IgnoreEntry(unsigned long long id);
@@ -78,6 +79,11 @@ private:
     std::unordered_map<unsigned long long, Entry> entries_;
     TRoots roots_;
     Filter filter_;
+
+    typedef std::vector<std::string> TFileInputs;
+    typedef std::vector<std::string> TFileOutputs;
+    typedef std::pair<TFileInputs, TFileOutputs> TFileInputsOutputs;
+    std::unordered_map<unsigned long long, TFileInputsOutputs> fileInputsOutputsPerInvocation_;
 
     typedef unsigned long long TSymbolKey;
     std::unordered_map<TSymbolKey, std::string> symbolNames_;

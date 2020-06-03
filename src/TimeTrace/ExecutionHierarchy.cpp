@@ -42,6 +42,28 @@ namespace
         return std::chrono::nanoseconds{ ConvertTickPrecision(ticks, frequency, std::chrono::nanoseconds::period::den) };
     }
 
+    unsigned int CountDigits(size_t number)
+    {
+        unsigned int digits;
+        for (digits = 0; number > 0; ++digits)
+        {
+            number /= 10;
+        }
+
+        return digits;
+    }
+
+    std::string PrePadNumber(size_t number, char paddingCharacter, size_t totalExpectedLength)
+    {
+        std::string asPaddedString = std::to_string(number);
+
+        if (asPaddedString.size() < totalExpectedLength) {
+            asPaddedString.insert(0, totalExpectedLength - asPaddedString.size(), paddingCharacter);
+        }
+
+        return asPaddedString;
+    }
+
 }  // anonymous namespace
 
 bool ExecutionHierarchy::Entry::OverlapsWith(const Entry* other) const
@@ -54,6 +76,7 @@ ExecutionHierarchy::ExecutionHierarchy(const Filter& filter) :
     entries_{},
     roots_{},
     filter_{filter},
+    fileInputsOutputsPerInvocation_{},
     symbolNames_{},
     unresolvedTemplateInstantiationsPerSymbol_{}
 {
@@ -78,7 +101,8 @@ AnalysisControl ExecutionHierarchy::OnStopActivity(const EventStack& eventStack)
     MatchEventInMemberFunction(eventStack.Back(), this, &ExecutionHierarchy::OnFinishActivity);
 
     // apply filtering
-    if (   MatchEventStackInMemberFunction(eventStack, this, &ExecutionHierarchy::OnFinishFunction)
+    if (   MatchEventInMemberFunction(eventStack.Back(), this, &ExecutionHierarchy::OnFinishInvocation)
+        || MatchEventStackInMemberFunction(eventStack, this, &ExecutionHierarchy::OnFinishFunction)
         || MatchEventStackInMemberFunction(eventStack, this, &ExecutionHierarchy::OnFinishNestedTemplateInstantiation)
         || MatchEventStackInMemberFunction(eventStack, this, &ExecutionHierarchy::OnFinishRootTemplateInstantiation))
     {}
@@ -181,6 +205,46 @@ void ExecutionHierarchy::OnThread(const Activity& parent, const Thread& thread)
     auto it = entries_.find(thread.EventInstanceId());
     assert(it != entries_.end());
     it->second.Name = std::string(parent.EventName()) + std::string(thread.EventName());
+}
+
+void ExecutionHierarchy::OnFinishInvocation(const Invocation& invocation)
+{
+    // store every FileInput and FileOutput as properties
+    auto itFileInputsOutputs = fileInputsOutputsPerInvocation_.find(invocation.EventInstanceId());
+    if (itFileInputsOutputs != fileInputsOutputsPerInvocation_.end())
+    {
+        auto itInvocation = entries_.find(invocation.EventInstanceId());
+        assert(itInvocation != entries_.end());
+
+        Entry& invocationEntry = itInvocation->second;
+        const TFileInputsOutputs& data = itFileInputsOutputs->second;
+
+        // FileInputs
+        if (data.first.size() == 1) {
+            invocationEntry.Properties.try_emplace("File Input", data.first[0]);
+        }
+        else
+        {
+            const size_t totalDigits = CountDigits(data.first.size());
+            for (size_t i = 0; i < data.first.size(); ++i) {
+                invocationEntry.Properties.try_emplace("File Input #" + PrePadNumber(i, '0', totalDigits), data.first[i]);
+            }
+        }
+
+        // FileOutputs
+        if (data.second.size() == 1) {
+            invocationEntry.Properties.try_emplace("File Output", data.second[0]);
+        }
+        else
+        {
+            const size_t totalDigits = CountDigits(data.second.size());
+            for (size_t i = 0; i < data.second.size(); ++i) {
+                invocationEntry.Properties.try_emplace("File Output #" + PrePadNumber(i, '0', totalDigits), data.second[i]);
+            }
+        }
+
+        fileInputsOutputsPerInvocation_.erase(invocation.EventInstanceId());
+    }
 }
 
 void ExecutionHierarchy::OnFinishFunction(const Activity& parent, const Function& function)
@@ -302,20 +366,22 @@ void ExecutionHierarchy::OnEnvironmentVariable(const Activity& parent, const Env
     }
 }
 
-void ExecutionHierarchy::OnFileInput(const Activity& parent, const FileInput& fileInput)
+void ExecutionHierarchy::OnFileInput(const Invocation& parent, const FileInput& fileInput)
 {
-    auto it = entries_.find(parent.EventInstanceId());
-    assert(it != entries_.end());
+    // an Invocation can have several FileInputs, keep track of them and add as properties later on
+    auto result = fileInputsOutputsPerInvocation_.try_emplace(parent.EventInstanceId(), TFileInputs(), TFileOutputs());
+    auto &inputsOutputsPair = result.first->second;
 
-    it->second.Properties.try_emplace("File Input", ToString(fileInput.Path()));
+    inputsOutputsPair.first.push_back(ToString(fileInput.Path()));
 }
 
-void ExecutionHierarchy::OnFileOutput(const Activity& parent, const FileOutput& fileOutput)
+void ExecutionHierarchy::OnFileOutput(const Invocation& parent, const FileOutput& fileOutput)
 {
-    auto it = entries_.find(parent.EventInstanceId());
-    assert(it != entries_.end());
+    // an Invocation can have several FileOutputs, keep track of them and add as properties later on
+    auto result = fileInputsOutputsPerInvocation_.try_emplace(parent.EventInstanceId(), TFileInputs(), TFileOutputs());
+    auto& inputsOutputsPair = result.first->second;
 
-    it->second.Properties.try_emplace("File Output", ToString(fileOutput.Path()));
+    inputsOutputsPair.second.push_back(ToString(fileOutput.Path()));
 }
 
 void ExecutionHierarchy::IgnoreEntry(unsigned long long id, unsigned long long parentId)
