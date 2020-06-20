@@ -211,6 +211,13 @@
   <ItemGroup>
     <ResourceCompile Include="$(IntDir)CppBuildInsightsEtw.rc" />
   </ItemGroup>
+  <!--TODO: Remove once the NuGet package automatically moves the WPA addin to the output directory. -->
+  <ItemGroup Condition="'$(Platform)' == 'Win32' Or '$(Platform)' == 'x86'">
+    <ReferenceCopyLocalPaths Include="$(MSBuildThisFileDirectory)packages\Microsoft.Cpp.BuildInsights.*\wpa\x86\perf_msvcbuildinsights.dll" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(Platform)' == 'x64'">
+    <ReferenceCopyLocalPaths Include="$(MSBuildThisFileDirectory)packages\Microsoft.Cpp.BuildInsights.*\wpa\x64\perf_msvcbuildinsights.dll" />
+  </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
