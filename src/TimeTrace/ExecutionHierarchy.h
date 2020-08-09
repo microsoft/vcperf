@@ -63,9 +63,7 @@ private:
 
     void OnFinishInvocation(const A::Invocation& invocation);
     void OnFinishFunction(const A::Activity& parent, const A::Function& function);
-    void OnFinishRootTemplateInstantiation(const A::Activity& parent, const A::TemplateInstantiation& templateInstantiation);
-    void OnFinishNestedTemplateInstantiation(const A::TemplateInstantiationGroup& templateInstantiationGroup,
-                                             const A::TemplateInstantiation& templateInstantiation);
+    void OnFinishTemplateInstantiation(const A::Activity& parent, const A::TemplateInstantiationGroup& templateInstantiationGroup);
 
     void OnSymbolName(const SE::SymbolName& symbolName);
     void OnCommandLine(const A::Activity& parent, const SE::CommandLine& commandLine);

@@ -103,8 +103,7 @@ AnalysisControl ExecutionHierarchy::OnStopActivity(const EventStack& eventStack)
     // apply filtering
     if (   MatchEventInMemberFunction(eventStack.Back(), this, &ExecutionHierarchy::OnFinishInvocation)
         || MatchEventStackInMemberFunction(eventStack, this, &ExecutionHierarchy::OnFinishFunction)
-        || MatchEventStackInMemberFunction(eventStack, this, &ExecutionHierarchy::OnFinishNestedTemplateInstantiation)
-        || MatchEventStackInMemberFunction(eventStack, this, &ExecutionHierarchy::OnFinishRootTemplateInstantiation))
+        || MatchEventStackInMemberFunction(eventStack, this, &ExecutionHierarchy::OnFinishTemplateInstantiation))
     {}
 
     return AnalysisControl::CONTINUE;
@@ -262,42 +261,30 @@ void ExecutionHierarchy::OnFinishFunction(const Activity& parent, const Function
     }
 }
 
-void ExecutionHierarchy::OnFinishRootTemplateInstantiation(const Activity& parent, const TemplateInstantiation& templateInstantiation)
+void ExecutionHierarchy::OnFinishTemplateInstantiation(const A::Activity& parent, const A::TemplateInstantiationGroup& templateInstantiationGroup)
 {
+    const A::Activity& parentActivity = templateInstantiationGroup.Size() == 1 ? parent : templateInstantiationGroup[templateInstantiationGroup.Size() - 2];
+
     if (!filter_.AnalyzeTemplates) {
-        IgnoreEntry(templateInstantiation.EventInstanceId(), parent.EventInstanceId());
+        IgnoreEntry(templateInstantiationGroup.Back().EventInstanceId(), parentActivity.EventInstanceId());
     }
     else
     {
-        // keep full hierarchy when root TemplateInstantiation passes filter, even if children wouldn't pass
-        auto rootDurationMs = std::chrono::duration_cast<std::chrono::milliseconds>(templateInstantiation.Duration());
-        if (rootDurationMs < filter_.IgnoreTemplateInstantiationUnderMs) {
-            IgnoreEntry(templateInstantiation.EventInstanceId(), parent.EventInstanceId());
+        // keep full hierarchy when root passes filter, even if children wouldn't pass
+        // we can only know root's Duration when it finishes: checking it when a child finishes will result in 0ns
+        if (templateInstantiationGroup.Size() == 1 &&
+            std::chrono::duration_cast<std::chrono::milliseconds>(templateInstantiationGroup.Front().Duration()) < filter_.IgnoreTemplateInstantiationUnderMs)
+        {
+            // ignores root TemplateInstantiation and its children (don't clear their symbol subscriptions, we'll deal with missing subscribers in OnSymbolName)
+            IgnoreEntry(templateInstantiationGroup.Back().EventInstanceId(), parentActivity.EventInstanceId());
         }
         else
         {
             // get us subscribed for name resolution (may already have some other activities following)
-            auto result = unresolvedTemplateInstantiationsPerSymbol_.try_emplace(templateInstantiation.SpecializationSymbolKey(),
+            auto result = unresolvedTemplateInstantiationsPerSymbol_.try_emplace(templateInstantiationGroup.Back().SpecializationSymbolKey(),
                                                                                  TUnresolvedTemplateInstantiationNames());
-            result.first->second.push_back(templateInstantiation.EventInstanceId());
+            result.first->second.push_back(templateInstantiationGroup.Back().EventInstanceId());
         }
-    }
-}
-
-void ExecutionHierarchy::OnFinishNestedTemplateInstantiation(const TemplateInstantiationGroup& templateInstantiationGroup,
-                                                             const TemplateInstantiation& templateInstantiation)
-{
-    assert(templateInstantiationGroup.Size() > 0);
-
-    if (!filter_.AnalyzeTemplates) {
-        IgnoreEntry(templateInstantiation.EventInstanceId(), templateInstantiationGroup.Back().EventInstanceId());
-    }
-    else
-    {
-        // get us subscribed for name resolution (may already have some other activities following)
-        auto result = unresolvedTemplateInstantiationsPerSymbol_.try_emplace(templateInstantiation.SpecializationSymbolKey(),
-                                                                                TUnresolvedTemplateInstantiationNames());
-        result.first->second.push_back(templateInstantiation.EventInstanceId());
     }
 }
 
@@ -318,9 +305,8 @@ void ExecutionHierarchy::OnSymbolName(const SymbolName& symbolName)
         {
             auto itEntry = entries_.find(id);
             
-            // may've been filtered out (didn't clean up the subscription as we're cleaning them all in a bit)
-            if (itEntry != entries_.end())
-            {
+            // may've been filtered out (didn't clean up this subscription when filtering happened, as we're cleaning them all in a bit)
+            if (itEntry != entries_.end()) {
                 itEntry->second.Name = name;
             }
         }
