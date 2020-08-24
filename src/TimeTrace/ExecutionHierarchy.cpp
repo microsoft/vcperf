@@ -304,7 +304,7 @@ void ExecutionHierarchy::OnSymbolName(const SymbolName& symbolName)
         for (unsigned long long id : itSubscribedForSymbol->second)
         {
             auto itEntry = entries_.find(id);
-            
+
             // may've been filtered out (didn't clean up this subscription when filtering happened, as we're cleaning them all in a bit)
             if (itEntry != entries_.end()) {
                 itEntry->second.Name = name;
@@ -358,7 +358,15 @@ void ExecutionHierarchy::OnFileInput(const Invocation& parent, const FileInput& 
     auto result = fileInputsOutputsPerInvocation_.try_emplace(parent.EventInstanceId(), TFileInputs(), TFileOutputs());
     auto &inputsOutputsPair = result.first->second;
 
-    inputsOutputsPair.first.push_back(ToString(fileInput.Path()));
+    std::wstring path = fileInput.Path();
+
+    // A rare bug in the linker causes it to emit FileInput events
+    // with an empty path. Ignore them.
+    if (path.empty()) {
+        return;
+    }
+
+    inputsOutputsPair.first.push_back(ToString(path));
 }
 
 void ExecutionHierarchy::OnFileOutput(const Invocation& parent, const FileOutput& fileOutput)
