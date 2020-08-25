@@ -13,17 +13,29 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Source Files\Views">
-      <UniqueIdentifier>{f61a812e-1836-4138-94d5-51a333458674}</UniqueIdentifier>
+    <Filter Include="Header Files\TimeTrace">
+      <UniqueIdentifier>{6662cbbc-0b0f-4663-b55e-832b4ba907c9}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Analyzers">
-      <UniqueIdentifier>{c72eeb06-e722-4c16-b021-4fef2d5bebf4}</UniqueIdentifier>
+    <Filter Include="Header Files\WPA">
+      <UniqueIdentifier>{bf80ee78-b96b-47c6-88c5-6449fd14a6f2}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Views">
+    <Filter Include="Header Files\WPA\Analyzers">
+      <UniqueIdentifier>{e8d7ee64-3202-4eb3-9409-a5b48b479489}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\WPA\Views">
       <UniqueIdentifier>{5bfef654-b52c-4c77-a35d-95b8c98bfe70}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Analyzers">
-      <UniqueIdentifier>{e8d7ee64-3202-4eb3-9409-a5b48b479489}</UniqueIdentifier>
+    <Filter Include="Source Files\TimeTrace">
+      <UniqueIdentifier>{f6f5a0ac-cf4e-4ca4-b07a-7ca118492af7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\WPA">
+      <UniqueIdentifier>{f0294dc9-9c99-49e2-8bcd-b5f6eaf956db}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\WPA\Analyzers">
+      <UniqueIdentifier>{c72eeb06-e722-4c16-b021-4fef2d5bebf4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\WPA\Views">
+      <UniqueIdentifier>{f61a812e-1836-4138-94d5-51a333458674}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -36,23 +48,32 @@
     <ClCompile Include="src\GenericFields.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Views\BuildExplorerView.cpp">
-      <Filter>Source Files\Views</Filter>
+    <ClCompile Include="src\WPA\Views\BuildExplorerView.cpp">
+      <Filter>Source Files\WPA\Views</Filter>
     </ClCompile>
-    <ClCompile Include="src\Views\FilesView.cpp">
-      <Filter>Source Files\Views</Filter>
+    <ClCompile Include="src\WPA\Views\FilesView.cpp">
+      <Filter>Source Files\WPA\Views</Filter>
     </ClCompile>
-    <ClCompile Include="src\Views\FunctionsView.cpp">
-      <Filter>Source Files\Views</Filter>
+    <ClCompile Include="src\WPA\Views\FunctionsView.cpp">
+      <Filter>Source Files\WPA\Views</Filter>
     </ClCompile>
-    <ClCompile Include="src\Views\TemplateInstantiationsView.cpp">
-      <Filter>Source Files\Views</Filter>
+    <ClCompile Include="src\WPA\Views\TemplateInstantiationsView.cpp">
+      <Filter>Source Files\WPA\Views</Filter>
     </ClCompile>
-    <ClCompile Include="src\Analyzers\ContextBuilder.cpp">
-      <Filter>Source Files\Analyzers</Filter>
+    <ClCompile Include="src\WPA\Analyzers\ContextBuilder.cpp">
+      <Filter>Source Files\WPA\Analyzers</Filter>
     </ClCompile>
-    <ClCompile Include="src\Analyzers\ExpensiveTemplateInstantiationCache.cpp">
-      <Filter>Source Files\Analyzers</Filter>
+    <ClCompile Include="src\WPA\Analyzers\ExpensiveTemplateInstantiationCache.cpp">
+      <Filter>Source Files\WPA\Analyzers</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TimeTrace\TimeTraceGenerator.cpp">
+      <Filter>Source Files\TimeTrace</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TimeTrace\PackedProcessThreadRemapping.cpp">
+      <Filter>Source Files\TimeTrace</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TimeTrace\ExecutionHierarchy.cpp">
+      <Filter>Source Files\TimeTrace</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -68,29 +89,38 @@
     <ClInclude Include="src\GenericFields.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Views\BuildExplorerView.h">
-      <Filter>Header Files\Views</Filter>
+    <ClInclude Include="src\WPA\Views\BuildExplorerView.h">
+      <Filter>Header Files\WPA\Views</Filter>
     </ClInclude>
-    <ClInclude Include="src\Views\FunctionsView.h">
-      <Filter>Header Files\Views</Filter>
+    <ClInclude Include="src\WPA\Views\FunctionsView.h">
+      <Filter>Header Files\WPA\Views</Filter>
     </ClInclude>
-    <ClInclude Include="src\Views\TemplateInstantiationsView.h">
-      <Filter>Header Files\Views</Filter>
+    <ClInclude Include="src\WPA\Views\TemplateInstantiationsView.h">
+      <Filter>Header Files\WPA\Views</Filter>
     </ClInclude>
-    <ClInclude Include="src\Views\FilesView.h">
-      <Filter>Header Files\Views</Filter>
+    <ClInclude Include="src\WPA\Views\FilesView.h">
+      <Filter>Header Files\WPA\Views</Filter>
     </ClInclude>
-    <ClInclude Include="src\Analyzers\ExpensiveTemplateInstantiationCache.h">
-      <Filter>Header Files\Analyzers</Filter>
+    <ClInclude Include="src\WPA\Analyzers\ExpensiveTemplateInstantiationCache.h">
+      <Filter>Header Files\WPA\Analyzers</Filter>
     </ClInclude>
-    <ClInclude Include="src\Analyzers\MiscellaneousCache.h">
-      <Filter>Header Files\Analyzers</Filter>
+    <ClInclude Include="src\WPA\Analyzers\MiscellaneousCache.h">
+      <Filter>Header Files\WPA\Analyzers</Filter>
     </ClInclude>
-    <ClInclude Include="src\Analyzers\ContextBuilder.h">
-      <Filter>Header Files\Analyzers</Filter>
+    <ClInclude Include="src\WPA\Analyzers\ContextBuilder.h">
+      <Filter>Header Files\WPA\Analyzers</Filter>
     </ClInclude>
     <ClInclude Include="src\VcperfBuildInsights.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\TimeTrace\PackedProcessThreadRemapping.h">
+      <Filter>Header Files\TimeTrace</Filter>
+    </ClInclude>
+    <ClInclude Include="src\TimeTrace\TimeTraceGenerator.h">
+      <Filter>Header Files\TimeTrace</Filter>
+    </ClInclude>
+    <ClInclude Include="src\TimeTrace\ExecutionHierarchy.h">
+      <Filter>Header Files\TimeTrace</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

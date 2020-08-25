@@ -1,8 +1,8 @@
 #pragma once
 
 #include "VcperfBuildInsights.h"
-#include "Analyzers\ContextBuilder.h"
-#include "Analyzers\MiscellaneousCache.h"
+#include "WPA\Analyzers\ContextBuilder.h"
+#include "WPA\Analyzers\MiscellaneousCache.h"
 
 namespace vcperf
 {

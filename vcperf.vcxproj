@@ -56,6 +56,7 @@
   </ImportGroup>
   <ImportGroup Label="Shared">
     <Import Project="packages\Microsoft.Cpp.BuildInsights.1.1.0\build\native\Microsoft.Cpp.BuildInsights.targets" Condition="Exists('packages\Microsoft.Cpp.BuildInsights.1.1.0\build\native\Microsoft.Cpp.BuildInsights.targets')" />
+    <Import Project="packages\nlohmann.json.3.7.3\build\native\nlohmann.json.targets" Condition="Exists('packages\nlohmann.json.3.7.3\build\native\nlohmann.json.targets')" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -179,29 +180,35 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\Analyzers\ContextBuilder.cpp" />
-    <ClCompile Include="src\Analyzers\ExpensiveTemplateInstantiationCache.cpp" />
-    <ClCompile Include="src\Views\BuildExplorerView.cpp" />
-    <ClCompile Include="src\Views\FilesView.cpp" />
-    <ClCompile Include="src\Views\FunctionsView.cpp" />
-    <ClCompile Include="src\Views\TemplateInstantiationsView.cpp" />
+    <ClCompile Include="src\WPA\Analyzers\ContextBuilder.cpp" />
+    <ClCompile Include="src\WPA\Analyzers\ExpensiveTemplateInstantiationCache.cpp" />
+    <ClCompile Include="src\WPA\Views\BuildExplorerView.cpp" />
+    <ClCompile Include="src\WPA\Views\FilesView.cpp" />
+    <ClCompile Include="src\WPA\Views\FunctionsView.cpp" />
+    <ClCompile Include="src\WPA\Views\TemplateInstantiationsView.cpp" />
     <ClCompile Include="src\Commands.cpp" />
     <ClCompile Include="src\GenericFields.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\TimeTrace\PackedProcessThreadRemapping.cpp" />
+    <ClCompile Include="src\TimeTrace\TimeTraceGenerator.cpp" />
+    <ClCompile Include="src\TimeTrace\ExecutionHierarchy.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\Analyzers\ContextBuilder.h" />
-    <ClInclude Include="src\Analyzers\MiscellaneousCache.h" />
-    <ClInclude Include="src\Analyzers\ExpensiveTemplateInstantiationCache.h" />
+    <ClInclude Include="src\WPA\Analyzers\ContextBuilder.h" />
+    <ClInclude Include="src\WPA\Analyzers\MiscellaneousCache.h" />
+    <ClInclude Include="src\WPA\Analyzers\ExpensiveTemplateInstantiationCache.h" />
     <ClInclude Include="src\VcperfBuildInsights.h" />
-    <ClInclude Include="src\Views\BuildExplorerView.h" />
-    <ClInclude Include="src\Views\FilesView.h" />
-    <ClInclude Include="src\Views\FunctionsView.h" />
-    <ClInclude Include="src\Views\TemplateInstantiationsView.h" />
+    <ClInclude Include="src\WPA\Views\BuildExplorerView.h" />
+    <ClInclude Include="src\WPA\Views\FilesView.h" />
+    <ClInclude Include="src\WPA\Views\FunctionsView.h" />
+    <ClInclude Include="src\WPA\Views\TemplateInstantiationsView.h" />
     <ClInclude Include="src\Commands.h" />
     <ClInclude Include="src\GenericFields.h" />
     <ClInclude Include="src\PayloadBuilder.h" />
     <ClInclude Include="src\Utility.h" />
+    <ClInclude Include="src\TimeTrace\PackedProcessThreadRemapping.h" />
+    <ClInclude Include="src\TimeTrace\TimeTraceGenerator.h" />
+    <ClInclude Include="src\TimeTrace\ExecutionHierarchy.h" />
   </ItemGroup>
   <ItemGroup>
     <Xml Include="src\CppBuildInsightsEtw.xml">
@@ -227,5 +234,6 @@
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('packages\Microsoft.Cpp.BuildInsights.1.1.0\build\native\Microsoft.Cpp.BuildInsights.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\Microsoft.Cpp.BuildInsights.1.1.0\build\native\Microsoft.Cpp.BuildInsights.targets'))" />
+    <Error Condition="!Exists('packages\nlohmann.json.3.7.3\build\native\nlohmann.json.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\nlohmann.json.3.7.3\build\native\nlohmann.json.targets'))" />
   </Target>
 </Project>

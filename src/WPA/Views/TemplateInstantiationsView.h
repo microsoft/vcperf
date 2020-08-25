@@ -3,9 +3,9 @@
 #include "VcperfBuildInsights.h"
 #include "Utility.h"
 #include "PayloadBuilder.h"
-#include "Analyzers\ContextBuilder.h"
-#include "Analyzers\ExpensiveTemplateInstantiationCache.h"
-#include "Analyzers\MiscellaneousCache.h"
+#include "WPA\Analyzers\ContextBuilder.h"
+#include "WPA\Analyzers\ExpensiveTemplateInstantiationCache.h"
+#include "WPA\Analyzers\MiscellaneousCache.h"
 
 namespace vcperf
 {

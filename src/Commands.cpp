@@ -5,13 +5,15 @@
 
 #include "VcperfBuildInsights.h"
 
-#include "Analyzers\ExpensiveTemplateInstantiationCache.h"
-#include "Analyzers\ContextBuilder.h"
-#include "Analyzers\MiscellaneousCache.h"
-#include "Views\BuildExplorerView.h"
-#include "Views\FunctionsView.h"
-#include "Views\FilesView.h"
-#include "Views\TemplateInstantiationsView.h"
+#include "WPA\Analyzers\ExpensiveTemplateInstantiationCache.h"
+#include "WPA\Analyzers\ContextBuilder.h"
+#include "WPA\Analyzers\MiscellaneousCache.h"
+#include "WPA\Views\BuildExplorerView.h"
+#include "WPA\Views\FunctionsView.h"
+#include "WPA\Views\FilesView.h"
+#include "WPA\Views\TemplateInstantiationsView.h"
+#include "TimeTrace\ExecutionHierarchy.h"
+#include "TimeTrace\TimeTraceGenerator.h"
 
 using namespace Microsoft::Cpp::BuildInsights;
 
@@ -165,6 +167,78 @@ void PrintError(RESULT_CODE failureCode)
     std::wcout << std::endl;
 }
 
+RESULT_CODE StopToWPA(const std::wstring& sessionName, const std::filesystem::path& outputFile, bool analyzeTemplates,
+    TRACING_SESSION_STATISTICS& statistics)
+{
+    ExpensiveTemplateInstantiationCache etic{ analyzeTemplates };
+    ContextBuilder cb;
+    MiscellaneousCache mc;
+    BuildExplorerView bev{ &cb, &mc };
+    FunctionsView funcv{ &cb, &mc };
+    FilesView fv{ &cb, &mc };
+    TemplateInstantiationsView tiv{ &cb, &etic, &mc, analyzeTemplates };
+
+    auto analyzerGroup = MakeStaticAnalyzerGroup(&cb, &etic, &mc);
+    auto reloggerGroup = MakeStaticReloggerGroup(&etic, &mc, &cb, &bev, &funcv, &fv, &tiv);
+
+    unsigned long long systemEventsRetentionFlags = RELOG_RETENTION_SYSTEM_EVENT_FLAGS_CPU_SAMPLES;
+
+    int analysisPassCount = analyzeTemplates ? 2 : 1;
+
+    return StopAndRelogTracingSession(sessionName.c_str(), outputFile.c_str(),
+        &statistics, analysisPassCount, systemEventsRetentionFlags, analyzerGroup, reloggerGroup);
+}
+
+RESULT_CODE StopToTimeTrace(const std::wstring& sessionName, const std::filesystem::path& outputFile, bool analyzeTemplates,
+    TRACING_SESSION_STATISTICS& statistics)
+{
+    ExecutionHierarchy::Filter f{ analyzeTemplates,
+                                  std::chrono::milliseconds(10),
+                                  std::chrono::milliseconds(10) };
+    ExecutionHierarchy eh{ f };
+    TimeTraceGenerator ttg{ &eh, outputFile };
+
+    auto analyzerGroup = MakeStaticAnalyzerGroup(&eh, &ttg);
+    int analysisPassCount = 1;
+
+    return StopAndAnalyzeTracingSession(sessionName.c_str(), analysisPassCount, &statistics, analyzerGroup);
+}
+
+RESULT_CODE AnalyzeToWPA(const std::filesystem::path& inputFile, const std::filesystem::path& outputFile, bool analyzeTemplates)
+{
+    ExpensiveTemplateInstantiationCache etic{ analyzeTemplates };
+    ContextBuilder cb;
+    MiscellaneousCache mc;
+    BuildExplorerView bev{ &cb, &mc };
+    FunctionsView funcv{ &cb, &mc };
+    FilesView fv{ &cb, &mc };
+    TemplateInstantiationsView tiv{ &cb, &etic, &mc, analyzeTemplates };
+
+    auto analyzerGroup = MakeStaticAnalyzerGroup(&cb, &etic, &mc);
+    auto reloggerGroup = MakeStaticReloggerGroup(&etic, &mc, &cb, &bev, &funcv, &fv, &tiv);
+
+    unsigned long long systemEventsRetentionFlags = RELOG_RETENTION_SYSTEM_EVENT_FLAGS_CPU_SAMPLES;
+
+    int analysisPassCount = analyzeTemplates ? 2 : 1;
+
+    return Relog(inputFile.c_str(), outputFile.c_str(), analysisPassCount,
+        systemEventsRetentionFlags, analyzerGroup, reloggerGroup);
+}
+
+RESULT_CODE AnalyzeToTimeTrace(const std::filesystem::path& inputFile, const std::filesystem::path& outputFile, bool analyzeTemplates)
+{
+    ExecutionHierarchy::Filter f{ analyzeTemplates,
+                                  std::chrono::milliseconds(10),
+                                  std::chrono::milliseconds(10) };
+    ExecutionHierarchy eh{ f };
+    TimeTraceGenerator ttg{ &eh, outputFile };
+
+    auto analyzerGroup = MakeStaticAnalyzerGroup(&eh, &ttg);
+    int analysisPassCount = 1;
+
+    return Analyze(inputFile.c_str(), analysisPassCount, analyzerGroup);
+}
+
 HRESULT DoStart(const std::wstring& sessionName, bool cpuSampling, VerbosityLevel verbosityLevel)
 {
     TRACING_SESSION_OPTIONS options{};
@@ -206,29 +280,18 @@ HRESULT DoStart(const std::wstring& sessionName, bool cpuSampling, VerbosityLeve
 }
 
 
-HRESULT DoStop(const std::wstring& sessionName, const std::filesystem::path& outputFile, bool analyzeTemplates)
+HRESULT DoStop(const std::wstring& sessionName, const std::filesystem::path& outputFile, bool analyzeTemplates, bool generateTimeTrace)
 {
-    TRACING_SESSION_STATISTICS statistics{};
-
-    ExpensiveTemplateInstantiationCache etic{analyzeTemplates};
-    ContextBuilder cb;
-    MiscellaneousCache mc;
-    BuildExplorerView bev{&cb, &mc};
-    FunctionsView funcv{&cb, &mc};
-    FilesView fv{&cb, &mc};
-    TemplateInstantiationsView tiv{&cb, &etic, &mc, analyzeTemplates};
-
-    auto analyzerGroup = MakeStaticAnalyzerGroup(&cb, &etic, &mc);
-    auto reloggerGroup = MakeStaticReloggerGroup(&etic, &mc, &cb, &bev, &funcv, &fv, &tiv);
-
     std::wcout << L"Stopping and analyzing tracing session " << sessionName << L"..." << std::endl;
 
-    unsigned long long systemEventsRetentionFlags = RELOG_RETENTION_SYSTEM_EVENT_FLAGS_CPU_SAMPLES;
-
-    int analysisPassCount = analyzeTemplates ? 2 : 1;
-
-    auto rc = StopAndRelogTracingSession(sessionName.c_str(), outputFile.c_str(),
-        &statistics, analysisPassCount, systemEventsRetentionFlags, analyzerGroup, reloggerGroup);
+    TRACING_SESSION_STATISTICS statistics{};
+    RESULT_CODE rc;
+    if (!generateTimeTrace) {
+        rc = StopToWPA(sessionName, outputFile, analyzeTemplates, statistics);
+    }
+    else {
+        rc = StopToTimeTrace(sessionName, outputFile, analyzeTemplates, statistics);
+    }
 
     PrintTraceStatistics(statistics);
 
@@ -270,27 +333,17 @@ HRESULT DoStopNoAnalyze(const std::wstring& sessionName, const std::filesystem::
     return S_OK;
 }
 
-HRESULT DoAnalyze(const std::filesystem::path& inputFile, const std::filesystem::path& outputFile, bool analyzeTemplates)
+HRESULT DoAnalyze(const std::filesystem::path& inputFile, const std::filesystem::path& outputFile, bool analyzeTemplates, bool generateTimeTrace)
 {
-    ExpensiveTemplateInstantiationCache etic{analyzeTemplates};
-    ContextBuilder cb;
-    MiscellaneousCache mc;
-    BuildExplorerView bev{&cb, &mc};
-    FunctionsView funcv{&cb, &mc};
-    FilesView fv{&cb, &mc};
-    TemplateInstantiationsView tiv{&cb, &etic, &mc, analyzeTemplates};
-
-    auto analyzerGroup = MakeStaticAnalyzerGroup(&cb, &etic, &mc);
-    auto reloggerGroup = MakeStaticReloggerGroup(&etic, &mc, &cb, &bev, &funcv, &fv, &tiv);
-
     std::wcout << L"Analyzing..." << std::endl;
-
-    unsigned long long systemEventsRetentionFlags = RELOG_RETENTION_SYSTEM_EVENT_FLAGS_CPU_SAMPLES;
-
-    int analysisPassCount = analyzeTemplates ? 2 : 1;
-
-    auto rc = Relog(inputFile.c_str(), outputFile.c_str(), analysisPassCount, 
-        systemEventsRetentionFlags, analyzerGroup, reloggerGroup);
+    
+    RESULT_CODE rc;
+    if (!generateTimeTrace) {
+        rc = AnalyzeToWPA(inputFile, outputFile, analyzeTemplates);
+    }
+    else {
+        rc = AnalyzeToTimeTrace(inputFile, outputFile, analyzeTemplates);
+    }
 
     if (rc != RESULT_CODE_SUCCESS)
     {
