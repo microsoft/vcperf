@@ -165,14 +165,14 @@ void BuildExplorerView::LogActivity(const void* relogSession, const Activity& a,
     using std::chrono::duration_cast;
     using std::chrono::milliseconds;
 
-    PCEVENT_DESCRIPTOR desc = &CppBuildInsightsBuildExplorerActivity;
+    PCEVENT_DESCRIPTOR desc = &CppBuildInsightsBuildExplorerActivity_V1;
 
     auto* context = contextBuilder_->GetContextData();
     auto& td = miscellaneousCache_->GetTimingData(a);
 
     Payload p = PayloadBuilder<
-        uint16_t, const char*, const char*, uint32_t, const wchar_t*, 
-        const wchar_t*, const char*, uint32_t, uint32_t, uint32_t, uint32_t>::Build(
+        uint16_t, const char*, const char*, uint32_t, const wchar_t*, const wchar_t*,
+        const char*, uint32_t, uint32_t, uint32_t, uint32_t, uint32_t>::Build(
             context->TimelineId,
             context->TimelineDescription,
             context->Tool,
@@ -183,7 +183,8 @@ void BuildExplorerView::LogActivity(const void* relogSession, const Activity& a,
             (uint32_t)duration_cast<milliseconds>(td.ExclusiveDuration).count(),
             (uint32_t)duration_cast<milliseconds>(td.Duration).count(),
             (uint32_t)duration_cast<milliseconds>(td.ExclusiveCPUTime).count(),
-            (uint32_t)duration_cast<milliseconds>(td.CPUTime).count());
+            (uint32_t)duration_cast<milliseconds>(td.CPUTime).count(),
+            (uint32_t)duration_cast<milliseconds>(td.WallClockTimeResponsibility).count());
 
     InjectEvent(relogSession, &CppBuildInsightsGuid, desc, a.ProcessId(), a.ThreadId(),
         a.ProcessorIndex(), a.StartTimestamp(), p.GetData(), (unsigned long)p.Size());
