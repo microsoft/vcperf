@@ -47,7 +47,7 @@
         </tasks>
 
         <templates>
-          <template tid="BuildExplorerActivityTemplate">
+          <template tid="BuildExplorerActivityTemplate_V0">
             <data name="TimelineId" inType="win:UInt16"/>
             <data name="TimelineDescription" inType="win:AnsiString"/>
             <data name="Tool" inType="win:AnsiString"/>
@@ -59,6 +59,21 @@
             <data name="InclusiveMillisecondDuration" inType="win:UInt32"/>
             <data name="ExclusiveMillisecondCPUTime" inType="win:UInt32"/>
             <data name="InclusiveMillisecondCPUTime" inType="win:UInt32"/>
+          </template>
+
+          <template tid="BuildExplorerActivityTemplate_V1">
+            <data name="TimelineId" inType="win:UInt16"/>
+            <data name="TimelineDescription" inType="win:AnsiString"/>
+            <data name="Tool" inType="win:AnsiString"/>
+            <data name="InvocationId" inType="win:UInt32"/>
+            <data name="InvocationDescription" inType="win:UnicodeString"/>
+            <data name="Component" inType="win:UnicodeString"/>
+            <data name="ActivityName" inType="win:AnsiString"/>
+            <data name="ExclusiveMillisecondDuration" inType="win:UInt32"/>
+            <data name="InclusiveMillisecondDuration" inType="win:UInt32"/>
+            <data name="ExclusiveMillisecondCPUTime" inType="win:UInt32"/>
+            <data name="InclusiveMillisecondCPUTime" inType="win:UInt32"/>
+            <data name="WallClockMillisecondTimeResponsibility" inType="win:UInt32"/>
           </template>
 
           <template tid="BuildExplorerAnsiStringPropertyTemplate">
@@ -88,12 +103,21 @@
         <events>
           <!-- BuildExplorer event values must be between 0 and 499 -->
           <event value="0"
-              symbol="CppBuildInsightsBuildExplorerActivity"
+              symbol="CppBuildInsightsBuildExplorerActivity_V0"
               task="BuildExplorer"
               opcode="Activity"
-              template="BuildExplorerActivityTemplate"
+              template="BuildExplorerActivityTemplate_V0"
               level="win:Informational"
               version="0"
+              keywords="" />
+
+          <event value="0"
+              symbol="CppBuildInsightsBuildExplorerActivity_V1"
+              task="BuildExplorer"
+              opcode="Activity"
+              template="BuildExplorerActivityTemplate_V1"
+              level="win:Informational"
+              version="1"
               keywords="" />
 
           <event value="1"
@@ -127,7 +151,7 @@
 
         <templates>
           
-          <template tid="FileActivityTemplate">
+          <template tid="FileActivityTemplate_V0">
             <data name="TimelineId" inType="win:UInt16"/>
             <data name="TimelineDescription" inType="win:AnsiString"/>
             <data name="Tool" inType="win:AnsiString"/>
@@ -140,18 +164,42 @@
             <data name="ExclusiveMillisecondDuration" inType="win:UInt32"/>
             <data name="InclusiveMillisecondDuration" inType="win:UInt32"/>
           </template>
+
+          <template tid="FileActivityTemplate_V1">
+            <data name="TimelineId" inType="win:UInt16"/>
+            <data name="TimelineDescription" inType="win:AnsiString"/>
+            <data name="Tool" inType="win:AnsiString"/>
+            <data name="InvocationId" inType="win:UInt32"/>
+            <data name="Component" inType="win:UnicodeString"/>
+            <data name="IncludedPath" inType="win:AnsiString"/>
+            <data name="ParentPath" inType="win:AnsiString"/>
+            <data name="Depth" inType="win:UInt16"/>
+            <data name="ActivityName" inType="win:AnsiString"/>
+            <data name="ExclusiveMillisecondDuration" inType="win:UInt32"/>
+            <data name="InclusiveMillisecondDuration" inType="win:UInt32"/>
+            <data name="WallClockMillisecondTimeResponsibility" inType="win:UInt32"/>
+          </template>
           
         </templates>
 
         <events>
           <!-- FileActivities event values must be between 1000 and 1499 -->
           <event value="1000"
-              symbol="CppBuildInsightsFileActivity"
+              symbol="CppBuildInsightsFileActivity_V0"
               task="Files"
               opcode="Activity"
-              template="FileActivityTemplate"
+              template="FileActivityTemplate_V0"
               level="win:Informational"
               version="0"
+              keywords="" />
+
+          <event value="1000"
+              symbol="CppBuildInsightsFileActivity_V1"
+              task="Files"
+              opcode="Activity"
+              template="FileActivityTemplate_V1"
+              level="win:Informational"
+              version="1"
               keywords="" />
 
         </events>
@@ -167,7 +215,7 @@
 
         <templates>
           
-          <template tid="FunctionActivityTemplate">
+          <template tid="FunctionActivityTemplate_V0">
             <data name="TimelineId" inType="win:UInt16"/>
             <data name="TimelineDescription" inType="win:AnsiString"/>
             <data name="Tool" inType="win:AnsiString"/>
@@ -178,11 +226,24 @@
             <data name="MillisecondDuration" inType="win:UInt32"/>
           </template>
 
+          <template tid="FunctionActivityTemplate_V1">
+            <data name="TimelineId" inType="win:UInt16"/>
+            <data name="TimelineDescription" inType="win:AnsiString"/>
+            <data name="Tool" inType="win:AnsiString"/>
+            <data name="InvocationId" inType="win:UInt32"/>
+            <data name="Component" inType="win:UnicodeString"/>
+            <data name="FunctionInstanceId" inType="win:UInt64"/>
+            <data name="FunctionName" inType="win:AnsiString"/>
+            <data name="ActivityName" inType="win:AnsiString"/>
+            <data name="MillisecondDuration" inType="win:UInt32"/>
+            <data name="WallClockMillisecondTimeResponsibility" inType="win:UInt32"/>
+          </template>
+
           <template tid="FunctionActivityTemplate_Extended1">
             <data name="FunctionInstanceId" inType="win:UInt64"/>
           </template>
 
-          <template tid="FunctionSimpleEventTemplate">
+          <template tid="FunctionSimpleEventTemplate_V0">
             <data name="TimelineId" inType="win:UInt16"/>
             <data name="TimelineDescription" inType="win:AnsiString"/>
             <data name="Tool" inType="win:AnsiString"/>
@@ -197,6 +258,21 @@
             <data name="NumericValue" inType="win:Int32"/>
           </template>
 
+          <template tid="FunctionSimpleEventTemplate_V1">
+            <data name="TimelineId" inType="win:UInt16"/>
+            <data name="TimelineDescription" inType="win:AnsiString"/>
+            <data name="Tool" inType="win:AnsiString"/>
+            <data name="InvocationId" inType="win:UInt32"/>
+            <data name="Component" inType="win:UnicodeString"/>
+            <data name="FunctionInstanceId" inType="win:UInt64"/>
+            <data name="FunctionName" inType="win:AnsiString"/>
+            <data name="ActivityName" inType="win:AnsiString"/>
+            <data name="EventId" inType="win:UInt16"/>
+            <data name="EventName" inType="win:AnsiString"/>
+            <data name="StringValue" inType="win:AnsiString"/>
+            <data name="NumericValue" inType="win:Int32"/>
+          </template>
+
           <template tid="FunctionSimpleEventTemplate_Extended1">
             <data name="FunctionInstanceId" inType="win:UInt64"/>
             <data name="EventId" inType="win:UInt16"/>
@@ -207,25 +283,43 @@
         <events>
           <!-- FunctionActivities event values must be between 1500 and 1999 -->
           <event value="1500"
-              symbol="CppBuildInsightsFunctionActivity"
+              symbol="CppBuildInsightsFunctionActivity_V0"
               task="Functions"
               opcode="Activity"
-              template="FunctionActivityTemplate"
+              template="FunctionActivityTemplate_V0"
+              level="win:Informational"
+              version="0"
+              keywords="" />
+
+          <event value="1500"
+              symbol="CppBuildInsightsFunctionActivity_V1"
+              task="Functions"
+              opcode="Activity"
+              template="FunctionActivityTemplate_V1"
+              level="win:Informational"
+              version="1"
+              keywords="" />
+
+          <event value="1501"
+              symbol="CppBuildInsightsFunctionSimpleEvent_V0"
+              task="Functions"
+              opcode="SimpleEvent"
+              template="FunctionSimpleEventTemplate_V0"
               level="win:Informational"
               version="0"
               keywords="" />
 
           <event value="1501"
-              symbol="CppBuildInsightsFunctionSimpleEvent"
+              symbol="CppBuildInsightsFunctionSimpleEvent_V1"
               task="Functions"
               opcode="SimpleEvent"
-              template="FunctionSimpleEventTemplate"
+              template="FunctionSimpleEventTemplate_V1"
               level="win:Informational"
-              version="0"
+              version="1"
               keywords="" />
 
           <event value="1502"
-              symbol="CppBuildInsightsFunctionActivity_Extended1"
+              symbol="CppBuildInsightsFunctionActivity_Extended1_Deprecated"
               task="Functions"
               opcode="ActivityExtension1"
               template="FunctionActivityTemplate_Extended1"
@@ -234,7 +328,7 @@
               keywords="" />
 
           <event value="1503"
-              symbol="CppBuildInsightsFunctionSimpleEvent_Extended1"
+              symbol="CppBuildInsightsFunctionSimpleEvent_Extended1_Deprecated"
               task="Functions"
               opcode="SimpleEventExtension1"
               template="FunctionSimpleEventTemplate_Extended1"
@@ -254,7 +348,7 @@
 
         <templates>
 
-          <template tid="TemplateInstantiationActivityTemplate">
+          <template tid="TemplateInstantiationActivityTemplate_V0">
             <data name="TimelineId" inType="win:UInt16"/>
             <data name="TimelineDescription" inType="win:AnsiString"/>
             <data name="Tool" inType="win:AnsiString"/>
@@ -265,17 +359,38 @@
             <data name="MicrosecondDuration" inType="win:UInt32"/>
           </template>
 
+          <template tid="TemplateInstantiationActivityTemplate_V1">
+            <data name="TimelineId" inType="win:UInt16"/>
+            <data name="TimelineDescription" inType="win:AnsiString"/>
+            <data name="Tool" inType="win:AnsiString"/>
+            <data name="InvocationId" inType="win:UInt32"/>
+            <data name="Component" inType="win:UnicodeString"/>
+            <data name="PrimaryTemplateName" inType="win:AnsiString"/>
+            <data name="SpecializationName" inType="win:AnsiString"/>
+            <data name="MicrosecondDuration" inType="win:UInt32"/>
+            <data name="WallClockMicrosecondTimeResponsibility" inType="win:UInt32"/>
+          </template>
+
         </templates>
 
         <events>
           <!-- TemplateInstantiationActivities event values must be between 2000 and 2499 -->
           <event value="2000"
-              symbol="CppBuildInsightsTemplateInstantiationActivity"
+              symbol="CppBuildInsightsTemplateInstantiationActivity_V0"
               task="TemplateInstantiations"
               opcode="Activity"
-              template="TemplateInstantiationActivityTemplate"
+              template="TemplateInstantiationActivityTemplate_V0"
               level="win:Informational"
               version="0"
+              keywords="" />
+
+          <event value="2000"
+              symbol="CppBuildInsightsTemplateInstantiationActivity_V1"
+              task="TemplateInstantiations"
+              opcode="Activity"
+              template="TemplateInstantiationActivityTemplate_V1"
+              level="win:Informational"
+              version="1"
               keywords="" />
 
         </events>

@@ -21,7 +21,7 @@ void FilesView::OnFileParse(const FrontEndFileGroup& files, const void* relogSes
     using std::chrono::duration_cast;
     using std::chrono::milliseconds;
 
-    PCEVENT_DESCRIPTOR desc = &CppBuildInsightsFileActivity;
+    PCEVENT_DESCRIPTOR desc = &CppBuildInsightsFileActivity_V1;
 
     auto* context = contextBuilder_->GetContextData();
 
@@ -37,7 +37,7 @@ void FilesView::OnFileParse(const FrontEndFileGroup& files, const void* relogSes
     auto& td = miscellaneousCache_->GetTimingData(currentFile);
 
     Payload p = PayloadBuilder<uint16_t, const char*, const char*, uint32_t, const wchar_t*, const char*,
-        const char*, uint16_t, const char*, uint32_t, uint32_t>::Build(
+        const char*, uint16_t, const char*, uint32_t, uint32_t, uint32_t>::Build(
             context->TimelineId,
             context->TimelineDescription,
             context->Tool,
@@ -48,7 +48,8 @@ void FilesView::OnFileParse(const FrontEndFileGroup& files, const void* relogSes
             (uint16_t)files.Size() - 1,
             "Parsing",
             (uint32_t)duration_cast<milliseconds>(td.ExclusiveDuration).count(),
-            (uint32_t)duration_cast<milliseconds>(td.Duration).count()
+            (uint32_t)duration_cast<milliseconds>(td.Duration).count(),
+            (uint32_t)duration_cast<milliseconds>(td.WallClockTimeResponsibility).count()
         );
     
     InjectEvent(relogSession, &CppBuildInsightsGuid, desc, 

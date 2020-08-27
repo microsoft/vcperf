@@ -24,6 +24,7 @@ public:
         std::chrono::nanoseconds ExclusiveDuration;
         std::chrono::nanoseconds CPUTime;
         std::chrono::nanoseconds ExclusiveCPUTime;
+        std::chrono::nanoseconds WallClockTimeResponsibility;
     };
     
     const TimingData& GetTimingData(const A::Activity& a)
@@ -52,6 +53,7 @@ public:
 
         t.Duration = a.Duration();
         t.CPUTime = a.CPUTime();
+        t.WallClockTimeResponsibility = a.WallClockTimeResponsibility();
 
         auto it = exclusivityLeaves_.find(eventStack.Back().EventInstanceId());
 

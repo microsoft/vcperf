@@ -46,73 +46,60 @@ AnalysisControl FunctionsView::OnSimpleEvent(const EventStack& eventStack, const
 
 void FunctionsView::EmitFunctionActivity(Function func, const void* relogSession)
 {
-    PCEVENT_DESCRIPTOR desc = &CppBuildInsightsFunctionActivity;
+    using namespace std::chrono;
+
+    PCEVENT_DESCRIPTOR desc = &CppBuildInsightsFunctionActivity_V1;
 
     auto* context = contextBuilder_->GetContextData();
 
     auto& td = miscellaneousCache_->GetTimingData(func);
 
     Payload p = PayloadBuilder<uint16_t, const char*, const char*, uint32_t, 
-        const wchar_t*, const char*, const char*, uint32_t>::Build(
+        const wchar_t*, uint64_t, const char*, const char*, uint32_t, uint32_t>::Build(
             context->TimelineId,
             context->TimelineDescription,
             context->Tool,
             context->InvocationId,
             context->Component,
+            func.EventInstanceId(),
             func.Name(),
             "CodeGeneration",
-            (uint32_t)std::chrono::duration_cast<std::chrono::milliseconds>(td.Duration).count()
+            (uint32_t)duration_cast<milliseconds>(td.Duration).count(),
+            (uint32_t)duration_cast<milliseconds>(td.WallClockTimeResponsibility).count()
         );
 
     InjectEvent(relogSession, &CppBuildInsightsGuid, desc, 
         func.ProcessId(), func.ThreadId(), func.ProcessorIndex(),
         func.StartTimestamp(), p.GetData(), (unsigned long)p.Size());
-
-    desc = &CppBuildInsightsFunctionActivity_Extended1;
-
-    Payload p2 = PayloadBuilder<uint64_t>::Build(func.EventInstanceId());
-
-    InjectEvent(relogSession, &CppBuildInsightsGuid, desc, 
-        func.ProcessId(), func.ThreadId(), func.ProcessorIndex(),
-        func.StartTimestamp(), p2.GetData(), (unsigned long)p2.Size());
 }
 
 void FunctionsView::EmitFunctionForceInlinee(const Function& func, 
     const ForceInlinee& forceInlinee, const void* relogSession)
 {
-    PCEVENT_DESCRIPTOR desc = &CppBuildInsightsFunctionSimpleEvent;
+    PCEVENT_DESCRIPTOR desc = &CppBuildInsightsFunctionSimpleEvent_V1;
 
     auto* context = contextBuilder_->GetContextData();
 
     Payload p = PayloadBuilder<uint16_t, const char*, const char*, uint32_t,
-        const wchar_t*, const char*, const char*, const char*, const char*, 
-        const char*, const char*, int32_t>::Build(
+        const wchar_t*, uint64_t, const char*, const char*, uint16_t, const char*, 
+        const char*, int32_t>::Build(
             context->TimelineId,
             context->TimelineDescription,
             context->Tool,
             context->InvocationId,
             context->Component,
+            func.EventInstanceId(),
             func.Name(),
             "CodeGeneration",
+            static_cast<uint16_t>(EventId::FORCE_INLINEE),
             "ForceInlinee",
-            "",
             forceInlinee.Name(),
-            "",
             forceInlinee.Size()
         );
 
     InjectEvent(relogSession, &CppBuildInsightsGuid, desc,
         forceInlinee.ProcessId(), forceInlinee.ThreadId(), forceInlinee.ProcessorIndex(),
         forceInlinee.Timestamp(), p.GetData(), (unsigned long)p.Size());
-
-    desc = &CppBuildInsightsFunctionSimpleEvent_Extended1;
-
-    Payload p2 = PayloadBuilder<uint64_t, uint16_t>::Build(func.EventInstanceId(),
-        static_cast<uint16_t>(EventId::FORCE_INLINEE));
-
-    InjectEvent(relogSession, &CppBuildInsightsGuid, desc, 
-        forceInlinee.ProcessId(), forceInlinee.ThreadId(), forceInlinee.ProcessorIndex(),
-        forceInlinee.Timestamp(), p2.GetData(), (unsigned long)p2.Size());
 }
 
 } // namespace vcperf

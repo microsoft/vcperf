@@ -15,7 +15,7 @@ void TemplateInstantiationsView::OnTemplateInstantiationStart(
     using std::chrono::duration_cast;
     using std::chrono::microseconds;
 
-    PCEVENT_DESCRIPTOR desc = &CppBuildInsightsTemplateInstantiationActivity;
+    PCEVENT_DESCRIPTOR desc = &CppBuildInsightsTemplateInstantiationActivity_V1;
 
     auto tiInfo = tiCache_->GetTemplateInstantiationInfo(ti);
 
@@ -33,7 +33,7 @@ void TemplateInstantiationsView::OnTemplateInstantiationStart(
     const char* specializationName = std::get<2>(tiInfo);
 
     Payload p = PayloadBuilder <uint16_t, const char*, const char*, uint32_t, const wchar_t*, const char*,
-        const char*, uint32_t>::Build(
+        const char*, uint32_t, uint32_t>::Build(
             context->TimelineId,
             context->TimelineDescription,
             context->Tool,
@@ -41,7 +41,8 @@ void TemplateInstantiationsView::OnTemplateInstantiationStart(
             context->Component,
             primaryTemplateName,
             specializationName,
-            (uint32_t)duration_cast<microseconds>(td.Duration).count()
+            (uint32_t)duration_cast<microseconds>(td.Duration).count(),
+            (uint32_t)duration_cast<microseconds>(td.WallClockTimeResponsibility).count()
         );
 
     InjectEvent(relogSession, &CppBuildInsightsGuid, desc,
