@@ -157,7 +157,10 @@ void PrintError(RESULT_CODE failureCode)
             "vcperf trace, or if you don't recall starting one at all, you can use the 'tracelog -l' command "
             "to list all ongoing tracing sessions on your system. Your currently ongoing vcperf trace will "
             "show up as MSVC_BUILD_INSIGHTS_SESSION_<session name that was passed to vcperf /start>. You can "
-            "then issue a vcperf /stop or /stopnoanalyze command with the identified session name.";
+            "then issue a vcperf /stop or /stopnoanalyze command with the identified session name."
+            "It a session named 'NT Kernel Logger' is found, it means a kernel trace is currently being "
+            "collected. You can stop such a kernel trace by running 'xperf -stop' from an elevated command "
+            "prompt.";
         break;
 
     default:
