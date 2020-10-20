@@ -153,11 +153,15 @@ void PrintError(RESULT_CODE failureCode)
             "from starting a new one. This can occur if you forgot to stop a vcperf trace prior to "
             "running the start command, or if processes other than vcperf have started ETW traces of "
             "their own. Please try running the vcperf /stop or /stopnoanalyze commands on your previously "
-            "started traces. If you do not remember the session name that was used for starting a previous "
+            "started trace. If you do not remember the session name that was used for starting a previous "
             "vcperf trace, or if you don't recall starting one at all, you can use the 'tracelog -l' command "
-            "to list all ongoing tracing sessions on your system. Your currently ongoing vcperf trace will "
-            "show up as MSVC_BUILD_INSIGHTS_SESSION_<session name that was passed to vcperf /start>. You can "
-            "then issue a vcperf /stop or /stopnoanalyze command with the identified session name.";
+            "from an elevated command prompt to list all ongoing tracing sessions on your system. Your currently " 
+            "ongoing vcperf trace will show up as MSVC_BUILD_INSIGHTS_SESSION_<session name that was passed to vcperf /start>. " 
+            "You can then issue a vcperf /stop or /stopnoanalyze command with the identified session name (the "
+            "part between the angle brackets). If no MSVC_BUILD_INSIGHTS_SESSION_ is found, it could mean a kernel " 
+            "ETW trace is currently being collected. This trace will show up as 'NT Kernel Logger' in your tracelog "
+            "output, and will also prevent you from starting a new trace. You can stop the 'NT Kernel Logger' session "
+            "by running 'xperf -stop' from an elevated command prompt.";
         break;
 
     default:
