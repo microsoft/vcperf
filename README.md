@@ -39,7 +39,7 @@ Following the instructions below to build and run the product.
 
 Requirements:
 
-- Visual Studio 2017 or later.
+- Visual Studio 2019 or later.
 - Windows 8 and above.
 
 Build steps:
