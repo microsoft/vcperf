@@ -1,7 +1,7 @@
 #include "ExecutionHierarchy.h"
 
 #include <algorithm>
-#include <assert.h>
+#include <cassert>
 #include <string>
 
 using namespace Microsoft::Cpp::BuildInsights;

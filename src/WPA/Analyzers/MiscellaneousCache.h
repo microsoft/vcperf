@@ -3,7 +3,7 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <chrono>
-#include <assert.h>
+#include <cassert>
 
 #include "VcperfBuildInsights.h"
 

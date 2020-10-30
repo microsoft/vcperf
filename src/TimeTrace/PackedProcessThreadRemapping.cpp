@@ -1,6 +1,6 @@
 #include "PackedProcessThreadRemapping.h"
 
-#include <assert.h>
+#include <cassert>
 #include <algorithm>
 
 using namespace vcperf;

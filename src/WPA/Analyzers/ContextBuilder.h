@@ -5,7 +5,7 @@
 #include <string>
 #include <set>
 #include <unordered_map>
-#include <assert.h>
+#include <cassert>
 
 #include "VcperfBuildInsights.h"
 #include "Utility.h"
