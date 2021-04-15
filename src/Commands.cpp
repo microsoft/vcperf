@@ -243,7 +243,7 @@ RESULT_CODE AnalyzeToTimeTrace(const std::filesystem::path& inputFile, const std
     return Analyze(inputFile.c_str(), analysisPassCount, analyzerGroup);
 }
 
-HRESULT DoStart(const std::wstring& sessionName, bool cpuSampling, VerbosityLevel verbosityLevel)
+HRESULT DoStart(const std::wstring& sessionName, bool admin, bool cpuSampling, VerbosityLevel verbosityLevel)
 {
     TRACING_SESSION_OPTIONS options{};
 
@@ -260,6 +260,10 @@ HRESULT DoStart(const std::wstring& sessionName, bool cpuSampling, VerbosityLeve
 
     case VerbosityLevel::LIGHT:
         options.MsvcEventFlags |= TRACING_SESSION_MSVC_EVENT_FLAGS_BASIC;
+    }
+
+    if (admin) {
+        options.SystemEventFlags |= TRACING_SESSION_SYSTEM_EVENT_FLAGS_ADMIN_PRIVILEGES;
     }
 
     if (cpuSampling) {
