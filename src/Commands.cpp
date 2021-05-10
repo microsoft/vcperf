@@ -265,6 +265,9 @@ HRESULT DoStart(const std::wstring& sessionName, bool admin, bool cpuSampling, V
     if (admin) {
         options.SystemEventFlags |= TRACING_SESSION_SYSTEM_EVENT_FLAGS_ADMIN_PRIVILEGES;
     }
+    else {
+        options.MsvcEventFlags |= TRACING_SESSION_MSVC_EVENT_FLAGS_CONTEXT;
+    }
 
     if (cpuSampling) {
         options.SystemEventFlags |= TRACING_SESSION_SYSTEM_EVENT_FLAGS_CPU_SAMPLES;
