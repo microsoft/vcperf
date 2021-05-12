@@ -247,8 +247,6 @@ HRESULT DoStart(const std::wstring& sessionName, bool admin, bool cpuSampling, V
 {
     TRACING_SESSION_OPTIONS options{};
 
-    options.SystemEventFlags |= TRACING_SESSION_SYSTEM_EVENT_FLAGS_CONTEXT;
-
     switch (verbosityLevel)
     {
     case VerbosityLevel::VERBOSE:
@@ -262,15 +260,12 @@ HRESULT DoStart(const std::wstring& sessionName, bool admin, bool cpuSampling, V
         options.MsvcEventFlags |= TRACING_SESSION_MSVC_EVENT_FLAGS_BASIC;
     }
 
-    if (admin) {
-        options.SystemEventFlags |= TRACING_SESSION_SYSTEM_EVENT_FLAGS_ADMIN_PRIVILEGES;
-    }
-    else {
-        options.MsvcEventFlags |= TRACING_SESSION_MSVC_EVENT_FLAGS_CONTEXT;
-    }
-
     if (cpuSampling) {
         options.SystemEventFlags |= TRACING_SESSION_SYSTEM_EVENT_FLAGS_CPU_SAMPLES;
+    }
+
+    if (!admin) {
+        options.SystemEventFlags = 0;
     }
 
     std::wcout << L"Starting tracing session " << sessionName << L"..." << std::endl;
