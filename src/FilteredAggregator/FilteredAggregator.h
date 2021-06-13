@@ -8,9 +8,9 @@
 namespace vcperf
 {
 
-class TemplateStatsAnalyzer : public BI::IAnalyzer {
+class FilteringAggregator : public BI::IAnalyzer {
 public:
-	TemplateStatsAnalyzer(const std::string& wildcard);
+	FilteringAggregator(const std::string& wildcard);
 
 	BI::AnalysisControl OnEndAnalysisPass() override;
 	BI::AnalysisControl OnStopActivity(const BI::EventStack& eventStack) override;
@@ -34,7 +34,7 @@ private:
 
 		void Print() const;
 	};
-	template<class Activity> void UpdateWildcardTime(const BI::EventGroup<Activity>& activityGroup, bool (TemplateStatsAnalyzer::*matchFunc)(const Activity&) const, WildcardTime& totalTime) const;
+	template<class Activity> void UpdateWildcardTime(const BI::EventGroup<Activity>& activityGroup, bool (FilteringAggregator::*matchFunc)(const Activity&) const, WildcardTime& totalTime) const;
 
 	//global
 	int passNumber_ = 0;

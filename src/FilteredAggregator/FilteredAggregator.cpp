@@ -1,4 +1,4 @@
-#include "TemplateStats.h"
+#include "FilteredAggregator.h"
 #include <algorithm>
 #include <stdio.h>
 #include "Wildcard.h"
@@ -7,18 +7,18 @@ using namespace Microsoft::Cpp::BuildInsights;
 using namespace vcperf;
 
 
-TemplateStatsAnalyzer::TemplateStatsAnalyzer(const std::string& wildcard)
+FilteringAggregator::FilteringAggregator(const std::string& wildcard)
 {
     wildcard_ = wildcard;
 }
 
-void TemplateStatsAnalyzer::WildcardTime::Print() const
+void FilteringAggregator::WildcardTime::Print() const
 {
     printf("  CPU Time:     %10.6lf / %10.6lf / %10.6lf\n", 1e-9 * exclusiveCpuTime_, 1e-9 * subtractedCpuTime_, 1e-9 * inclusiveCpuTime_);
     printf("  Duration:     %10.6lf / %10.6lf / %10.6lf\n", 1e-9 * exclusiveDuration_, 1e-9 * subtractedDuration_, 1e-9 * inclusiveDuration_);
 }
 
-BI::AnalysisControl TemplateStatsAnalyzer::OnEndAnalysisPass()
+BI::AnalysisControl FilteringAggregator::OnEndAnalysisPass()
 {
     if (passNumber_ == 0) {
         std::sort(filteredKeys_.begin(), filteredKeys_.end());
@@ -36,26 +36,26 @@ BI::AnalysisControl TemplateStatsAnalyzer::OnEndAnalysisPass()
     return AnalysisControl::CONTINUE;
 }
 
-AnalysisControl TemplateStatsAnalyzer::OnStopActivity(const EventStack& eventStack)
+AnalysisControl FilteringAggregator::OnStopActivity(const EventStack& eventStack)
 {
     if (passNumber_ == 1) {
-        MatchEventStackInMemberFunction(eventStack, this, &TemplateStatsAnalyzer::OnFinishTemplateInstantiation);
-        MatchEventStackInMemberFunction(eventStack, this, &TemplateStatsAnalyzer::OnFileParse);
+        MatchEventStackInMemberFunction(eventStack, this, &FilteringAggregator::OnFinishTemplateInstantiation);
+        MatchEventStackInMemberFunction(eventStack, this, &FilteringAggregator::OnFileParse);
     }
 
     return AnalysisControl::CONTINUE;
 }
 
-AnalysisControl TemplateStatsAnalyzer::OnSimpleEvent(const EventStack& eventStack)
+AnalysisControl FilteringAggregator::OnSimpleEvent(const EventStack& eventStack)
 {
     if (passNumber_ == 0) {
-        MatchEventStackInMemberFunction(eventStack, this, &TemplateStatsAnalyzer::OnSymbolName);
+        MatchEventStackInMemberFunction(eventStack, this, &FilteringAggregator::OnSymbolName);
     }
 
     return AnalysisControl::CONTINUE;
 }
 
-void TemplateStatsAnalyzer::OnSymbolName(const SE::SymbolName& symbolName)
+void FilteringAggregator::OnSymbolName(const SE::SymbolName& symbolName)
 {
     const char *name = symbolName.Name();
     size_t len = strlen(name);
@@ -64,21 +64,21 @@ void TemplateStatsAnalyzer::OnSymbolName(const SE::SymbolName& symbolName)
     }
 }
 
-bool TemplateStatsAnalyzer::InstantiationMatchesWildcard(const A::TemplateInstantiation& templateInstantiation) const
+bool FilteringAggregator::InstantiationMatchesWildcard(const A::TemplateInstantiation& templateInstantiation) const
 {
     uint64_t primaryKey = templateInstantiation.PrimaryTemplateSymbolKey();
     size_t pos = std::lower_bound(filteredKeys_.begin(), filteredKeys_.end(), primaryKey) - filteredKeys_.begin();
     return (pos < filteredKeys_.size() && filteredKeys_[pos] == primaryKey);
 }
 
-bool TemplateStatsAnalyzer::FileParseMatchesWildcard(const A::FrontEndFile& file) const
+bool FilteringAggregator::FileParseMatchesWildcard(const A::FrontEndFile& file) const
 {
     const char *path = file.Path();
     //bool isHeader = !(WildcardMatch("*.cpp", path) || WildcardMatch("*.cxx", path) || WildcardMatch("*.c", path));
     return WildcardMatch(wildcard_.c_str(), path);
 }
 
-template<class Activity> void TemplateStatsAnalyzer::UpdateWildcardTime(const BI::EventGroup<Activity>& activityGroup, bool (TemplateStatsAnalyzer::*matchFunc)(const Activity&) const, WildcardTime& totalTime) const
+template<class Activity> void FilteringAggregator::UpdateWildcardTime(const BI::EventGroup<Activity>& activityGroup, bool (FilteringAggregator::*matchFunc)(const Activity&) const, WildcardTime& totalTime) const
 {
     int n = (int)activityGroup.Size();
     uint64_t inclCpuTime = activityGroup.Back().CPUTime().count();
@@ -111,11 +111,11 @@ template<class Activity> void TemplateStatsAnalyzer::UpdateWildcardTime(const BI
     }
 }
 
-void TemplateStatsAnalyzer::OnFinishTemplateInstantiation(const A::Activity& parent, const A::TemplateInstantiationGroup& templateInstantiationGroup)
+void FilteringAggregator::OnFinishTemplateInstantiation(const A::Activity& parent, const A::TemplateInstantiationGroup& templateInstantiationGroup)
 {
-    UpdateWildcardTime(templateInstantiationGroup, &TemplateStatsAnalyzer::InstantiationMatchesWildcard, _instantiationsTime);
+    UpdateWildcardTime(templateInstantiationGroup, &FilteringAggregator::InstantiationMatchesWildcard, _instantiationsTime);
 }
 
-void TemplateStatsAnalyzer::OnFileParse(const A::FrontEndFileGroup& files) {
-    UpdateWildcardTime(files, &TemplateStatsAnalyzer::FileParseMatchesWildcard, _parsingTime);
+void FilteringAggregator::OnFileParse(const A::FrontEndFileGroup& files) {
+    UpdateWildcardTime(files, &FilteringAggregator::FileParseMatchesWildcard, _parsingTime);
 }

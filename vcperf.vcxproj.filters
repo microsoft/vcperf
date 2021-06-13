@@ -37,8 +37,11 @@
     <Filter Include="Source Files\WPA\Views">
       <UniqueIdentifier>{f61a812e-1836-4138-94d5-51a333458674}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\TemplateStats">
+    <Filter Include="Source Files\FilteredAggregator">
       <UniqueIdentifier>{eda37a9b-4613-4d88-963d-17845f38d077}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\FilteredAggregator">
+      <UniqueIdentifier>{77b5c8c0-a632-4e3c-816f-5e9606de3010}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -78,8 +81,8 @@
     <ClCompile Include="src\TimeTrace\ExecutionHierarchy.cpp">
       <Filter>Source Files\TimeTrace</Filter>
     </ClCompile>
-    <ClCompile Include="src\TemplateStats\TemplateStats.cpp">
-      <Filter>Source Files\TemplateStats</Filter>
+    <ClCompile Include="src\FilteredAggregator\FilteredAggregator.cpp">
+      <Filter>Source Files\FilteredAggregator</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -128,11 +131,11 @@
     <ClInclude Include="src\TimeTrace\ExecutionHierarchy.h">
       <Filter>Header Files\TimeTrace</Filter>
     </ClInclude>
-    <ClInclude Include="src\TemplateStats\TemplateStats.h">
-      <Filter>Source Files\TemplateStats</Filter>
-    </ClInclude>
     <ClInclude Include="src\TemplateStats\Wildcard.h">
-      <Filter>Source Files\TemplateStats</Filter>
+      <Filter>Header Files\FilteredAggregator</Filter>
+    </ClInclude>
+    <ClInclude Include="src\FilteredAggregator\FilteredAggregator.h">
+      <Filter>Header Files\FilteredAggregator</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
