@@ -10,7 +10,7 @@ namespace vcperf
 
 class TemplateStatsAnalyzer : public BI::IAnalyzer {
 public:
-	TemplateStatsAnalyzer(const std::string& prefix);
+	TemplateStatsAnalyzer(const std::string& wildcard);
 
 	BI::AnalysisControl OnEndAnalysisPass() override;
 	BI::AnalysisControl OnStopActivity(const BI::EventStack& eventStack) override;
@@ -23,7 +23,7 @@ private:
 	bool MatchesPrefix(uint64_t primaryKey) const;
 
 	int passNumber_ = 0;
-	std::string prefix_;
+	std::string wildcard_;
 
 	//pass 0:
 	std::vector<uint64_t> filteredKeys_;

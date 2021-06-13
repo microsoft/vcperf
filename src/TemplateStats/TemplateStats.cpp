@@ -1,14 +1,15 @@
 #include "TemplateStats.h"
 #include <algorithm>
 #include <stdio.h>
+#include "Wildcard.h"
 
 using namespace Microsoft::Cpp::BuildInsights;
 using namespace vcperf;
 
 
-TemplateStatsAnalyzer::TemplateStatsAnalyzer(const std::string& prefix)
+TemplateStatsAnalyzer::TemplateStatsAnalyzer(const std::string& wildcard)
 {
-    prefix_ = prefix;
+    wildcard_ = wildcard;
 }
 
 BI::AnalysisControl TemplateStatsAnalyzer::OnEndAnalysisPass()
@@ -19,7 +20,7 @@ BI::AnalysisControl TemplateStatsAnalyzer::OnEndAnalysisPass()
     else if (passNumber_ == 1) {
         filteredKeys_.clear();
 
-        printf("Total time for template instantiations matching \"%s\":\n", prefix_.c_str());
+        printf("Total time for template instantiations matching \"%s\":\n", wildcard_.c_str());
         printf("  CPU Time:     %10.6lf / %10.6lf\n", 1e-9 * exclusiveCpuTime_, 1e-9 * inclusiveCpuTime_);
         printf("  Duration:     %10.6lf / %10.6lf\n", 1e-9 * exclusiveDuration_, 1e-9 * inclusiveDuration_);
     }
@@ -50,9 +51,12 @@ void TemplateStatsAnalyzer::OnSymbolName(const SE::SymbolName& symbolName)
 {
     const char *name = symbolName.Name();
     size_t len = strlen(name);
-    if (len >= prefix_.length() && memcmp(name, prefix_.data(), prefix_.length()) == 0) {
+    if (WildcardMatch(wildcard_.c_str(), name)) {
         filteredKeys_.push_back(symbolName.Key());
     }
+    /*if (len >= prefix_.length() && memcmp(name, prefix_.data(), prefix_.length()) == 0) {
+        filteredKeys_.push_back(symbolName.Key());
+    }*/
 }
 
 bool TemplateStatsAnalyzer::MatchesPrefix(uint64_t primaryKey) const
@@ -63,18 +67,29 @@ bool TemplateStatsAnalyzer::MatchesPrefix(uint64_t primaryKey) const
 
 void TemplateStatsAnalyzer::OnFinishTemplateInstantiation(const A::Activity& parent, const A::TemplateInstantiationGroup& templateInstantiationGroup)
 {
-    bool matchLast = MatchesPrefix(templateInstantiationGroup.Back().PrimaryTemplateSymbolKey());
-    bool matchAny = matchLast;
-    for (int i = templateInstantiationGroup.Size() - 2; i >= 0 && !matchAny; i--)
-        if (MatchesPrefix(templateInstantiationGroup[i].PrimaryTemplateSymbolKey()))
-            matchAny = true;
+    int n = (int)templateInstantiationGroup.Size();
+    uint64_t inclCpuTime = templateInstantiationGroup.Back().CPUTime().count();
+    uint64_t inclDuration = templateInstantiationGroup.Back().Duration().count();
 
-    if (matchLast) {
-        exclusiveCpuTime_ += templateInstantiationGroup.Back().ExclusiveCPUTime().count();
-        exclusiveDuration_ += templateInstantiationGroup.Back().Duration().count();
+    if (n >= 1 && MatchesPrefix(templateInstantiationGroup[n-1].PrimaryTemplateSymbolKey())) {
+        bool hasMatchingAncestor = false;
+        for (int i = n-2; i >= 0; i--)
+            if (MatchesPrefix(templateInstantiationGroup[i].PrimaryTemplateSymbolKey())) {
+                hasMatchingAncestor = true;
+                break;
+            }
+        if (!hasMatchingAncestor) {
+            //instantiation stack looks like:  no, no, no, ..., no, match
+            inclusiveCpuTime_ += inclCpuTime;
+            inclusiveDuration_ += inclDuration;
+        }
+        //instantiation stack looks like:  any, any, any, ..., any, match
+        exclusiveCpuTime_ += inclCpuTime;
+        exclusiveDuration_ += inclDuration;
     }
-    if (matchAny) {
-        inclusiveCpuTime_ += templateInstantiationGroup.Back().ExclusiveCPUTime().count();
-        inclusiveDuration_ += templateInstantiationGroup.Back().Duration().count();
+    if (n >= 2 && MatchesPrefix(templateInstantiationGroup[n-2].PrimaryTemplateSymbolKey())) {
+        //instantiation stack looks like:  any any ... any match any
+        exclusiveCpuTime_ -= inclCpuTime;
+        exclusiveDuration_ -= inclDuration;
     }
 }
