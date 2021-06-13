@@ -196,6 +196,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\TemplateStats\TemplateStats.h" />
+    <ClInclude Include="src\TemplateStats\Wildcard.h" />
     <ClInclude Include="src\WPA\Analyzers\ContextBuilder.h" />
     <ClInclude Include="src\WPA\Analyzers\MiscellaneousCache.h" />
     <ClInclude Include="src\WPA\Analyzers\ExpensiveTemplateInstantiationCache.h" />

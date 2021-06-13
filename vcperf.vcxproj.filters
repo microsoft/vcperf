@@ -131,6 +131,9 @@
     <ClInclude Include="src\TemplateStats\TemplateStats.h">
       <Filter>Source Files\TemplateStats</Filter>
     </ClInclude>
+    <ClInclude Include="src\TemplateStats\Wildcard.h">
+      <Filter>Source Files\TemplateStats</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="$(IntDir)CppBuildInsightsEtw.rc">
