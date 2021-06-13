@@ -14,7 +14,7 @@
 #include "WPA\Views\TemplateInstantiationsView.h"
 #include "TimeTrace\ExecutionHierarchy.h"
 #include "TimeTrace\TimeTraceGenerator.h"
-#include "TemplateStats\TemplateStats.h"
+#include "FilteredAggregator\FilteredAggregator.h"
 
 using namespace Microsoft::Cpp::BuildInsights;
 
@@ -254,9 +254,9 @@ std::string ws2s(const std::wstring& wstr)
     }
     return res;
 }
-HRESULT DoTemplateStats(const std::filesystem::path& inputFile, const std::wstring& wildcard)
+HRESULT DoFilteredAggregate(const std::filesystem::path& inputFile, const std::wstring& wildcard)
 {
-    TemplateStatsAnalyzer analyzer{ ws2s(wildcard) };
+    FilteringAggregator analyzer{ ws2s(wildcard) };
     auto analyzerGroup = MakeStaticAnalyzerGroup(&analyzer);
     return Analyze(inputFile.c_str(), 2, analyzerGroup);
 }

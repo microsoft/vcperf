@@ -169,7 +169,7 @@ int wmain(int argc, wchar_t* argv[])
         std::wcout << L"vcperf.exe /stopnoanalyze sessionName outputRawFile.etl" << std::endl;
         std::wcout << L"vcperf.exe /analyze [/templates] inputRawFile.etl output.etl" << std::endl;
         std::wcout << L"vcperf.exe /analyze [/templates] inputRawFile.etl /timetrace output.json" << std::endl;
-        std::wcout << L"vcperf.exe /templateStats {wildcard} inputRawFile.etl" << std::endl;
+        std::wcout << L"vcperf.exe /sumof {wildcard} inputRawFile.etl" << std::endl;
 
         std::wcout << std::endl;
 
@@ -294,7 +294,7 @@ int wmain(int argc, wchar_t* argv[])
 
         return DoAnalyze(inputFile, outputFile, analyzeTemplates, generateTimeTrace);
     }
-    else if (CheckCommand(argv[1], L"templateStats")) 
+    else if (CheckCommand(argv[1], L"sumof")) 
     {
         if (argc < 4) {
             return E_FAIL;
@@ -306,7 +306,7 @@ int wmain(int argc, wchar_t* argv[])
             return E_FAIL;
         }
 
-        return DoTemplateStats(inputFile, wildcard);
+        return DoFilteredAggregate(inputFile, wildcard);
     }
     else 
     {
