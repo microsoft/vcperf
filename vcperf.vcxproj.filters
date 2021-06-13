@@ -37,6 +37,9 @@
     <Filter Include="Source Files\WPA\Views">
       <UniqueIdentifier>{f61a812e-1836-4138-94d5-51a333458674}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\TemplateStats">
+      <UniqueIdentifier>{eda37a9b-4613-4d88-963d-17845f38d077}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Commands.cpp">
@@ -74,6 +77,9 @@
     </ClCompile>
     <ClCompile Include="src\TimeTrace\ExecutionHierarchy.cpp">
       <Filter>Source Files\TimeTrace</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TemplateStats\TemplateStats.cpp">
+      <Filter>Source Files\TemplateStats</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -121,6 +127,9 @@
     </ClInclude>
     <ClInclude Include="src\TimeTrace\ExecutionHierarchy.h">
       <Filter>Header Files\TimeTrace</Filter>
+    </ClInclude>
+    <ClInclude Include="src\TemplateStats\TemplateStats.h">
+      <Filter>Source Files\TemplateStats</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
