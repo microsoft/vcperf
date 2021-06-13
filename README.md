@@ -1,3 +1,36 @@
+# Fork changes
+
+Added `/sumof` command, which computes total time for all stuff matching given wildcard. Given a raw trace, it can be used as follows:
+
+    vcperf /sumof *Eigen* rawTrace.etl 
+
+It prints results to stdout:
+```
+Total time for parsing files matching "*Eigen*":
+  CPU Time:      79.565226 /  96.567721 / 110.676782
+  Duration:     448.373768 / 1112.570639 / 1168.585713
+Total time for template instantiations matching "*Eigen*":
+  CPU Time:     169.516602 / 169.516602 / 170.677942
+  Duration:     122.637069 / 188.706707 / 190.002096
+```
+
+Ideally, this should show how much time is spent on Eigen template library.
+Better use "CPU Time" instead of "Duration", unless you disable parallel builds.
+
+Note that every line reports three numbers, which are slightly different.
+The first one is the sum of exclusive time (as reported by framework) over all matching activities.
+The second one also the sum of exclusive time over all matches, but exclusive time is computed as inclusive time minus inclusive time of all children.
+The last one is the sum of inclusive time over all topmost matches.
+
+For instance, if we consider parsing files in the sample above:
+
+* 110.676782 seconds is spent on Eigen headers and all headers included from them (regardless of whether they are from Eigen of not).
+* 96.567721 or 79.565226 seconds is spent on Eigen headers only, and excludes time for non-Eigen headers included from them. No idea why these two numbers are different...
+
+*(Original vcperf readme follows)*
+
+---------------------
+
 # vcperf
 
 ## Overview
