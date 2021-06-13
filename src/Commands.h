@@ -18,6 +18,6 @@ HRESULT DoStart(const std::wstring& sessionName, bool cpuSampling, VerbosityLeve
 HRESULT DoStop(const std::wstring& sessionName, const std::filesystem::path& outputFile, bool analyzeTemplates = false, bool generateTimeTrace = false);
 HRESULT DoStopNoAnalyze(const std::wstring& sessionName, const std::filesystem::path& outputFile);
 HRESULT DoAnalyze(const std::filesystem::path& inputFile, const std::filesystem::path& outputFile, bool analyzeTemplates = false, bool generateTimeTrace = false);
-HRESULT DoTemplateStats(const std::filesystem::path& inputFile, const std::wstring& prefix);
+HRESULT DoTemplateStats(const std::filesystem::path& inputFile, const std::wstring& wildcard);
 
 } // namespace vcperf

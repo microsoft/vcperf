@@ -254,9 +254,9 @@ std::string ws2s(const std::wstring& wstr)
     }
     return res;
 }
-HRESULT DoTemplateStats(const std::filesystem::path& inputFile, const std::wstring& prefix)
+HRESULT DoTemplateStats(const std::filesystem::path& inputFile, const std::wstring& wildcard)
 {
-    TemplateStatsAnalyzer analyzer{ ws2s(prefix) };
+    TemplateStatsAnalyzer analyzer{ ws2s(wildcard) };
     auto analyzerGroup = MakeStaticAnalyzerGroup(&analyzer);
     return Analyze(inputFile.c_str(), 2, analyzerGroup);
 }

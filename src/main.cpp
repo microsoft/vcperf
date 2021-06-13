@@ -169,7 +169,7 @@ int wmain(int argc, wchar_t* argv[])
         std::wcout << L"vcperf.exe /stopnoanalyze sessionName outputRawFile.etl" << std::endl;
         std::wcout << L"vcperf.exe /analyze [/templates] inputRawFile.etl output.etl" << std::endl;
         std::wcout << L"vcperf.exe /analyze [/templates] inputRawFile.etl /timetrace output.json" << std::endl;
-        std::wcout << L"vcperf.exe /templateStats {prefix} inputRawFile.etl" << std::endl;
+        std::wcout << L"vcperf.exe /templateStats {wildcard} inputRawFile.etl" << std::endl;
 
         std::wcout << std::endl;
 
@@ -299,14 +299,14 @@ int wmain(int argc, wchar_t* argv[])
         if (argc < 4) {
             return E_FAIL;
         }
-        std::wstring prefix = argv[2];
+        std::wstring wildcard = argv[2];
         std::wstring inputFile = argv[3];
 
         if (!ValidateFile(inputFile, true, L".etl")) {
             return E_FAIL;
         }
 
-        return DoTemplateStats(inputFile, prefix);
+        return DoTemplateStats(inputFile, wildcard);
     }
     else 
     {
