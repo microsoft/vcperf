@@ -247,8 +247,6 @@ HRESULT DoStart(const std::wstring& sessionName, bool cpuSampling, VerbosityLeve
 {
     TRACING_SESSION_OPTIONS options{};
 
-    options.SystemEventFlags |= TRACING_SESSION_SYSTEM_EVENT_FLAGS_CONTEXT;
-
     switch (verbosityLevel)
     {
     case VerbosityLevel::VERBOSE:
