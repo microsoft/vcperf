@@ -55,8 +55,8 @@
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
   <ImportGroup Label="Shared">
-    <Import Project="packages\Microsoft.Cpp.BuildInsights.1.1.0\build\native\Microsoft.Cpp.BuildInsights.targets" Condition="Exists('packages\Microsoft.Cpp.BuildInsights.1.1.0\build\native\Microsoft.Cpp.BuildInsights.targets')" />
     <Import Project="packages\nlohmann.json.3.7.3\build\native\nlohmann.json.targets" Condition="Exists('packages\nlohmann.json.3.7.3\build\native\nlohmann.json.targets')" />
+    <Import Project="packages\Microsoft.Cpp.BuildInsights.1.1.0\build\native\Microsoft.Cpp.BuildInsights.targets" Condition="Exists('packages\Microsoft.Cpp.BuildInsights.1.1.0\build\native\Microsoft.Cpp.BuildInsights.targets')" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -233,7 +233,7 @@
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('packages\Microsoft.Cpp.BuildInsights.1.1.0\build\native\Microsoft.Cpp.BuildInsights.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\Microsoft.Cpp.BuildInsights.1.1.0\build\native\Microsoft.Cpp.BuildInsights.targets'))" />
     <Error Condition="!Exists('packages\nlohmann.json.3.7.3\build\native\nlohmann.json.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\nlohmann.json.3.7.3\build\native\nlohmann.json.targets'))" />
+    <Error Condition="!Exists('packages\Microsoft.Cpp.BuildInsights.1.1.0\build\native\Microsoft.Cpp.BuildInsights.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\Microsoft.Cpp.BuildInsights.1.1.0\build\native\Microsoft.Cpp.BuildInsights.targets'))" />
   </Target>
 </Project>
