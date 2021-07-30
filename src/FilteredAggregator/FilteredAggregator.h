@@ -20,9 +20,12 @@ private:
 	void OnFinishTemplateInstantiation(const A::Activity& parent, const A::TemplateInstantiationGroup& templateInstantiationGroup);
 	void OnSymbolName(const SE::SymbolName& symbolName);
 	void OnFileParse(const A::FrontEndFileGroup& files);
+	void OnFunction(const A::Function& function);
 
 	bool InstantiationMatchesWildcard(const A::TemplateInstantiation& templateInstantiation) const;
 	bool FileParseMatchesWildcard(const A::FrontEndFile& file) const;
+	bool FunctionMatchesWildcard(const A::Function& function) const;
+	
 
 	struct WildcardTime {
 		uint64_t exclusiveCpuTime_ = 0;
@@ -35,6 +38,7 @@ private:
 		void Print() const;
 	};
 	template<class Activity> void UpdateWildcardTime(const BI::EventGroup<Activity>& activityGroup, bool (FilteringAggregator::*matchFunc)(const Activity&) const, WildcardTime& totalTime) const;
+	template<class Activity> void UpdateWildcardTime(const Activity& activity, bool (FilteringAggregator::* matchFunc)(const Activity&) const, WildcardTime& totalTime) const;
 
 	//global
 	int passNumber_ = 0;
@@ -42,10 +46,13 @@ private:
 
 	//pass 0:
 	std::vector<uint64_t> filteredKeys_;
+	std::vector<std::string> functionNamesDecorated_;
+	std::vector<std::string> functionNamesUndecorated_;
 
 	//pass 1:
 	WildcardTime _instantiationsTime;
 	WildcardTime _parsingTime;
+	WildcardTime _generationTime;
 };
 
 }

@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <stdio.h>
 #include "Wildcard.h"
+#include "Undecorate.h"
 
 using namespace Microsoft::Cpp::BuildInsights;
 using namespace vcperf;
@@ -22,6 +23,11 @@ BI::AnalysisControl FilteringAggregator::OnEndAnalysisPass()
 {
     if (passNumber_ == 0) {
         std::sort(filteredKeys_.begin(), filteredKeys_.end());
+        filteredKeys_.resize(std::unique(filteredKeys_.begin(), filteredKeys_.end()) - filteredKeys_.begin());
+
+        std::sort(functionNamesDecorated_.begin(), functionNamesDecorated_.end());
+        functionNamesDecorated_.resize(std::unique(functionNamesDecorated_.begin(), functionNamesDecorated_.end()) - functionNamesDecorated_.begin());
+        Undecorate(functionNamesDecorated_, functionNamesUndecorated_);
     }
     else if (passNumber_ == 1) {
         filteredKeys_.clear();
@@ -30,6 +36,8 @@ BI::AnalysisControl FilteringAggregator::OnEndAnalysisPass()
         _parsingTime.Print();
         printf("Total time for template instantiations matching \"%s\":\n", wildcard_.c_str());
         _instantiationsTime.Print();
+        printf("Total time for code generation matching \"%s\":\n", wildcard_.c_str());
+        _generationTime.Print();
     }
     passNumber_++;
 
@@ -42,6 +50,7 @@ AnalysisControl FilteringAggregator::OnStopActivity(const EventStack& eventStack
         MatchEventStackInMemberFunction(eventStack, this, &FilteringAggregator::OnFinishTemplateInstantiation);
         MatchEventStackInMemberFunction(eventStack, this, &FilteringAggregator::OnFileParse);
     }
+    MatchEventStackInMemberFunction(eventStack, this, &FilteringAggregator::OnFunction);
 
     return AnalysisControl::CONTINUE;
 }
@@ -78,6 +87,16 @@ bool FilteringAggregator::FileParseMatchesWildcard(const A::FrontEndFile& file) 
     return WildcardMatch(wildcard_.c_str(), path);
 }
 
+bool FilteringAggregator::FunctionMatchesWildcard(const A::Function& function) const
+{
+    std::string decName = function.Name();
+    size_t pos = std::lower_bound(functionNamesDecorated_.begin(), functionNamesDecorated_.end(), decName) - functionNamesDecorated_.begin();
+    if (pos == functionNamesDecorated_.size() || functionNamesDecorated_[pos] != decName)
+        return false;   //not even registered
+    const std::string& undecName = functionNamesUndecorated_[pos];
+    return WildcardMatch(wildcard_.c_str(), undecName.c_str());
+}
+
 template<class Activity> void FilteringAggregator::UpdateWildcardTime(const BI::EventGroup<Activity>& activityGroup, bool (FilteringAggregator::*matchFunc)(const Activity&) const, WildcardTime& totalTime) const
 {
     int n = (int)activityGroup.Size();
@@ -111,11 +130,39 @@ template<class Activity> void FilteringAggregator::UpdateWildcardTime(const BI::
     }
 }
 
+template<class Activity> void FilteringAggregator::UpdateWildcardTime(const Activity& activity, bool (FilteringAggregator::* matchFunc)(const Activity&) const, WildcardTime& totalTime) const
+{
+    if (!(this->*matchFunc)(activity))
+        return;
+
+    uint64_t inclCpuTime = activity.CPUTime().count();
+    uint64_t inclDuration = activity.Duration().count();
+    uint64_t exclCpuTime = activity.ExclusiveCPUTime().count();
+    uint64_t exclDuration = activity.ExclusiveDuration().count();
+    totalTime.inclusiveCpuTime_ += inclCpuTime;
+    totalTime.inclusiveDuration_ += inclDuration;
+    totalTime.subtractedCpuTime_ += inclCpuTime;
+    totalTime.subtractedDuration_ += inclDuration;
+    totalTime.exclusiveCpuTime_ += exclCpuTime;
+    totalTime.exclusiveDuration_ += exclDuration;
+}
+
 void FilteringAggregator::OnFinishTemplateInstantiation(const A::Activity& parent, const A::TemplateInstantiationGroup& templateInstantiationGroup)
 {
     UpdateWildcardTime(templateInstantiationGroup, &FilteringAggregator::InstantiationMatchesWildcard, _instantiationsTime);
 }
 
-void FilteringAggregator::OnFileParse(const A::FrontEndFileGroup& files) {
+void FilteringAggregator::OnFileParse(const A::FrontEndFileGroup& files)
+{
     UpdateWildcardTime(files, &FilteringAggregator::FileParseMatchesWildcard, _parsingTime);
+}
+
+void FilteringAggregator::OnFunction(const A::Function& function)
+{
+    if (passNumber_ == 0) {
+        functionNamesDecorated_.push_back(function.Name());
+    }
+    if (passNumber_ == 1) {
+       UpdateWildcardTime(function, &FilteringAggregator::FunctionMatchesWildcard, _generationTime);
+    }
 }
