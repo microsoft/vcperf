@@ -45,14 +45,14 @@ private:
 	std::string wildcard_;
 
 	//pass 0:
-	std::vector<uint64_t> filteredKeys_;
+	std::vector<std::pair<uint64_t, std::string>> symbolNames_;
 	std::vector<std::string> functionNamesDecorated_;
 	std::vector<std::string> functionNamesUndecorated_;
 
 	//pass 1:
-	WildcardTime _instantiationsTime;
-	WildcardTime _parsingTime;
-	WildcardTime _generationTime;
+	WildcardTime instantiationsTime_;
+	WildcardTime parsingTime_;
+	WildcardTime generationTime_;
 };
 
 }
