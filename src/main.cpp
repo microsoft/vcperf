@@ -170,6 +170,7 @@ int wmain(int argc, wchar_t* argv[])
         std::wcout << L"vcperf.exe /analyze [/templates] inputRawFile.etl output.etl" << std::endl;
         std::wcout << L"vcperf.exe /analyze [/templates] inputRawFile.etl /timetrace output.json" << std::endl;
         std::wcout << L"vcperf.exe /sumof {wildcard} inputRawFile.etl" << std::endl;
+        std::wcout << L"vcperf.exe /stats inputRawFile.etl" << std::endl;
 
         std::wcout << std::endl;
 
@@ -307,6 +308,19 @@ int wmain(int argc, wchar_t* argv[])
         }
 
         return DoFilteredAggregate(inputFile, wildcard);
+    }
+    else if (CheckCommand(argv[1], L"stats")) 
+    {
+        if (argc < 3) {
+            return E_FAIL;
+        }
+        std::wstring inputFile = argv[2];
+
+        if (!ValidateFile(inputFile, true, L".etl")) {
+            return E_FAIL;
+        }
+
+        return DoCollectStatistics(inputFile);
     }
     else 
     {

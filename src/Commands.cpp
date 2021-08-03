@@ -15,6 +15,7 @@
 #include "TimeTrace\ExecutionHierarchy.h"
 #include "TimeTrace\TimeTraceGenerator.h"
 #include "FilteredAggregator\FilteredAggregator.h"
+#include "FilteredAggregator\StatisticsCollector.h"
 
 using namespace Microsoft::Cpp::BuildInsights;
 
@@ -257,6 +258,12 @@ std::string ws2s(const std::wstring& wstr)
 HRESULT DoFilteredAggregate(const std::filesystem::path& inputFile, const std::wstring& wildcard)
 {
     FilteringAggregator analyzer{ ws2s(wildcard) };
+    auto analyzerGroup = MakeStaticAnalyzerGroup(&analyzer);
+    return Analyze(inputFile.c_str(), 2, analyzerGroup);
+}
+HRESULT DoCollectStatistics(const std::filesystem::path& inputFile)
+{
+    StatisticsCollector analyzer;
     auto analyzerGroup = MakeStaticAnalyzerGroup(&analyzer);
     return Analyze(inputFile.c_str(), 2, analyzerGroup);
 }

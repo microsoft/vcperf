@@ -87,6 +87,9 @@
     <ClCompile Include="src\FilteredAggregator\Undecorate.cpp">
       <Filter>Source Files\FilteredAggregator</Filter>
     </ClCompile>
+    <ClCompile Include="src\FilteredAggregator\StatisticsCollector.cpp">
+      <Filter>Source Files\FilteredAggregator</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Commands.h">
@@ -141,6 +144,9 @@
       <Filter>Header Files\FilteredAggregator</Filter>
     </ClInclude>
     <ClInclude Include="src\FilteredAggregator\Undecorate.h">
+      <Filter>Header Files\FilteredAggregator</Filter>
+    </ClInclude>
+    <ClInclude Include="src\FilteredAggregator\StatisticsCollector.h">
       <Filter>Header Files\FilteredAggregator</Filter>
     </ClInclude>
   </ItemGroup>

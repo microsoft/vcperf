@@ -181,6 +181,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\FilteredAggregator\FilteredAggregator.cpp" />
+    <ClCompile Include="src\FilteredAggregator\StatisticsCollector.cpp" />
     <ClCompile Include="src\FilteredAggregator\Undecorate.cpp" />
     <ClCompile Include="src\WPA\Analyzers\ContextBuilder.cpp" />
     <ClCompile Include="src\WPA\Analyzers\ExpensiveTemplateInstantiationCache.cpp" />
@@ -197,6 +198,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\FilteredAggregator\FilteredAggregator.h" />
+    <ClInclude Include="src\FilteredAggregator\StatisticsCollector.h" />
     <ClInclude Include="src\FilteredAggregator\Undecorate.h" />
     <ClInclude Include="src\TemplateStats\Wildcard.h" />
     <ClInclude Include="src\WPA\Analyzers\ContextBuilder.h" />

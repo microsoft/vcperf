@@ -19,5 +19,6 @@ HRESULT DoStop(const std::wstring& sessionName, const std::filesystem::path& out
 HRESULT DoStopNoAnalyze(const std::wstring& sessionName, const std::filesystem::path& outputFile);
 HRESULT DoAnalyze(const std::filesystem::path& inputFile, const std::filesystem::path& outputFile, bool analyzeTemplates = false, bool generateTimeTrace = false);
 HRESULT DoFilteredAggregate(const std::filesystem::path& inputFile, const std::wstring& wildcard);
+HRESULT DoCollectStatistics(const std::filesystem::path& inputFile);
 
 } // namespace vcperf
