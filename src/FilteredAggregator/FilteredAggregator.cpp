@@ -22,19 +22,22 @@ void FilteringAggregator::WildcardTime::Print() const
 BI::AnalysisControl FilteringAggregator::OnEndAnalysisPass()
 {
     if (passNumber_ == 0) {
-        std::sort(symbolNames_.begin(), symbolNames_.end());
+        std::sort(filteredKeys_.begin(), filteredKeys_.end());
+        filteredKeys_.resize(std::unique(filteredKeys_.begin(), filteredKeys_.end()) - filteredKeys_.begin());
 
         std::sort(functionNamesDecorated_.begin(), functionNamesDecorated_.end());
         functionNamesDecorated_.resize(std::unique(functionNamesDecorated_.begin(), functionNamesDecorated_.end()) - functionNamesDecorated_.begin());
         Undecorate(functionNamesDecorated_, functionNamesUndecorated_);
     }
     else if (passNumber_ == 1) {
+        filteredKeys_.clear();
+
         printf("Total time for parsing files matching \"%s\":\n", wildcard_.c_str());
-        parsingTime_.Print();
+        _parsingTime.Print();
         printf("Total time for template instantiations matching \"%s\":\n", wildcard_.c_str());
-        instantiationsTime_.Print();
+        _instantiationsTime.Print();
         printf("Total time for code generation matching \"%s\":\n", wildcard_.c_str());
-        generationTime_.Print();
+        _generationTime.Print();
     }
     passNumber_++;
 
@@ -63,19 +66,18 @@ AnalysisControl FilteringAggregator::OnSimpleEvent(const EventStack& eventStack)
 
 void FilteringAggregator::OnSymbolName(const SE::SymbolName& symbolName)
 {
-    symbolNames_.emplace_back(symbolName.Key(), symbolName.Name());
+    const char *name = symbolName.Name();
+    size_t len = strlen(name);
+    if (WildcardMatch(wildcard_.c_str(), name)) {
+        filteredKeys_.push_back(symbolName.Key());
+    }
 }
 
 bool FilteringAggregator::InstantiationMatchesWildcard(const A::TemplateInstantiation& templateInstantiation) const
 {
     uint64_t primaryKey = templateInstantiation.PrimaryTemplateSymbolKey();
-    std::pair<uint64_t, std::string> key(primaryKey, "");
-    size_t pos = std::lower_bound(symbolNames_.begin(), symbolNames_.end(), key) - symbolNames_.begin();
-    if (pos == symbolNames_.size() || symbolNames_[pos].first != primaryKey)
-        return false;   //not even registered
-
-    const std::string& fullName = symbolNames_[pos].second;
-    return WildcardMatch(wildcard_.c_str(), fullName.c_str());
+    size_t pos = std::lower_bound(filteredKeys_.begin(), filteredKeys_.end(), primaryKey) - filteredKeys_.begin();
+    return (pos < filteredKeys_.size() && filteredKeys_[pos] == primaryKey);
 }
 
 bool FilteringAggregator::FileParseMatchesWildcard(const A::FrontEndFile& file) const
@@ -91,7 +93,6 @@ bool FilteringAggregator::FunctionMatchesWildcard(const A::Function& function) c
     size_t pos = std::lower_bound(functionNamesDecorated_.begin(), functionNamesDecorated_.end(), decName) - functionNamesDecorated_.begin();
     if (pos == functionNamesDecorated_.size() || functionNamesDecorated_[pos] != decName)
         return false;   //not even registered
-
     const std::string& undecName = functionNamesUndecorated_[pos];
     return WildcardMatch(wildcard_.c_str(), undecName.c_str());
 }
@@ -148,12 +149,12 @@ template<class Activity> void FilteringAggregator::UpdateWildcardTime(const Acti
 
 void FilteringAggregator::OnFinishTemplateInstantiation(const A::Activity& parent, const A::TemplateInstantiationGroup& templateInstantiationGroup)
 {
-    UpdateWildcardTime(templateInstantiationGroup, &FilteringAggregator::InstantiationMatchesWildcard, instantiationsTime_);
+    UpdateWildcardTime(templateInstantiationGroup, &FilteringAggregator::InstantiationMatchesWildcard, _instantiationsTime);
 }
 
 void FilteringAggregator::OnFileParse(const A::FrontEndFileGroup& files)
 {
-    UpdateWildcardTime(files, &FilteringAggregator::FileParseMatchesWildcard, parsingTime_);
+    UpdateWildcardTime(files, &FilteringAggregator::FileParseMatchesWildcard, _parsingTime);
 }
 
 void FilteringAggregator::OnFunction(const A::Function& function)
@@ -162,6 +163,6 @@ void FilteringAggregator::OnFunction(const A::Function& function)
         functionNamesDecorated_.push_back(function.Name());
     }
     if (passNumber_ == 1) {
-       UpdateWildcardTime(function, &FilteringAggregator::FunctionMatchesWildcard, generationTime_);
+       UpdateWildcardTime(function, &FilteringAggregator::FunctionMatchesWildcard, _generationTime);
     }
 }
