@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <stdio.h>
 #include "Undecorate.h"
+#include <assert.h>
 
 using namespace Microsoft::Cpp::BuildInsights;
 using namespace vcperf;
@@ -77,7 +78,7 @@ BI::AnalysisControl StatisticsCollector::OnEndAnalysisPass()
             }
 
             static const double MIN_TIME_SEC = 1e-3;
-            static const double MIN_TIME_PERCENT = 1e-1;
+            static const double MIN_TIME_PERCENT = 1e-2;
 
             printf("\n  sorted by total time:\n");
             std::sort(arr.begin(), arr.end(), [](const PrintLine& a, const PrintLine& b) {
@@ -86,7 +87,7 @@ BI::AnalysisControl StatisticsCollector::OnEndAnalysisPass()
             for (int i = 0; i < arr.size(); i++) {
                 if (arr[i].totalTimeSec < MIN_TIME_SEC || arr[i].totalTimePercent < MIN_TIME_PERCENT)
                     break;
-                printf("    %-120s : %10.3lf | %6d  (%6.3lf%%)\n", arr[i].path.c_str(), arr[i].totalTimeSec, arr[i].count, arr[i].totalTimePercent);
+                printf("    %10.3lf | %6d  (%6.3lf%%)  :  %s\n", arr[i].totalTimeSec, arr[i].count, arr[i].totalTimePercent, arr[i].path.c_str());
             }
 
             printf("\n  sorted lexicographically:\n");
@@ -96,20 +97,49 @@ BI::AnalysisControl StatisticsCollector::OnEndAnalysisPass()
             for (int i = 0; i < arr.size(); i++) {
                 if (arr[i].totalTimeSec < MIN_TIME_SEC || arr[i].totalTimePercent < MIN_TIME_PERCENT)
                     continue;
-                printf("    %-120s : %10.3lf | %6d  (%6.3lf%%)\n", arr[i].path.c_str(), arr[i].totalTimeSec, arr[i].count, arr[i].totalTimePercent);
+                printf("    %10.3lf | %6d  (%6.3lf%%)  :  %s\n", arr[i].totalTimeSec, arr[i].count, arr[i].totalTimePercent, arr[i].path.c_str());
             }
         };
 
+        auto FilterTemplateArguments = [](std::string path) -> std::string {
+            int totalBalance = 0;
+            int lastBalanceZero = 0;
+            for (int i = 0; i < path.size(); i++) {
+                if (path[i] == '<')
+                    totalBalance++;
+                if (path[i] == '>')
+                    totalBalance--;
+                if (totalBalance == 0)
+                    lastBalanceZero = i + 1;
+            }
+
+            std::string res;
+            int runningBalance = 0;
+            for (int i = 0; i < path.size(); i++) {
+                if (path[i] == '<')
+                    runningBalance++;
+                if (runningBalance == 0 || i >= lastBalanceZero)
+                    res += path[i];
+                if (path[i] == '>')
+                    runningBalance--;
+            }
+            return res;
+        };
+
+        std::vector<std::string> generationPaths;
+        for (int i = 0; i < functionNamesUndecorated_.size(); i++)
+            generationPaths.push_back(FilterTemplateArguments(functionNamesUndecorated_[i]));
+
         std::vector<std::string> symbolStrNames(symbolNames_.size());
         for (int i = 0; i < symbolNames_.size(); i++)
-            symbolStrNames[i] = symbolNames_[i].second;
+            symbolStrNames[i] = FilterTemplateArguments(symbolNames_[i].second);
 
         std::map<std::string, Result> parseTree_;
         std::map<std::string, Result> instantiationTree_;
         std::map<std::string, Result> generationTree_;
         BuildTree(parsedFilePaths_, parseTimes_, "\\", parseTree_);
         BuildTree(symbolStrNames, instantiationTimes_, "::", instantiationTree_);
-        BuildTree(functionNamesUndecorated_, generationTimes_, "::", generationTree_);
+        BuildTree(generationPaths, generationTimes_, "::", generationTree_);
 
         uint64_t totalTime = parseTree_.at("#").totalTime_ + instantiationTree_.at("#").totalTime_ + generationTree_.at("#").totalTime_;
         printf("All reported values are exclusive CPU times.\n");
