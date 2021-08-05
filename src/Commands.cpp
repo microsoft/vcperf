@@ -14,6 +14,8 @@
 #include "WPA\Views\TemplateInstantiationsView.h"
 #include "TimeTrace\ExecutionHierarchy.h"
 #include "TimeTrace\TimeTraceGenerator.h"
+#include "FilteredAggregator\FilteredAggregator.h"
+#include "FilteredAggregator\StatisticsCollector.h"
 
 using namespace Microsoft::Cpp::BuildInsights;
 
@@ -241,6 +243,29 @@ RESULT_CODE AnalyzeToTimeTrace(const std::filesystem::path& inputFile, const std
     int analysisPassCount = 1;
 
     return Analyze(inputFile.c_str(), analysisPassCount, analyzerGroup);
+}
+
+std::string ws2s(const std::wstring& wstr)
+{
+    std::string res;
+    for (int i = 0; i < wstr.size(); i++) {
+        // I feel sorry =)
+        assert(wstr[i] >= 0 && wstr[i] < 128);
+        res += char(wstr[i]);
+    }
+    return res;
+}
+HRESULT DoFilteredAggregate(const std::filesystem::path& inputFile, const std::wstring& wildcard)
+{
+    FilteringAggregator analyzer{ ws2s(wildcard) };
+    auto analyzerGroup = MakeStaticAnalyzerGroup(&analyzer);
+    return Analyze(inputFile.c_str(), 2, analyzerGroup);
+}
+HRESULT DoCollectStatistics(const std::filesystem::path& inputFile)
+{
+    StatisticsCollector analyzer;
+    auto analyzerGroup = MakeStaticAnalyzerGroup(&analyzer);
+    return Analyze(inputFile.c_str(), 2, analyzerGroup);
 }
 
 HRESULT DoStart(const std::wstring& sessionName, bool cpuSampling, VerbosityLevel verbosityLevel)
