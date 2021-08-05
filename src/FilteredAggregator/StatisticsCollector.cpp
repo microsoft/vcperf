@@ -141,7 +141,7 @@ BI::AnalysisControl StatisticsCollector::OnEndAnalysisPass()
         BuildTree(symbolStrNames, instantiationTimes_, "::", instantiationTree_);
         BuildTree(generationPaths, generationTimes_, "::", generationTree_);
 
-        uint64_t totalTime = parseTree_.at("#").totalTime_ + instantiationTree_.at("#").totalTime_ + generationTree_.at("#").totalTime_;
+        uint64_t totalTime = parseTree_["#"].totalTime_ + instantiationTree_["#"].totalTime_ + generationTree_["#"].totalTime_;
         printf("All reported values are exclusive CPU times.\n");
 
         printf("\n\n\nFile parsing:\n");
