@@ -206,10 +206,11 @@ int wmain(int argc, wchar_t* argv[])
                     return E_FAIL;
                 }
                 noAdminSpecified = true;
+                noCpuSamplingSpecified = true;
             }
             else if (subCommand == StartSubCommand::NO_CPU_SAMPLING)
             {
-                if (noCpuSamplingSpecified)
+                if (noCpuSamplingSpecified && !noAdminSpecified)
                 {
                     std::wcout << L"ERROR: you can only specify /nocpusampling once." << std::endl;
                     std::wcout << L"vcperf.exe /start [/noadmin] [/nocpusampling] [/level1 | /level2 | /level3] sessionName" << std::endl;
@@ -248,12 +249,6 @@ int wmain(int argc, wchar_t* argv[])
             }
 
             subCommand = CheckStartSubCommands(argv[currentArg]);
-        }
-
-        if (noAdminSpecified && !noCpuSamplingSpecified) {
-            std::wcout << L"ERROR: you cannot specify both no admin privileges (with the [/noadmin] flag) and have CPU sampling on (without the [/nocpusampling] flag). CPU sampling requires admin privileges." << std::endl;
-            std::wcout << L"vcperf.exe /start [/noadmin] [/nocpusampling] [/level1 | /level2 | /level3] sessionName" << std::endl;
-            return E_FAIL;
         }
 
         if (currentArg >= argc) 
