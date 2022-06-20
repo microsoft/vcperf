@@ -206,11 +206,10 @@ int wmain(int argc, wchar_t* argv[])
                     return E_FAIL;
                 }
                 noAdminSpecified = true;
-                noCpuSamplingSpecified = true;
             }
             else if (subCommand == StartSubCommand::NO_CPU_SAMPLING)
             {
-                if (noCpuSamplingSpecified && !noAdminSpecified)
+                if (noCpuSamplingSpecified)
                 {
                     std::wcout << L"ERROR: you can only specify /nocpusampling once." << std::endl;
                     std::wcout << L"vcperf.exe /start [/noadmin] [/nocpusampling] [/level1 | /level2 | /level3] sessionName" << std::endl;

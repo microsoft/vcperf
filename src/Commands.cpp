@@ -136,7 +136,7 @@ void PrintError(RESULT_CODE failureCode)
     case RESULT_CODE_FAILURE_INSUFFICIENT_PRIVILEGES:
         std::wcout << "This operation requires administrator privileges.";
         break;
-
+    
     case RESULT_CODE_FAILURE_DROPPED_EVENTS:
         std::wcout << "Events were dropped during the trace. Please try recollecting the trace.";
         break;
@@ -146,7 +146,10 @@ void PrintError(RESULT_CODE failureCode)
             "does not support the version of the operating system that the trace was collected on. "
             "Please try updating vcperf to the latest version.";
         break;
-
+    case RESULT_CODE_FAILURE_NO_CONTEXT_INFO_AVAILABLE:
+        std::wcout << "You are using a version of Build Insights that does not support the `/noadmin` option. "
+			"Please try updating your Build Insights version to at least 1.3.0.";
+        break;
     case RESULT_CODE_FAILURE_START_SYSTEM_TRACE:
     case RESULT_CODE_FAILURE_START_MSVC_TRACE:
         std::wcout << "A trace that is currently being collected on your system is preventing vcperf "
