@@ -21,6 +21,7 @@
 enum class StartSubCommand
 {
     NONE,
+    NO_ADMIN,
     NO_CPU_SAMPLING,
     LEVEL1,
     LEVEL2,
@@ -59,6 +60,10 @@ bool ValidateFile(const std::filesystem::path& file, bool isInput, const std::ws
 
 StartSubCommand CheckStartSubCommands(const wchar_t* arg)
 {
+    if (CheckCommand(arg, L"noadmin")) {
+        return StartSubCommand::NO_ADMIN;
+    }
+    
     if (CheckCommand(arg, L"nocpusampling")) {
         return StartSubCommand::NO_CPU_SAMPLING;
     }
@@ -163,7 +168,7 @@ int wmain(int argc, wchar_t* argv[])
     {
         std::wcout << std::endl;
         std::wcout << L"USAGE:" << std::endl;
-        std::wcout << L"vcperf.exe /start [/nocpusampling] [/level1 | /level2 | /level3] sessionName" << std::endl;
+        std::wcout << L"vcperf.exe /start [/noadmin] [/nocpusampling] [/level1 | /level2 | /level3] sessionName" << std::endl;
         std::wcout << L"vcperf.exe /stop [/templates] sessionName outputFile.etl" << std::endl;
         std::wcout << L"vcperf.exe /stop [/templates] sessionName /timetrace outputFile.json" << std::endl;
         std::wcout << L"vcperf.exe /stopnoanalyze sessionName outputRawFile.etl" << std::endl;
@@ -179,10 +184,11 @@ int wmain(int argc, wchar_t* argv[])
     {
         if (argc < 3) 
         {
-            std::wcout << L"vcperf.exe /start [/nocpusampling] [/level1 | /level2 | /level3] sessionName" << std::endl;
+            std::wcout << L"vcperf.exe /start [/noadmin] [/nocpusampling] [/level1 | /level2 | /level3] sessionName" << std::endl;
             return E_FAIL;
         }
 
+        bool noAdminSpecified = false;
         bool noCpuSamplingSpecified = false;
         VerbosityLevel verbosityLevel = VerbosityLevel::INVALID;
 
@@ -191,12 +197,22 @@ int wmain(int argc, wchar_t* argv[])
 
         while (subCommand != StartSubCommand::NONE)
         {
-            if (subCommand == StartSubCommand::NO_CPU_SAMPLING)
+            if (subCommand == StartSubCommand::NO_ADMIN)
+            {
+                if (noAdminSpecified)
+                {
+                    std::wcout << L"ERROR: you can only specify /noadmin once." << std::endl;
+                    std::wcout << L"vcperf.exe /start [/noadmin] [/nocpusampling] [/level1 | /level2 | /level3] sessionName" << std::endl;
+                    return E_FAIL;
+                }
+                noAdminSpecified = true;
+            }
+            else if (subCommand == StartSubCommand::NO_CPU_SAMPLING)
             {
                 if (noCpuSamplingSpecified)
                 {
                     std::wcout << L"ERROR: you can only specify /nocpusampling once." << std::endl;
-                    std::wcout << L"vcperf.exe /start [/nocpusampling] [/level1 | /level2 | /level3] sessionName" << std::endl;
+                    std::wcout << L"vcperf.exe /start [/noadmin] [/nocpusampling] [/level1 | /level2 | /level3] sessionName" << std::endl;
                     return E_FAIL;
                 }
                 noCpuSamplingSpecified = true;
@@ -204,7 +220,7 @@ int wmain(int argc, wchar_t* argv[])
             else if (verbosityLevel != VerbosityLevel::INVALID)
             {
                 std::wcout << L"ERROR: you can only specify one verbosity level: /level1, /level2, or /level3." << std::endl;
-                std::wcout << L"vcperf.exe /start [/nocpusampling] [/level1 | /level2 | /level3] sessionName" << std::endl;
+                std::wcout << L"vcperf.exe /start [/noadmin] [/nocpusampling] [/level1 | /level2 | /level3] sessionName" << std::endl;
                 return E_FAIL;
             }
             else
@@ -237,7 +253,7 @@ int wmain(int argc, wchar_t* argv[])
         if (currentArg >= argc) 
         {
             std::wcout << L"ERROR: a session name must be specified." << std::endl;
-            std::wcout << L"vcperf.exe /start [/nocpusampling] [/level1 | /level2 | /level3] sessionName" << std::endl;
+            std::wcout << L"vcperf.exe /start [/noadmin] [/nocpusampling] [/level1 | /level2 | /level3] sessionName" << std::endl;
             return E_FAIL;
         }
 
@@ -248,7 +264,7 @@ int wmain(int argc, wchar_t* argv[])
 
         std::wstring sessionName = argv[currentArg];
 
-        return DoStart(sessionName, !noCpuSamplingSpecified, verbosityLevel);
+        return DoStart(sessionName, !noAdminSpecified, !noCpuSamplingSpecified, verbosityLevel);
     }
     else if (CheckCommand(argv[1], L"stop")) 
     {
