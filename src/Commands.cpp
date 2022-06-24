@@ -147,8 +147,8 @@ void PrintError(RESULT_CODE failureCode)
             "Please try updating vcperf to the latest version.";
         break;
     case RESULT_CODE_FAILURE_NO_CONTEXT_INFO_AVAILABLE:
-        std::wcout << "You are using a version of Build Insights that does not support the `/noadmin` option. "
-			"Please try updating your Build Insights version to at least 1.3.0.";
+        std::wcout << "You are using a version of the MSVC toolset that does not support the `/noadmin` option. "
+			"Please try updating your MSVC toolset to at least 16.11.";
         break;
     case RESULT_CODE_FAILURE_START_SYSTEM_TRACE:
     case RESULT_CODE_FAILURE_START_MSVC_TRACE:
