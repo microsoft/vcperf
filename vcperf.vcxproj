@@ -47,7 +47,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
@@ -56,7 +56,7 @@
   </ImportGroup>
   <ImportGroup Label="Shared">
     <Import Project="packages\nlohmann.json.3.7.3\build\native\nlohmann.json.targets" Condition="Exists('packages\nlohmann.json.3.7.3\build\native\nlohmann.json.targets')" />
-    <Import Project="packages\Microsoft.Cpp.BuildInsights.1.3.0\build\native\Microsoft.Cpp.BuildInsights.targets" Condition="Exists('packages\Microsoft.Cpp.BuildInsights.1.3.0\build\native\Microsoft.Cpp.BuildInsights.targets')" />
+    <Import Project="packages\Microsoft.Cpp.BuildInsights.1.3.1\build\native\Microsoft.Cpp.BuildInsights.targets" Condition="Exists('packages\Microsoft.Cpp.BuildInsights.1.3.1\build\native\Microsoft.Cpp.BuildInsights.targets')" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -72,12 +72,12 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>$(SolutionDir)out\$(Configuration)\x86\</OutDir>
-    <IntDir>$(SolutionDir)src\x86\$(Configuration)\</IntDir>
+    <OutDir>$(SolutionDir)\out\$(Configuration)\x86\</OutDir>
+    <IntDir>$(SolutionDir)\src\x86\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>$(SolutionDir)out\$(Configuration)\x86\</OutDir>
-    <IntDir>$(SolutionDir)src\x86\$(Configuration)\</IntDir>
+    <OutDir>$(SolutionDir)\out\$(Configuration)\x86\</OutDir>
+    <IntDir>$(SolutionDir)\src\x86\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>$(SolutionDir)\out\$(Configuration)\x64\</OutDir>
@@ -105,7 +105,7 @@
       <Command>mc $(SolutionDir)\src\CppBuildInsightsEtw.xml -h $(IntDir) -r $(IntDir)</Command>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>copy $(SolutionDir)src\CppBuildInsightsEtw.xml $(OutDir)</Command>
+      <Command>copy $(SolutionDir)\src\CppBuildInsightsEtw.xml $(OutDir)</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -126,7 +126,7 @@
       <Command>mc $(SolutionDir)\src\CppBuildInsightsEtw.xml -h $(IntDir) -r $(IntDir)</Command>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>copy $(SolutionDir)src\CppBuildInsightsEtw.xml $(OutDir)</Command>
+      <Command>copy $(SolutionDir)\src\CppBuildInsightsEtw.xml $(OutDir)</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -151,7 +151,7 @@
       <Command>mc $(SolutionDir)\src\CppBuildInsightsEtw.xml -h $(IntDir) -r $(IntDir)</Command>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>copy $(SolutionDir)src\CppBuildInsightsEtw.xml $(OutDir)</Command>
+      <Command>copy $(SolutionDir)\src\CppBuildInsightsEtw.xml $(OutDir)</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -176,7 +176,7 @@
       <Command>mc $(SolutionDir)\src\CppBuildInsightsEtw.xml -h $(IntDir) -r $(IntDir)</Command>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>copy $(SolutionDir)src\CppBuildInsightsEtw.xml $(OutDir)</Command>
+      <Command>copy $(SolutionDir)\src\CppBuildInsightsEtw.xml $(OutDir)</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -234,6 +234,6 @@
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('packages\nlohmann.json.3.7.3\build\native\nlohmann.json.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\nlohmann.json.3.7.3\build\native\nlohmann.json.targets'))" />
-    <Error Condition="!Exists('packages\Microsoft.Cpp.BuildInsights.1.3.0\build\native\Microsoft.Cpp.BuildInsights.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\Microsoft.Cpp.BuildInsights.1.3.0\build\native\Microsoft.Cpp.BuildInsights.targets'))" />
+    <Error Condition="!Exists('packages\Microsoft.Cpp.BuildInsights.1.3.1\build\native\Microsoft.Cpp.BuildInsights.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\Microsoft.Cpp.BuildInsights.1.3.1\build\native\Microsoft.Cpp.BuildInsights.targets'))" />
   </Target>
 </Project>
