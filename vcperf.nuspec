@@ -18,5 +18,8 @@
     <file src="out\Release\x86\*.exe" target="x86\" />
     <file src="out\Release\x86\*.pdb" target="x86\" />
     <file src="out\Release\x64\*.xml" target="" />
+    <file src="out\Release\ARM64\*.dll" target="ARM64\" />
+    <file src="out\Release\ARM64\*.exe" target="ARM64\" />
+    <file src="out\Release\ARM64\*.pdb" target="ARM64\" />
   </files>
 </package>
