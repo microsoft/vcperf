@@ -3,6 +3,6 @@ param (
 )
 
 $VersionMajor = "2"
-$VersionMinor = "1"
+$VersionMinor = "2"
 
 Write-Host "##vso[task.setvariable variable=VersionString;]$VersionMajor.$VersionMinor.$BuildNumber"
