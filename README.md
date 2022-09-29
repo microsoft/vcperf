@@ -47,12 +47,12 @@ Build steps:
 1. Clone the repository on your machine.
 1. Open the Visual Studio solution file.
 1. vcperf relies on the C++ Build Insights SDK NuGet package. Restore NuGet packages and accept the license for the SDK.
-1. Build the desired configuration. Available platforms are x86 and x64, and available configurations are *Debug* and *Release*.
+1. Build the desired configuration. Available platforms are x86, x64, and ARM64 and available configurations are *Debug* and *Release*.
 
 Running vcperf:
 
 1. vcperf requires *CppBuildInsights.dll* and *KernelTraceControl.dll* to run. These files are available in the C++ Build Insights NuGet package. When building vcperf, they are automatically copied next to it in the output directory. If you are going to move vcperf around on your machine, please be sure to move these DLL's along with it.
-1. Launch an elevated command prompt.
+1. Launch a command prompt. (Must be elevated command prompt to collect CPU sampling)
 1. Use vcperf according to the [Command-line reference](#command-line-reference) below.
 1. Before viewing traces in WPA, follow the instructions in [Installing the C++ Build Insights WPA add-in](#installing-wpa-add-in).
 
@@ -60,12 +60,8 @@ Running vcperf:
 
 Viewing vcperf traces in WPA requires the C++ Build Insights WPA add-in. Install it by following these steps:
 
-1. Have WPA installed on your machine, or install the latest version available here: [https://docs.microsoft.com/windows-hardware/get-started/adk-install](https://docs.microsoft.com/windows-hardware/get-started/adk-install).
+1. Have WPA installed on your machine, or install the latest version available here: [https://docs.microsoft.com/windows-hardware/get-started/adk-install](https://docs.microsoft.com/windows-hardware/get-started/adk-install). Make sure your WPA version has perf_msvcbuildinsights.dll located at `C:\Program Files (x86)\Windows Kits\10\Windows Performance Toolkit`.
 1. Make sure you have restored the NuGet packages for the vcperf solution.
-1. Starting from the root of your vcperf repository, find the C++ Build Insights WPA add-in at the following location: `packages\Microsoft.Cpp.BuildInsights.{version}\wpa`
-1. An x86 and x64 add-in are available. Select the one that matches your WPA installation. The files are named `perf_msvcbuildinsights.dll`.
-1. Copy the appropriate `perf_msvcbuildinsights.dll` file into the root of your WPA installation. The WPA root is typically located here: `C:\Program Files (x86)\Windows Kits\10\Windows Performance Toolkit`. You should see several other files that start with `perf_` if you are at the right place, as well as `wpa.exe` and `perfcore.ini`.
-1. Open the `perfcore.ini` file in a text editor and add an entry for `perf_msvcbuildinsights.dll`.
 
 ## Command-line reference
 
