@@ -67,7 +67,7 @@ Viewing vcperf traces in WPA requires the C++ Build Insights WPA add-in. Install
 
 ### Commands to start and stop traces
 
-*IMPORTANT: the following commands all require administrative privileges.*
+*IMPORTANT: Unless /noadmin is used, the following commands require administrative privileges.*
 
 | Option           | Arguments and description |
 |------------------|---------------------------|
