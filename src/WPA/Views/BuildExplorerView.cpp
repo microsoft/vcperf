@@ -121,6 +121,37 @@ void BuildExplorerView::OnCompilerEnvironmentVariable(const Compiler& cl,
         ProcessStringProperty(relogSession, envVar, "Env Var: PATH", envVar.Value());
         return;
     }
+
+    // new env vars
+    if (_wcsicmp(name, L"VSTEL_SolutionSessionID") == 0)
+    {
+        ProcessStringProperty(relogSession, envVar, "Env Var: VSTEL_SolutionSessionID", envVar.Value());
+        return;
+    }
+
+    if (_wcsicmp(name, L"VSTEL_CurrentSolutionBuildID") == 0)
+    {
+        ProcessStringProperty(relogSession, envVar, "Env Var: VSTEL_CurrentSolutionBuildID", envVar.Value());
+        return;
+    }
+
+    if (_wcsicmp(name, L"VSTEL_SolutionPath") == 0)
+    {
+        ProcessStringProperty(relogSession, envVar, "Env Var: VSTEL_SolutionPath", envVar.Value());
+        return;
+    } 
+
+    if (_wcsicmp(name, L"VSTEL_MSBuildProjectFullPath") == 0)
+    {
+        ProcessStringProperty(relogSession, envVar, "Env Var: VSTEL_MSBuildProjectFullPath", envVar.Value());
+        return;
+    }
+
+    if (_wcsicmp(name, L"VSTEL_ProjectID") == 0)
+    {
+        ProcessStringProperty(relogSession, envVar, "Env Var: VSTEL_ProjectID", envVar.Value());
+        return;
+    }
 }
 
 void BuildExplorerView::OnLinkerEnvironmentVariable(const Linker& link, 
@@ -155,6 +186,36 @@ void BuildExplorerView::OnLinkerEnvironmentVariable(const Linker& link,
     if (_wcsicmp(name, L"TMP") == 0) 
     {
         ProcessStringProperty(relogSession, envVar, "Env Var: TMP", envVar.Value());
+        return;
+    }
+
+    if (_wcsicmp(name, L"VSTEL_SolutionSessionID") == 0)
+    {
+        ProcessStringProperty(relogSession, envVar, "Env Var: VSTEL_SolutionSessionID", envVar.Value());
+        return;
+    }
+
+    if (_wcsicmp(name, L"VSTEL_CurrentSolutionBuildID") == 0)
+    {
+        ProcessStringProperty(relogSession, envVar, "Env Var: VSTEL_CurrentSolutionBuildID", envVar.Value());
+        return;
+    }
+
+    if (_wcsicmp(name, L"VSTEL_SolutionPath") == 0)
+    {
+        ProcessStringProperty(relogSession, envVar, "Env Var: VSTEL_SolutionPath", envVar.Value());
+        return;
+    } 
+
+    if (_wcsicmp(name, L"VSTEL_MSBuildProjectFullPath") == 0)
+    {
+        ProcessStringProperty(relogSession, envVar, "Env Var: VSTEL_MSBuildProjectFullPath", envVar.Value());
+        return;
+    }
+
+    if (_wcsicmp(name, L"VSTEL_ProjectID") == 0)
+    {
+        ProcessStringProperty(relogSession, envVar, "Env Var: VSTEL_ProjectID", envVar.Value());
         return;
     }
 }
