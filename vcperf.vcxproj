@@ -204,6 +204,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalOptions>/debugtype:cv,fixup %(AdditionalOptions)</AdditionalOptions>
     </Link>
     <PreBuildEvent>
       <Command>mc $(SolutionDir)\src\CppBuildInsightsEtw.xml -h $(IntDir) -r $(IntDir)</Command>
@@ -229,6 +230,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalOptions>/debugtype:cv,fixup %(AdditionalOptions)</AdditionalOptions>
     </Link>
     <PreBuildEvent>
       <Command>mc $(SolutionDir)\src\CppBuildInsightsEtw.xml -h $(IntDir) -r $(IntDir)</Command>
