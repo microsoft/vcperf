@@ -1,1 +1,71 @@
-# Placeholder yml file for pipeline
+trigger: none
+name: $(date:yyMMdd)$(rev:rr)
+resources:
+  repositories:
+  - repository: 1ESPipelineTemplates
+    type: git
+    name: 1ESPipelineTemplates/1ESPipelineTemplates
+    ref: refs/tags/release
+extends:
+  template: v1/1ES.Official.PipelineTemplate.yml@1ESPipelineTemplates
+  parameters:
+    pool:
+      name: $(pool-name)
+      image: $(pool-image)
+      os: windows
+    customBuildTags:
+    - $(custom-build-tag)
+    stages:
+    - stage: stage
+      jobs:
+      - job: Job_1
+        displayName: Release
+        cancelTimeoutInMinutes: 1
+        templateContext:
+          outputs:
+          - output: nuget
+            displayName: 'Publish NuGet Package'
+            packageParentPath: '$(Build.ArtifactStagingDirectory)'
+            searchPatternPush: $(Build.ArtifactStagingDirectory)/*.nupkg
+            feedPublish: $(feed-publish)
+        steps:
+        - checkout: self
+          clean: true
+          persistCredentials: True
+        - task: PowerShell@2
+          displayName: Set Version String
+          inputs:
+            filePath: $(build.sourcesdirectory)\set_version.ps1
+            arguments: -BuildNumber $(Build.BuildNumber)
+        - task: NuGetCommand@2
+          displayName: NuGet restore
+          inputs:
+            solution: vcperf.sln
+        - task: VSBuild@1
+          displayName: Build x64 vcperf
+          inputs:
+            solution: vcperf.sln
+            msbuildArgs: /p:ExternalPreprocessorDefinitions="VCPERF_VERSION=$(VersionString)"
+            platform: x64
+            configuration: Release
+            clean: true
+        - task: VSBuild@1
+          displayName: Build x86 vcperf
+          inputs:
+            solution: vcperf.sln
+            msbuildArgs: /p:ExternalPreprocessorDefinitions="VCPERF_VERSION=$(VersionString)"
+            platform: x86
+            configuration: Release
+            clean: true
+        - task: VSBuild@1
+          displayName: Build ARM64 vcperf
+          inputs:
+            solution: vcperf.sln
+            msbuildArgs: /p:ExternalPreprocessorDefinitions="VCPERF_VERSION=$(VersionString)"
+            platform: ARM64
+            configuration: Release
+        - task: NuGetCommand@2
+          displayName: Create NuGet Package
+          inputs:
+            command: custom
+            arguments: pack $(build.sourcesdirectory)\vcperf.nuspec -Tool -Version $(VersionString) -BasePath $(build.sourcesdirectory) -NoPackageAnalysis -OutputDirectory $(build.artifactstagingdirectory)
