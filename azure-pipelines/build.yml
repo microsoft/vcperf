@@ -24,10 +24,10 @@ extends:
         templateContext:
           outputs:
           - output: nuget
-            displayName: 'Publish NuGet Package'
-            packageParentPath: '$(Build.ArtifactStagingDirectory)'
-            searchPatternPush: $(Build.ArtifactStagingDirectory)/*.nupkg
-            feedPublish: $(feed-publish)
+            displayName: Publish NuGet Package
+            packageParentPath: $(Build.ArtifactStagingDirectory)
+            packagesToPush: $(Build.ArtifactStagingDirectory)/*.nupkg
+            publishVstsFeed: $(feed-publish)
         steps:
         - checkout: self
           clean: true
@@ -35,7 +35,7 @@ extends:
         - task: PowerShell@2
           displayName: Set Version String
           inputs:
-            filePath: $(build.sourcesdirectory)\set_version.ps1
+            filePath: $(Build.SourcesDirectory)\set_version.ps1
             arguments: -BuildNumber $(Build.BuildNumber)
         - task: NuGetCommand@2
           displayName: NuGet restore
@@ -63,9 +63,9 @@ extends:
             solution: vcperf.sln
             msbuildArgs: /p:ExternalPreprocessorDefinitions="VCPERF_VERSION=$(VersionString)"
             platform: ARM64
-            configuration: Release
+            configuration: Release   
         - task: NuGetCommand@2
           displayName: Create NuGet Package
           inputs:
             command: custom
-            arguments: pack $(build.sourcesdirectory)\vcperf.nuspec -Tool -Version $(VersionString) -BasePath $(build.sourcesdirectory) -NoPackageAnalysis -OutputDirectory $(build.artifactstagingdirectory)
+            arguments: pack $(Build.SourcesDirectory)\vcperf.nuspec -Tool -Version $(VersionString) -BasePath $(Build.SourcesDirectory) -NoPackageAnalysis -OutputDirectory $(Build.ArtifactStagingDirectory)
