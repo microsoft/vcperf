@@ -21,13 +21,6 @@ extends:
       - job: Job_1
         displayName: Release
         cancelTimeoutInMinutes: 1
-        templateContext:
-          outputs:
-          - output: nuget
-            displayName: 'Publish NuGet Package'
-            packageParentPath: '$(Build.ArtifactStagingDirectory)'
-            searchPatternPush: $(Build.ArtifactStagingDirectory)/*.nupkg
-            feedPublish: $(feed-publish)
         steps:
         - checkout: self
           clean: true
@@ -69,3 +62,16 @@ extends:
           inputs:
             command: custom
             arguments: pack $(build.sourcesdirectory)\vcperf.nuspec -Tool -Version $(VersionString) -BasePath $(build.sourcesdirectory) -NoPackageAnalysis -OutputDirectory $(build.artifactstagingdirectory)
+        - task: NuGetCommand@2
+          displayName: Publish NuGet Package
+          inputs:
+            command: push
+            searchPatternPush: $(Build.ArtifactStagingDirectory)/*.nupkg
+            feedPublish: $(feed-publish)
+            arguments: pack $(build.sourcesdirectory)\vcperf.nuspec -Tool -Version $(VersionString) -BasePath $(build.sourcesdirectory) -NoPackageAnalysis -OutputDirectory $(build.artifactstagingdirectory)
+        - task: PowerShell@1
+          displayName: Tag Build
+          enabled: False
+          inputs:
+            scriptName: $(build.sourcesdirectory)\tag_version.ps1
+            arguments: -VersionString $(VersionString) -SHA1 $(Build.SourceVersion)
