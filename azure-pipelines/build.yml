@@ -14,8 +14,6 @@ extends:
   parameters:
     pool:
       name: $(pool-name)
-      image: $(pool-image)
-      os: windows
     customBuildTags:
     - $(custom-build-tag)
     stages:
