@@ -13,7 +13,7 @@ extends:
   template: v1/1ES.Official.PipelineTemplate.yml@1ESPipelineTemplates
   parameters:
     pool:
-      name: $(pool-name)
+      name: VSEngSS-MicroBuild2022-1ES
     customBuildTags:
     - $(custom-build-tag)
     stages:
