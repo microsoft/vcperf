@@ -25,6 +25,11 @@ extends:
         displayName: Release
         cancelTimeoutInMinutes: 1
         templateContext:
+          mb:
+            signing:
+              enabled: true
+              signType: 'real'
+              zipSources: false
           outputs:
           - output: nuget
             displayName: Publish NuGet Package
