@@ -85,12 +85,6 @@ extends:
             userProvideBuildInfo: auto
             setupCommandlinePicker: vs2022
         - task: NuGetCommand@2
-          name: NuGetCommand10
-          displayName: NuGet restore for Signing Solution
-          inputs:
-            solution: $(SigningSolutionRoot)/SigningSolution.sln
-            selectOrConfig: config
-        - task: NuGetCommand@2
           displayName: Create NuGet Package
           inputs:
             command: custom
