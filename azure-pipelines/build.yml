@@ -7,8 +7,6 @@ resources:
     name: 1ESPipelineTemplates/1ESPipelineTemplates
     ref: refs/tags/release
 variables:
-- name: SigningSolutionRoot
-  value: $(Build.SourcesDirectory)/Signing
 - name: ApiScanClientId
   value: d318cba7-db4d-4fb3-99e1-01879cb74e91
 extends:
@@ -78,45 +76,20 @@ extends:
             configuration: Release   
             createLogFile: true
             logFileVerbosity: diagnostic
-        # - task: securedevelopmentteam.vss-secure-development-tools.build-task-prefast.SDLNativeRules@3
-        #   displayName: 'Run the PREfast SDL Native Rules for MSBuild x86, x64 & arm64'
-        #   env:
-        #     SYSTEM_ACCESSTOKEN: $(System.AccessToken)
-        #   inputs:
-        #     publishXML: true
-        #     userProvideBuildInfo: auto
-        #     setupCommandlinePicker: vs2022
+        - task: securedevelopmentteam.vss-secure-development-tools.build-task-prefast.SDLNativeRules@3
+          displayName: 'Run the PREfast SDL Native Rules for MSBuild x86, x64 & arm64'
+          env:
+            SYSTEM_ACCESSTOKEN: $(System.AccessToken)
+          inputs:
+            publishXML: true
+            userProvideBuildInfo: auto
+            setupCommandlinePicker: vs2022
         - task: NuGetCommand@2
           name: NuGetCommand10
           displayName: NuGet restore for Signing Solution
           inputs:
             solution: $(SigningSolutionRoot)/SigningSolution.sln
             selectOrConfig: config
-        - task: CopyFiles@2
-          displayName: x64 - Collect Files to Sign
-          inputs:
-            SourceFolder: '$(Build.SourcesDirectory)/out/Release/x64'
-            Contents: |
-             *.exe
-             *.dll
-            TargetFolder: $(SigningSolutionRoot)/input/
-            CleanTargetFolder: true
-        - task: VSBuild@1
-          displayName: x64 - Trigger Signing
-          inputs:
-            solution: $(SigningSolutionRoot)\SigningSolution.sln
-            vsVersion: 17.0
-            platform: Any CPU
-            configuration: Debug
-        - task: CopyFiles@2
-          displayName: x64 - Copy Signed Files to Packaging Location
-          inputs:
-            SourceFolder: $(SigningSolutionRoot)/out/Signed
-            Contents: |
-             *.exe
-             *.dll
-            TargetFolder: '$(Build.SourcesDirectory)/out/Release/x64'
-            OverWrite: true
         - task: NuGetCommand@2
           displayName: Create NuGet Package
           inputs:
