@@ -102,19 +102,15 @@ extends:
           inputs:
             command: custom
             arguments: pack $(Build.SourcesDirectory)\vcperf.nuspec -Tool -Version $(VersionString) -BasePath $(Build.SourcesDirectory) -NoPackageAnalysis -OutputDirectory $(Build.ArtifactStagingDirectory)
-        - task: CmdLine@2
-          displayName: Set APIScan environment
-          inputs:
-            script: setx AzureServicesAuthConnectionString runAs=App;AppId=$(ApiScanClientId) /m
-        - task: securedevelopmentteam.vss-secure-development-tools.build-task-apiscan.APIScan@2
-          displayName: 'Run APIScan - x64 x86'
+        - task: APIScan@2
+          displayName: Run APIScan
           inputs:
             softwareFolder: '$(Build.SourcesDirectory)/out/Release/x64;$(Build.SourcesDirectory)/out/Release/x86'
-            softwareName: VCPerf
+            softwareName: 'VCPerf'
             softwareVersionNum: '$(VersionString)'
             symbolsFolder: '$(Build.SourcesDirectory)'
             isLargeApp: false
-        - task: CmdLine@2
-          displayName: Clear APIScan environment
-          inputs:
-            script: setx AzureServicesAuthConnectionString "" /m
+            preserveTempFiles: true
+            toolVersion: LatestPreRelease
+          env:
+            AzureServicesAuthConnectionString: runAs=App;AppId=$(ApiScanClientId)
