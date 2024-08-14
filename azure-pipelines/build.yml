@@ -7,6 +7,8 @@ resources:
     name: 1ESPipelineTemplates/1ESPipelineTemplates
     ref: refs/tags/release
 variables:
+- name: SigningSolutionRoot
+  value: $(Build.SourcesDirectory)/Signing
 - name: ApiScanClientId
   value: d318cba7-db4d-4fb3-99e1-01879cb74e91
 extends:
@@ -79,6 +81,31 @@ extends:
             publishXML: true
             userProvideBuildInfo: auto
             setupCommandlinePicker: vs2022
+        - task: CopyFiles@2
+          displayName: x64 - Collect Files to Sign
+          inputs:
+            SourceFolder: '$(Build.SourcesDirectory)/out/Release/x64'
+            Contents: |
+             *.exe
+             *.dll
+            TargetFolder: $(SigningSolutionRoot)/input/
+            CleanTargetFolder: true
+        - task: VSBuild@1
+          displayName: x64 - Trigger Signing
+          inputs:
+            solution: $(SigningSolutionRoot)\SigningSolution.sln
+            vsVersion: 17.0
+            platform: Any CPU
+            configuration: Debug
+        - task: CopyFiles@2
+          displayName: x64 - Copy Signed Files to Packaging Location
+          inputs:
+            SourceFolder: $(SigningSolutionRoot)/out/Signed
+            Contents: |
+             *.exe
+             *.dll
+            TargetFolder: '$(Build.SourcesDirectory)/out/Release/x64'
+            OverWrite: true
         - task: NuGetCommand@2
           displayName: Create NuGet Package
           inputs:
