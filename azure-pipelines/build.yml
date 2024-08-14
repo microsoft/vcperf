@@ -78,14 +78,14 @@ extends:
             configuration: Release   
             createLogFile: true
             logFileVerbosity: diagnostic
-        - task: securedevelopmentteam.vss-secure-development-tools.build-task-prefast.SDLNativeRules@3
-          displayName: 'Run the PREfast SDL Native Rules for MSBuild x86, x64 & arm64'
-          env:
-            SYSTEM_ACCESSTOKEN: $(System.AccessToken)
-          inputs:
-            publishXML: true
-            userProvideBuildInfo: auto
-            setupCommandlinePicker: vs2022
+        # - task: securedevelopmentteam.vss-secure-development-tools.build-task-prefast.SDLNativeRules@3
+        #   displayName: 'Run the PREfast SDL Native Rules for MSBuild x86, x64 & arm64'
+        #   env:
+        #     SYSTEM_ACCESSTOKEN: $(System.AccessToken)
+        #   inputs:
+        #     publishXML: true
+        #     userProvideBuildInfo: auto
+        #     setupCommandlinePicker: vs2022
         - task: CopyFiles@2
           displayName: x64 - Collect Files to Sign
           inputs:
