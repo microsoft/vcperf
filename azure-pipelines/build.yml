@@ -52,14 +52,6 @@ extends:
             clean: true
             createLogFile: true
             logFileVerbosity: diagnostic
-        - task: securedevelopmentteam.vss-secure-development-tools.build-task-prefast.SDLNativeRules@3
-          displayName: 'Run the PREfast SDL Native Rules for MSBuild x64'
-          env:
-            SYSTEM_ACCESSTOKEN: $(System.AccessToken)
-          inputs:
-            publishXML: true
-            userProvideBuildInfo: auto
-            setupCommandlinePicker: vs2022
         - task: VSBuild@1
           displayName: Build x86 vcperf
           inputs:
@@ -70,14 +62,6 @@ extends:
             clean: true
             createLogFile: true
             logFileVerbosity: diagnostic
-        - task: securedevelopmentteam.vss-secure-development-tools.build-task-prefast.SDLNativeRules@3
-          displayName: 'Run the PREfast SDL Native Rules for MSBuild x86'
-          env:
-            SYSTEM_ACCESSTOKEN: $(System.AccessToken)
-          inputs:
-            publishXML: true
-            userProvideBuildInfo: auto
-            setupCommandlinePicker: vs2022
         - task: VSBuild@1
           displayName: Build ARM64 vcperf
           inputs:
@@ -88,7 +72,7 @@ extends:
             createLogFile: true
             logFileVerbosity: diagnostic
         - task: securedevelopmentteam.vss-secure-development-tools.build-task-prefast.SDLNativeRules@3
-          displayName: 'Run the PREfast SDL Native Rules for MSBuild arm64'
+          displayName: 'Run the PREfast SDL Native Rules for MSBuild x86, x64 & arm64'
           env:
             SYSTEM_ACCESSTOKEN: $(System.AccessToken)
           inputs:
