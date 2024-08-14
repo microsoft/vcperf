@@ -86,6 +86,12 @@ extends:
         #     publishXML: true
         #     userProvideBuildInfo: auto
         #     setupCommandlinePicker: vs2022
+        - task: NuGetCommand@2
+          name: NuGetCommand10
+          displayName: NuGet restore for Signing Solution
+          inputs:
+            solution: $(SigningSolutionRoot)/SigningSolution.sln
+            selectOrConfig: config
         - task: CopyFiles@2
           displayName: x64 - Collect Files to Sign
           inputs:
