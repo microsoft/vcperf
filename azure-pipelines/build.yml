@@ -6,13 +6,14 @@ resources:
     type: git
     name: 1ESPipelineTemplates/1ESPipelineTemplates
     ref: refs/tags/release
+variables:
+- name: ApiScanClientId
+  value: d318cba7-db4d-4fb3-99e1-01879cb74e91
 extends:
   template: v1/1ES.Official.PipelineTemplate.yml@1ESPipelineTemplates
   parameters:
     pool:
-      name: $(pool-name)
-      image: $(pool-image)
-      os: windows
+      name: VSEngSS-MicroBuild2022-1ES
     customBuildTags:
     - $(custom-build-tag)
     stages:
@@ -49,6 +50,8 @@ extends:
             platform: x64
             configuration: Release
             clean: true
+            createLogFile: true
+            logFileVerbosity: diagnostic
         - task: VSBuild@1
           displayName: Build x86 vcperf
           inputs:
@@ -57,6 +60,8 @@ extends:
             platform: x86
             configuration: Release
             clean: true
+            createLogFile: true
+            logFileVerbosity: diagnostic
         - task: VSBuild@1
           displayName: Build ARM64 vcperf
           inputs:
@@ -64,8 +69,30 @@ extends:
             msbuildArgs: /p:ExternalPreprocessorDefinitions="VCPERF_VERSION=$(VersionString)"
             platform: ARM64
             configuration: Release   
+            createLogFile: true
+            logFileVerbosity: diagnostic
+        - task: securedevelopmentteam.vss-secure-development-tools.build-task-prefast.SDLNativeRules@3
+          displayName: 'Run the PREfast SDL Native Rules for MSBuild x86, x64 & arm64'
+          env:
+            SYSTEM_ACCESSTOKEN: $(System.AccessToken)
+          inputs:
+            publishXML: true
+            userProvideBuildInfo: auto
+            setupCommandlinePicker: vs2022
         - task: NuGetCommand@2
           displayName: Create NuGet Package
           inputs:
             command: custom
             arguments: pack $(Build.SourcesDirectory)\vcperf.nuspec -Tool -Version $(VersionString) -BasePath $(Build.SourcesDirectory) -NoPackageAnalysis -OutputDirectory $(Build.ArtifactStagingDirectory)
+        - task: APIScan@2
+          displayName: Run APIScan
+          inputs:
+            softwareFolder: '$(Build.SourcesDirectory)/out/Release/x64;$(Build.SourcesDirectory)/out/Release/x86'
+            softwareName: 'VCPerf'
+            softwareVersionNum: '$(VersionString)'
+            symbolsFolder: '$(Build.SourcesDirectory)'
+            isLargeApp: false
+            preserveTempFiles: true
+            toolVersion: LatestPreRelease
+          env:
+            AzureServicesAuthConnectionString: runAs=App;AppId=$(ApiScanClientId)
