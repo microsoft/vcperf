@@ -29,6 +29,7 @@ extends:
             packageParentPath: $(Build.ArtifactStagingDirectory)
             packagesToPush: $(Build.ArtifactStagingDirectory)/*.nupkg
             publishVstsFeed: $(feed-publish)
+            codeSignValidationEnabled: false
         steps:
         - checkout: self
           clean: true
