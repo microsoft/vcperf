@@ -53,7 +53,7 @@ Running vcperf:
 
 1. vcperf requires *CppBuildInsights.dll* and *KernelTraceControl.dll* to run. These files are available in the C++ Build Insights NuGet package. When building vcperf, they are automatically copied next to it in the output directory. If you are going to move vcperf around on your machine, please be sure to move these DLL's along with it.
 1. (Optional) Open an elevated command prompt the first time to prepare permissions.
-2. (One-time step per machine/user) Run `/grantusercontrol` elevated. This grants your user the rights needed for non-elevated control and for using `/noadmin`.
+    - (One-time step per machine/user) Run `/grantusercontrol` elevated. This grants your user the rights needed for non-elevated control and for using `/noadmin`.
 1. Launch a command prompt. (Must be elevated command prompt to collect CPU sampling even after using `/grantusercontrol`)
 1. Use vcperf according to the [Command-line reference](#command-line-reference) below.
 1. Before viewing traces in WPA, follow the instructions in [Installing the C++ Build Insights WPA add-in](#installing-wpa-add-in).
