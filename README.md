@@ -52,7 +52,9 @@ Build steps:
 Running vcperf:
 
 1. vcperf requires *CppBuildInsights.dll* and *KernelTraceControl.dll* to run. These files are available in the C++ Build Insights NuGet package. When building vcperf, they are automatically copied next to it in the output directory. If you are going to move vcperf around on your machine, please be sure to move these DLL's along with it.
-1. Launch a command prompt. (Must be elevated command prompt to collect CPU sampling)
+1. (Optional) Open an elevated command prompt the first time to prepare permissions.
+2. (One-time step per machine/user) Run `/grantusercontrol` elevated. This grants your user the rights needed for non-elevated control and for using `/noadmin`.
+1. Launch a command prompt. (Must be elevated command prompt to collect CPU sampling even after using `/grantusercontrol`)
 1. Use vcperf according to the [Command-line reference](#command-line-reference) below.
 1. Before viewing traces in WPA, follow the instructions in [Installing the C++ Build Insights WPA add-in](#installing-wpa-add-in).
 
@@ -80,10 +82,12 @@ Viewing vcperf traces in WPA requires the C++ Build Insights WPA add-in. Install
 
 ### Miscellaneous commands
 
-| Option     | Arguments and description |
-|------------|---------------------------|
-| `/analyze` | (1) `[/templates]` `<rawInputFile.etl>` `<outputFile.etl>`<br/>(2) `[/templates]` `<rawInputFile.etl>` `/timetrace` `<outputFile.json>` |
-|            | Accepts a raw trace file produced by the `/stopnoanalyze` command. Runs a post-processing step on this trace to generate a file specified by the `<outputFile>` parameter.<br/><br/>If the `/templates` option is specified, also analyze template instantiation events.<br/><br/>(1) Generates a file viewable in Windows Performance Analyzer (WPA). The output file requires a `.etl` extension.<br/>(2) Generates a file viewable in Microsoft Edge's trace viewer ([edge://tracing](edge://tracing)). The output file requires a `.json` extension. |
+| Option              | Arguments and description |
+|---------------------|---------------------------|
+| `/analyze`          | (1) `[/templates]` `<rawInputFile.etl>` `<outputFile.etl>`<br/>(2) `[/templates]` `<rawInputFile.etl>` `/timetrace` `<outputFile.json>` |
+|                     | Accepts a raw trace file produced by the `/stopnoanalyze` command. Runs a post-processing step on this trace to generate a file specified by the `<outputFile>` parameter.<br/><br/>If the `/templates` option is specified, also analyze template instantiation events.<br/><br/>(1) Generates a file viewable in Windows Performance Analyzer (WPA). The output file requires a `.etl` extension.<br/>(2) Generates a file viewable in Microsoft Edge's trace viewer ([edge://tracing](edge://tracing)). The output file requires a `.json` extension. |
+| `/grantusercontrol` | (No arguments) |
+|                               | Grants the current (non-elevated) user permission to control vcperf tracing sessions when using `/start /noadmin`. Run this once elevated before attempting a non-elevated `/start /noadmin`. |
 
 ## Overview of the code
 

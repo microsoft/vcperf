@@ -167,6 +167,12 @@ void PrintError(RESULT_CODE failureCode)
             "by running 'xperf -stop' from an elevated command prompt.";
         break;
 
+    case RESULT_CODE_FAILURE_SET_PROVIDER_EVENT_ACCESS_CONTROL:
+        std::wcout << "Failed to set access control on ETW providers. This usually indicates that "
+            "the current user does not have sufficient privileges to modify ETW provider settings. "
+            "Please try running the command from an elevated command prompt.";
+		break;
+
     default:
         std::wcout << L"ERROR CODE: " << ResultCodeToString(failureCode);
     }
@@ -366,6 +372,19 @@ HRESULT DoAnalyze(const std::filesystem::path& inputFile, const std::filesystem:
     std::wcout << L"Analysis completed successfully!" << std::endl;
 
     return S_OK;
+}
+
+HRESULT DoGrantUserSessionControl()
+{
+    auto rc = GrantUserSessionControl();
+    if (rc != RESULT_CODE_SUCCESS)
+    {
+        std::wcout << "Failed to enable session control to user." << std::endl;
+        PrintError(rc);
+        return E_FAIL;
+    }
+    std::wcout << L"Session control to user enabled successfully!" << std::endl;
+	return S_OK;
 }
 
 } // namespace vcperf
