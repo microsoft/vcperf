@@ -128,7 +128,7 @@ void PrintPrivacyNotice(const std::filesystem::path& outputFile)
         L"Please be aware of this when sharing this trace with others." << std::endl;
 }
 
-void PrintError(RESULT_CODE failureCode)
+void PrintError(RESULT_CODE failureCode, bool admin)
 {
     switch (failureCode)
     {
@@ -151,7 +151,8 @@ void PrintError(RESULT_CODE failureCode)
         break;
     case RESULT_CODE_FAILURE_START_SYSTEM_TRACE:
     case RESULT_CODE_FAILURE_START_MSVC_TRACE:
-        std::wcout << "A trace that is currently being collected on your system is preventing vcperf "
+        std::wcout << (admin ? "A trace that is currently being collected on your system is preventing vcperf "
+                       : "To use `/noadmin` flag requires to run vcperf with the `/grantusercontrol` flag with admin privileges first, if that was already done then a trace that is currently being collected on your system is preventing vcperf ") <<
             "from starting a new one. This can occur if you forgot to stop a vcperf trace prior to "
             "running the start command, or if processes other than vcperf have started ETW traces of "
             "their own. Please try running the vcperf /stop or /stopnoanalyze commands on your previously "
@@ -283,7 +284,7 @@ HRESULT DoStart(const std::wstring& sessionName, bool admin, bool cpuSampling, V
     if (rc != RESULT_CODE_SUCCESS) 
     {
         std::wcout << "Failed to start trace." << std::endl;
-        PrintError(rc);
+        PrintError(rc, admin);
         
         return E_FAIL;
     }
