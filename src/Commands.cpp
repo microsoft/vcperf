@@ -1,8 +1,7 @@
 #include <Windows.h>
-#include "Commands.h"
-
 #include <iostream>
 
+#include "Commands.h"
 #include "VcperfBuildInsights.h"
 
 #include "WPA\Analyzers\ExpensiveTemplateInstantiationCache.h"
