@@ -309,6 +309,14 @@ int wmain(int argc, wchar_t* argv[])
 
         return DoAnalyze(inputFile, outputFile, analyzeTemplates, generateTimeTrace);
     }
+	else if (CheckCommand(argv[1], L"grantusercontrol"))
+    {
+		// We don't validate arguments for this command since it takes no arguments
+        if (DoGrantUserSessionControl() != S_OK)
+        {
+            return E_FAIL;
+        }
+    }
     else 
     {
         std::wcout << L"ERROR: Unknown command " << argv[1] << std::endl;
