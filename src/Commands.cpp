@@ -128,7 +128,7 @@ void PrintPrivacyNotice(const std::filesystem::path& outputFile)
         L"Please be aware of this when sharing this trace with others." << std::endl;
 }
 
-void PrintError(RESULT_CODE failureCode, bool admin)
+void PrintError(RESULT_CODE failureCode, bool admin = true)
 {
     switch (failureCode)
     {
@@ -388,3 +388,4 @@ HRESULT DoGrantUserSessionControl()
 }
 
 } // namespace vcperf
+
