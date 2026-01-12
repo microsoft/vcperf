@@ -1,5 +1,9 @@
 trigger: none
 name: $(date:yyMMdd)$(rev:rr)
+parameters:
+- name: SigningSolutionRoot
+  value: $(Build.ArtifactStagingDirectory)/VSInsertion/Signing
+
 resources:
   repositories:
   - repository: 1ESPipelineTemplates
@@ -23,12 +27,25 @@ extends:
         displayName: Release
         cancelTimeoutInMinutes: 1
         templateContext:
+          mb:
+            signing:
+              enabled: true
+              signType: 'real'
+              signWithProd: true
+              zipSources: false
+
           outputs:
           - output: nuget
             displayName: Publish NuGet Package
             packageParentPath: $(Build.ArtifactStagingDirectory)
             packagesToPush: $(Build.ArtifactStagingDirectory)/*.nupkg
             publishVstsFeed: $(feed-publish)
+            codeSignValidationEnabled: false
+          - output: nuget
+            displayName: Publish NuGet Package
+            packageParentPath: $(Build.ArtifactStagingDirectory)
+            packagesToPush: $(Build.ArtifactStagingDirectory)/*.nupkg
+            publishVstsFeed: $(feed-publish2)
             codeSignValidationEnabled: false
         steps:
         - checkout: self
@@ -80,6 +97,20 @@ extends:
             publishXML: true
             userProvideBuildInfo: auto
             setupCommandlinePicker: vs2022
+        - task: NuGetCommand@2
+          name: NuGetCommand10
+          displayName: NuGet restore for Signing Solution
+          inputs:
+            solution: $(SigningSolutionRoot)/SigningSolution.sln
+            selectOrConfig: config
+        - task: VSBuild@1
+          name: VSBuild12
+          displayName: Trigger Signing
+          inputs:
+            solution: $(SigningSolutionRoot)\SigningSolution.sln
+            vsVersion: 17.0
+            platform: $(BuildPlatform)
+            configuration: Debug
         - task: NuGetCommand@2
           displayName: Create NuGet Package
           inputs:
