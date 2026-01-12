@@ -30,6 +30,12 @@ extends:
             packagesToPush: $(Build.ArtifactStagingDirectory)/*.nupkg
             publishVstsFeed: $(feed-publish)
             codeSignValidationEnabled: false
+          - output: nuget
+            displayName: Publish NuGet Package
+            packageParentPath: $(Build.ArtifactStagingDirectory)
+            packagesToPush: $(Build.ArtifactStagingDirectory)/*.nupkg
+            publishVstsFeed: $(feed-publish2)
+            codeSignValidationEnabled: false
         steps:
         - checkout: self
           clean: true
