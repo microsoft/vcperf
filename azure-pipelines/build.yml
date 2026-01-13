@@ -3,6 +3,8 @@ name: $(date:yyMMdd)$(rev:rr)
 variables:
 - name: SigningSolutionRoot
   value: $(Build.ArtifactStagingDirectory)/VSInsertion/Signing
+- name: TeamName
+  value: vcls
 resources:
   repositories:
   - repository: MicroBuildTemplate
