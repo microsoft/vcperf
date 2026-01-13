@@ -34,6 +34,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+	  <!--Only signing the executable since the other dlls come signed from the BI SDK -->
       <FilesToSign
         Include="$(OutDir)\Release\x64\*.exe">
         <Authenticode>Microsoft400</Authenticode>
