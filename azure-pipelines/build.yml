@@ -1,6 +1,6 @@
 trigger: none
 name: $(date:yyMMdd)$(rev:rr)
-parameters:
+variables:
 - name: SigningSolutionRoot
   value: $(Build.ArtifactStagingDirectory)/VSInsertion/Signing
 resources:
@@ -55,7 +55,7 @@ extends:
             filePath: $(Build.SourcesDirectory)\set_version.ps1
             arguments: -BuildNumber $(Build.BuildNumber)
         - task: NuGetCommand@2
-          displayName: NuGet restore
+          displayName: NuGet restore vcperf solution
           inputs:
             solution: vcperf.sln
         - task: VSBuild@1
@@ -96,7 +96,7 @@ extends:
             userProvideBuildInfo: auto
             setupCommandlinePicker: vs2022
         - task: NuGetCommand@2
-          name: NuGetCommand10
+          name: NuGetRestoreSigningSolution
           displayName: NuGet restore for Signing Solution
           inputs:
             solution: $(SigningSolutionRoot)/SigningSolution.sln
