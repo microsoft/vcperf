@@ -45,7 +45,7 @@
       </FilesToSign>
       <FilesToSign
         Include="$(OutDir)\Release\ARM64\*.exe">
-        <Authenticode>Microsoft400</Authenticode>
+        <Authenticode>MicrosoftWin8WinBlue</Authenticode>
       </FilesToSign>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
