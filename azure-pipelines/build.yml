@@ -32,7 +32,6 @@ extends:
               signType: 'real'
               signWithProd: true
               zipSources: false
-
           outputs:
           - output: nuget
             displayName: Publish NuGet Package
