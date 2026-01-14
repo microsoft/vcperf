@@ -2,8 +2,8 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
         <EnlistmentRoot>$(MSBuildThisFileDirectory)..\..\</EnlistmentRoot>
-		<BuildOutDir>$(EnlistmentRoot)out</BuildOutDir>
-        <OutDir>$(BuildOutDir)</OutDir>
+        <IntermediateOutputPath>$(EnlistmentRoot)\out</IntermediateOutputPath>
+        <OutDir>$(IntermediateOutputPath)\out</OutDir>
         <OutputPath>$(OutDir)</OutputPath>
         <NuGetPackages>$(EnlistmentRoot)packages\</NuGetPackages>
         <UseCommonOutputDirectory>True</UseCommonOutputDirectory>
