@@ -3,6 +3,8 @@ name: $(date:yyMMdd)$(rev:rr)
 variables:
 - name: SigningSolutionRoot
   value: $(Build.SourcesDirectory)/VSInsertion/Signing
+- name: SigningNupkgRoot
+  value: $(Build.SourcesDirectory)/VSInsertion/SigningNupkg
 - name: TeamName
   value: vcls
 resources:
@@ -115,12 +117,22 @@ extends:
           displayName: Create NuGet Package
           inputs:
             command: custom
-            arguments: pack $(Build.SourcesDirectory)\vcperf.nuspec -Tool -Version $(VersionString) -BasePath $(Build.SourcesDirectory) -NoPackageAnalysis -OutputDirectory $(Build.ArtifactStagingDirectory)
-        - task: MSBuild@1
-          displayName: Sign nuget files
+            arguments: pack $(Build.SourcesDirectory)\vcperf.nuspec -Tool -Version $(VersionString) -BasePath $(Build.SourcesDirectory) -NoPackageAnalysis -OutputDirectory $(Build.SourcesDirectory)/out/Release
+        - task: VSBuild@1
+          name: VSBuild2
+          displayName: Trigger Signing for Nuget Package
           inputs:
-            solution: $(SigningSolutionRoot)\SignNupkg.csproj
-            msbuildArguments: /p:SignType=real
+            solution: $(SigningNupkgRoot)/SigningSolution.sln
+            vsVersion: 17.0
+            platform: Any CPU
+            configuration: Debug
+        - task: CopyFiles@2
+          displayName: Copy Nuget To Staging Folder
+          inputs:
+            SourceFolder: $(Build.SourcesDirectory)/out/Release
+            Contents: '*.nupkg'
+            TargetFolder: $(Build.ArtifactStagingDirectory)
+            CleanTargetFolder: false
         - task: PublishSymbols@2
           displayName: Publish vcperf symbols
           inputs:
