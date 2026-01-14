@@ -117,10 +117,18 @@ extends:
             command: custom
             arguments: pack $(Build.SourcesDirectory)\vcperf.nuspec -Tool -Version $(VersionString) -BasePath $(Build.SourcesDirectory) -NoPackageAnalysis -OutputDirectory $(Build.ArtifactStagingDirectory)
         - task: MSBuild@1
-          displayName: Sign files
+          displayName: Sign nuget files
           inputs:
             solution: $(SigningSolutionRoot)\SignNupkg.csproj
             msbuildArguments: /p:SignType=real
+        - task: PublishSymbols@2
+          displayName: Publish vcperf symbols
+          inputs:
+            SymbolsFolder: $(Build.SourcesDirectory)/out/Release
+            SearchPattern: '**/*.pdb'
+            SymbolServerType: 'TeamServices'
+            IndexSources: false
+            TreatNotIndexedAsWarning: true
         - task: APIScan@2
           displayName: Run APIScan
           inputs:
