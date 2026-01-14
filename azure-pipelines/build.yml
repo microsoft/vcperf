@@ -37,6 +37,9 @@ extends:
               signWithProd: true
               zipSources: false
           outputs:
+          - output: pipelineArtifact
+            targetPath: '$(Build.ArtifactStagingDirectory)/symbols'
+            artifactName: 'symbols'
           - output: nuget
             displayName: Publish NuGet Package MSVC
             packageParentPath: $(Build.ArtifactStagingDirectory)
@@ -138,15 +141,28 @@ extends:
             SourceFolder: $(Build.SourcesDirectory)/out/Release
             Contents: '*.nupkg'
             TargetFolder: $(Build.ArtifactStagingDirectory)
-            CleanTargetFolder: false
+            CleanTargetFolder: true
+        - task: CopyFiles@2
+          displayName: Copy binaries and PDBs to symbols folder
+          inputs:
+            SourceFolder: '$(Build.SourcesDirectory)/out/Release'
+            Contents: |
+              **/*.pdb
+              **/*.exe
+            TargetFolder: '$(Build.ArtifactStagingDirectory)/symbols'
+            CleanTargetFolder: true
         - task: PublishSymbols@2
           displayName: Publish vcperf symbols
           inputs:
-            SymbolsFolder: $(Build.SourcesDirectory)/out/Release
+            SymbolsFolder: '$(Build.ArtifactStagingDirectory)/symbols'
             SearchPattern: '**/*.pdb'
             SymbolServerType: 'TeamServices'
             IndexSources: false
             TreatNotIndexedAsWarning: true
+        - task: ManifestGeneratorTask@0
+          condition: eq('${{ parameters.IsProd }}', true)
+          inputs:
+            BuildDropPath: '$(Build.ArtifactStagingDirectory)/symbols'
         - task: APIScan@2
           displayName: Run APIScan
           inputs:
@@ -160,4 +176,21 @@ extends:
             toolVersion: LatestPreRelease
           env:
             AzureServicesAuthConnectionString: RunAs=App;AppId=d318cba7-db4d-4fb3-99e1-01879cb74e91;TenantId=72f988bf-86f1-41af-91ab-2d7cd011db47;ServiceConnectionId=93e24264-c5e6-4681-8175-ec8a41668480;
+            SYSTEM_ACCESSTOKEN: $(System.AccessToken)
+    - stage: archiveSymbols
+      jobs:
+      - job: main
+        steps:
+        - task: DownloadPipelineArtifact@2
+          inputs:
+            buildType: 'current'
+            artifactName: 'symbols'
+            targetPath: '$(Pipeline.Workspace)/symbols'
+        - task: MicroBuildArchiveSymbols@6
+          inputs:
+            SymbolsFeatureName: 'vcperf'
+            SymbolsProject: VS
+            SymbolsAgentPath: '$(Pipeline.Workspace)/symbols'
+            azureSubscription: 'VSEng-SymbolsUpload'
+          env:
             SYSTEM_ACCESSTOKEN: $(System.AccessToken)
