@@ -107,7 +107,7 @@ extends:
           name: VSBuild12
           displayName: Trigger Signing
           inputs:
-            solution: $(SigningSolutionRoot)\SigningSolution.sln
+            solution: $(SigningSolutionRoot)/SigningSolution.sln
             vsVersion: 17.0
             platform: Any CPU
             configuration: Debug

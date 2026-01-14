@@ -5,7 +5,7 @@
 		<BuildOutDir>$(EnlistmentRoot)out</BuildOutDir>
         <OutDir>$(BuildOutDir)</OutDir>
         <OutputPath>$(OutDir)</OutputPath>
-        <NuGetPackages>$(EnlistmentRoot)NuGetPackages\</NuGetPackages>
+        <NuGetPackages>$(EnlistmentRoot)packages\</NuGetPackages>
         <UseCommonOutputDirectory>True</UseCommonOutputDirectory>
     </PropertyGroup>
 
