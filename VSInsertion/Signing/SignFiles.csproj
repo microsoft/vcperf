@@ -47,12 +47,6 @@
 	<FilesToSign Include="$(OutDir)\Release\x64\CppBuildInsightsEtw.xml">
 	 <Authenticode>MicrosoftXmlSHA2</Authenticode>
 	</FilesToSign>
-	<FilesToSign Include="$(OutDir)\Release\x86\CppBuildInsightsEtw.xml">
-	 <Authenticode>MicrosoftXmlSHA2</Authenticode>
-	</FilesToSign>
-	<FilesToSign Include="$(OutDir)\Release\ARM64\CppBuildInsightsEtw.xml">
-	 <Authenticode>MicrosoftXmlSHA2</Authenticode>
-	</FilesToSign>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   </Project>
