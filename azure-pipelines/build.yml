@@ -2,7 +2,7 @@ trigger: none
 name: $(date:yyMMdd)$(rev:rr)
 variables:
 - name: SigningSolutionRoot
-  value: $(Build.ArtifactStagingDirectory)/VSInsertion/Signing
+  value: $(Build.SourcesDirectory)/VSInsertion/Signing
 - name: TeamName
   value: vcls
 resources:
