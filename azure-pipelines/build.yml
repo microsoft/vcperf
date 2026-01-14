@@ -117,7 +117,13 @@ extends:
           displayName: Create NuGet Package
           inputs:
             command: custom
-            arguments: pack $(Build.SourcesDirectory)\vcperf.nuspec -Tool -Version $(VersionString) -BasePath $(Build.SourcesDirectory) -NoPackageAnalysis -OutputDirectory $(Build.SourcesDirectory)/out/Release
+            arguments: pack $(Build.SourcesDirectory)\vcperf.nuspec -Tool -Version $(VersionString) -BasePath $(Build.SourcesDirectory) -NoPackageAnalysis -OutputDirectory $(Build.SourcesDirectory)\out\Release
+        - task: NuGetCommand@2
+          name: NuGetRestoreSigningSolution
+          displayName: NuGet restore for Signing Nupkg
+          inputs:
+            solution: $(SigningNupkgRoot)/SigningSolution.sln
+            selectOrConfig: config
         - task: VSBuild@1
           name: VSBuild2
           displayName: Trigger Signing for Nuget Package
