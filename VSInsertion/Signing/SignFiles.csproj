@@ -34,7 +34,7 @@
     <PackageReference Include="Microsoft.VisualStudioEng.MicroBuild.Core" Version="0.4.1" />
   </ItemGroup>
   <ItemGroup>
-    <!--Only signing the executable since the other dlls come signed from the BI SDK -->
+    <!--Only signing the executable and html since the other dlls come signed from the BI SDK -->
     <FilesToSign Include="$(OutDir)\Release\x64\*.exe">
       <Authenticode>Microsoft400</Authenticode>
     </FilesToSign>
@@ -44,6 +44,15 @@
     <FilesToSign Include="$(OutDir)\Release\ARM64\*.exe">
       <Authenticode>MicrosoftWin8WinBlue</Authenticode>
     </FilesToSign>
+	<FilesToSign Include="$(OutDir)\Release\x64\CppBuildInsightsEtw.xml">
+	 <Authenticode>MicrosoftXmlSHA2</Authenticode>
+	</FilesToSign>
+	<FilesToSign Include="$(OutDir)\Release\x86\CppBuildInsightsEtw.xml">
+	 <Authenticode>MicrosoftXmlSHA2</Authenticode>
+	</FilesToSign>
+	<FilesToSign Include="$(OutDir)\Release\ARM64\CppBuildInsightsEtw.xml">
+	 <Authenticode>MicrosoftXmlSHA2</Authenticode>
+	</FilesToSign>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   </Project>
