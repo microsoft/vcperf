@@ -36,13 +36,13 @@ extends:
               zipSources: false
           outputs:
           - output: nuget
-            displayName: Publish NuGet Package
+            displayName: Publish NuGet Package MSVC
             packageParentPath: $(Build.ArtifactStagingDirectory)
             packagesToPush: $(Build.ArtifactStagingDirectory)/*.nupkg
             publishVstsFeed: $(feed-publish)
             codeSignValidationEnabled: false
           - output: nuget
-            displayName: Publish NuGet Package
+            displayName: Publish NuGet Package VS
             packageParentPath: $(Build.ArtifactStagingDirectory)
             packagesToPush: $(Build.ArtifactStagingDirectory)/*.nupkg
             publishVstsFeed: $(feed-publish2)
@@ -116,6 +116,11 @@ extends:
           inputs:
             command: custom
             arguments: pack $(Build.SourcesDirectory)\vcperf.nuspec -Tool -Version $(VersionString) -BasePath $(Build.SourcesDirectory) -NoPackageAnalysis -OutputDirectory $(Build.ArtifactStagingDirectory)
+        - task: MSBuild@1
+          displayName: Sign files
+          inputs:
+            solution: $(SigningSolutionRoot)\SignNupkg.csproj
+            msbuildArguments: /p:SignType=real
         - task: APIScan@2
           displayName: Run APIScan
           inputs:

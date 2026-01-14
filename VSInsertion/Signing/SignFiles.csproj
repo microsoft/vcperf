@@ -31,32 +31,19 @@
   </PropertyGroup>
   <Import Project="Common.props" />
   <ItemGroup>
-    <None Include="packages.config" />
+    <PackageReference Include="Microsoft.VisualStudioEng.MicroBuild.Core" Version="0.4.1" />
   </ItemGroup>
   <ItemGroup>
-	  <!--Only signing the executable since the other dlls come signed from the BI SDK -->
-      <FilesToSign
-        Include="$(OutDir)\Release\x64\*.exe">
-        <Authenticode>Microsoft400</Authenticode>
-      </FilesToSign>
-      <FilesToSign
-        Include="$(OutDir)\Release\x86\*.exe">
-        <Authenticode>Microsoft400</Authenticode>
-      </FilesToSign>
-      <FilesToSign
-        Include="$(OutDir)\Release\ARM64\*.exe">
-        <Authenticode>MicrosoftWin8WinBlue</Authenticode>
-      </FilesToSign>
+    <!--Only signing the executable since the other dlls come signed from the BI SDK -->
+    <FilesToSign Include="$(OutDir)\Release\x64\*.exe">
+      <Authenticode>Microsoft400</Authenticode>
+    </FilesToSign>
+    <FilesToSign Include="$(OutDir)\Release\x86\*.exe">
+      <Authenticode>Microsoft400</Authenticode>
+    </FilesToSign>
+    <FilesToSign Include="$(OutDir)\Release\ARM64\*.exe">
+      <Authenticode>MicrosoftWin8WinBlue</Authenticode>
+    </FilesToSign>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="$(VSToolsPath)\VSSDK\Microsoft.VsSDK.targets" Condition="'$(VSToolsPath)' != ''" />
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('$(EnlistmentRoot)\packages\Microsoft.VisualStudioEng.Microbuild.Core.0.4.1\build\Microsoft.VisualStudioEng.MicroBuild.Core.props')" Text="$([System.String]::Format('$(ErrorText)', 'packages\Microsoft.VisualStudioEng.Microbuild.Core.0.4.1\build\Microsoft.VisualStudioEng.MicroBuild.Core.props'))" />
-    <Error Condition="!Exists('$(EnlistmentRoot)\packages\Microsoft.VisualStudioEng.Microbuild.Core.0.4.1\build\Microsoft.VisualStudioEng.MicroBuild.Core.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\Microsoft.VisualStudioEng.Microbuild.Core.0.4.1\build\Microsoft.VisualStudioEng.MicroBuild.Core.targets'))" />
-  </Target>
-  <Import Project="$(EnlistmentRoot)\packages\Microsoft.VisualStudioEng.Microbuild.Core.0.4.1\build\Microsoft.VisualStudioEng.MicroBuild.Core.targets" Condition="Exists('$(EnlistmentRoot)\packages\Microsoft.VisualStudioEng.Microbuild.Core.0.4.1\build\Microsoft.VisualStudioEng.MicroBuild.Core.targets')" />
-
-</Project>
+  </Project>

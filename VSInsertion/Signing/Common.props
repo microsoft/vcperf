@@ -3,7 +3,7 @@
     <PropertyGroup>
         <EnlistmentRoot>$(MSBuildThisFileDirectory)..\..\</EnlistmentRoot>
         <IntermediateOutputPath>$(EnlistmentRoot)\out</IntermediateOutputPath>
-        <OutDir>$(IntermediateOutputPath)\out</OutDir>
+        <OutDir>$(IntermediateOutputPath)</OutDir>
         <OutputPath>$(OutDir)</OutputPath>
         <NuGetPackages>$(EnlistmentRoot)packages\</NuGetPackages>
         <UseCommonOutputDirectory>True</UseCommonOutputDirectory>
