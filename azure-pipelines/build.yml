@@ -119,7 +119,7 @@ extends:
             command: custom
             arguments: pack $(Build.SourcesDirectory)\vcperf.nuspec -Tool -Version $(VersionString) -BasePath $(Build.SourcesDirectory) -NoPackageAnalysis -OutputDirectory $(Build.SourcesDirectory)\out\Release
         - task: NuGetCommand@2
-          name: NuGetRestoreSigningSolution
+          name: NuGetRestoreSigningNupkg
           displayName: NuGet restore for Signing Nupkg
           inputs:
             solution: $(SigningNupkgRoot)/SigningSolution.sln
