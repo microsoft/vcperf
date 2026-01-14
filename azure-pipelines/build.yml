@@ -160,7 +160,6 @@ extends:
             IndexSources: false
             TreatNotIndexedAsWarning: true
         - task: ManifestGeneratorTask@0
-          condition: eq('${{ parameters.IsProd }}', true)
           inputs:
             BuildDropPath: '$(Build.ArtifactStagingDirectory)/symbols'
         - task: APIScan@2
