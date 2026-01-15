@@ -1,13 +1,20 @@
 trigger: none
 name: $(date:yyMMdd)$(rev:rr)
+variables:
+- name: SigningSolutionRoot
+  value: $(Build.SourcesDirectory)/VSInsertion/Signing
+- name: SigningNupkgRoot
+  value: $(Build.SourcesDirectory)/VSInsertion/SigningNupkg
+- name: TeamName
+  value: vcls
 resources:
   repositories:
-  - repository: 1ESPipelineTemplates
+  - repository: MicroBuildTemplate
     type: git
-    name: 1ESPipelineTemplates/1ESPipelineTemplates
+    name: 1ESPipelineTemplates/MicroBuildTemplate
     ref: refs/tags/release
 extends:
-  template: v1/1ES.Official.PipelineTemplate.yml@1ESPipelineTemplates
+  template: azure-pipelines/MicroBuild.1ES.Official.yml@MicroBuildTemplate
   parameters:
     sdl:
       policheck:
@@ -23,12 +30,27 @@ extends:
         displayName: Release
         cancelTimeoutInMinutes: 1
         templateContext:
+          mb:
+            signing:
+              enabled: true
+              signType: 'real'
+              signWithProd: true
+              zipSources: false
           outputs:
+          - output: pipelineArtifact
+            targetPath: '$(Build.ArtifactStagingDirectory)/symbols'
+            artifactName: 'symbols'
           - output: nuget
-            displayName: Publish NuGet Package
+            displayName: Publish NuGet Package MSVC
             packageParentPath: $(Build.ArtifactStagingDirectory)
             packagesToPush: $(Build.ArtifactStagingDirectory)/*.nupkg
             publishVstsFeed: $(feed-publish)
+            codeSignValidationEnabled: false
+          - output: nuget
+            displayName: Publish NuGet Package VS
+            packageParentPath: $(Build.ArtifactStagingDirectory)
+            packagesToPush: $(Build.ArtifactStagingDirectory)/*.nupkg
+            publishVstsFeed: $(feed-publish2)
             codeSignValidationEnabled: false
         steps:
         - checkout: self
@@ -40,7 +62,7 @@ extends:
             filePath: $(Build.SourcesDirectory)\set_version.ps1
             arguments: -BuildNumber $(Build.BuildNumber)
         - task: NuGetCommand@2
-          displayName: NuGet restore
+          displayName: NuGet restore vcperf solution
           inputs:
             solution: vcperf.sln
         - task: VSBuild@1
@@ -81,10 +103,65 @@ extends:
             userProvideBuildInfo: auto
             setupCommandlinePicker: vs2022
         - task: NuGetCommand@2
+          name: NuGetRestoreSigningSolution
+          displayName: NuGet restore for Signing Solution
+          inputs:
+            solution: $(SigningSolutionRoot)/SigningSolution.sln
+            selectOrConfig: config
+        - task: VSBuild@1
+          name: VSBuild12
+          displayName: Trigger Signing
+          inputs:
+            solution: $(SigningSolutionRoot)/SigningSolution.sln
+            vsVersion: 17.0
+            platform: Any CPU
+            configuration: Debug
+        - task: NuGetCommand@2
           displayName: Create NuGet Package
           inputs:
             command: custom
-            arguments: pack $(Build.SourcesDirectory)\vcperf.nuspec -Tool -Version $(VersionString) -BasePath $(Build.SourcesDirectory) -NoPackageAnalysis -OutputDirectory $(Build.ArtifactStagingDirectory)
+            arguments: pack $(Build.SourcesDirectory)\vcperf.nuspec -Tool -Version $(VersionString) -BasePath $(Build.SourcesDirectory) -NoPackageAnalysis -OutputDirectory $(Build.SourcesDirectory)\out\Release
+        - task: NuGetCommand@2
+          name: NuGetRestoreSigningNupkg
+          displayName: NuGet restore for Signing Nupkg
+          inputs:
+            solution: $(SigningNupkgRoot)/SigningSolution.sln
+            selectOrConfig: config
+        - task: VSBuild@1
+          name: VSBuild2
+          displayName: Trigger Signing for Nuget Package
+          inputs:
+            solution: $(SigningNupkgRoot)/SigningSolution.sln
+            vsVersion: 17.0
+            platform: Any CPU
+            configuration: Debug
+        - task: CopyFiles@2
+          displayName: Copy Nuget To Staging Folder
+          inputs:
+            SourceFolder: $(Build.SourcesDirectory)/out/Release
+            Contents: '*.nupkg'
+            TargetFolder: $(Build.ArtifactStagingDirectory)
+            CleanTargetFolder: true
+        - task: CopyFiles@2
+          displayName: Copy binaries and PDBs to symbols folder
+          inputs:
+            SourceFolder: '$(Build.SourcesDirectory)/out/Release'
+            Contents: |
+              **/*.pdb
+              **/*.exe
+            TargetFolder: '$(Build.ArtifactStagingDirectory)/symbols'
+            CleanTargetFolder: true
+        - task: PublishSymbols@2
+          displayName: Publish vcperf symbols
+          inputs:
+            SymbolsFolder: '$(Build.ArtifactStagingDirectory)/symbols'
+            SearchPattern: '**/*.pdb'
+            SymbolServerType: 'TeamServices'
+            IndexSources: false
+            TreatNotIndexedAsWarning: true
+        - task: ManifestGeneratorTask@0
+          inputs:
+            BuildDropPath: '$(Build.ArtifactStagingDirectory)/symbols'
         - task: APIScan@2
           displayName: Run APIScan
           inputs:
@@ -98,4 +175,21 @@ extends:
             toolVersion: LatestPreRelease
           env:
             AzureServicesAuthConnectionString: RunAs=App;AppId=d318cba7-db4d-4fb3-99e1-01879cb74e91;TenantId=72f988bf-86f1-41af-91ab-2d7cd011db47;ServiceConnectionId=93e24264-c5e6-4681-8175-ec8a41668480;
+            SYSTEM_ACCESSTOKEN: $(System.AccessToken)
+    - stage: archiveSymbols
+      jobs:
+      - job: main
+        steps:
+        - task: DownloadPipelineArtifact@2
+          inputs:
+            buildType: 'current'
+            artifactName: 'symbols'
+            targetPath: '$(Pipeline.Workspace)/symbols'
+        - task: MicroBuildArchiveSymbols@6
+          inputs:
+            SymbolsFeatureName: 'vcperf'
+            SymbolsProject: VS
+            SymbolsAgentPath: '$(Pipeline.Workspace)/symbols'
+            azureSubscription: 'VSEng-SymbolsUpload'
+          env:
             SYSTEM_ACCESSTOKEN: $(System.AccessToken)
