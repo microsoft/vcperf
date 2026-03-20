@@ -180,7 +180,7 @@ void PrintError(RESULT_CODE failureCode, bool admin = true)
     std::wcout << std::endl;
 }
 
-// Add a helper to convert RESULT_CODE ? a unique HRESULT:
+// Add a helper to convert RESULT_CODE to a unique HRESULT:
 static HRESULT ResultCodeToHResult(RESULT_CODE rc)
 {
     // FACILITY_ITF (4) is reserved for custom interface-specific errors
