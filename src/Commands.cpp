@@ -180,6 +180,14 @@ void PrintError(RESULT_CODE failureCode, bool admin = true)
     std::wcout << std::endl;
 }
 
+// Add a helper to convert RESULT_CODE ? a unique HRESULT:
+static HRESULT ResultCodeToHResult(RESULT_CODE rc)
+{
+    // FACILITY_ITF (4) is reserved for custom interface-specific errors
+    // The RESULT_CODE value goes into the low 16 bits
+    return MAKE_HRESULT(SEVERITY_ERROR, FACILITY_ITF, static_cast<WORD>(rc));
+}
+
 RESULT_CODE StopToWPA(const std::wstring& sessionName, const std::filesystem::path& outputFile, bool analyzeTemplates,
     TRACING_SESSION_STATISTICS& statistics)
 {
@@ -285,8 +293,8 @@ HRESULT DoStart(const std::wstring& sessionName, bool admin, bool cpuSampling, V
     {
         std::wcout << "Failed to start trace." << std::endl;
         PrintError(rc, admin);
-        
-        return E_FAIL;
+
+        return ResultCodeToHResult(rc);
     }
 
     std::wcout << L"Tracing session started successfully!" << std::endl;
@@ -315,7 +323,7 @@ HRESULT DoStop(const std::wstring& sessionName, const std::filesystem::path& out
         std::wcout << "Failed to stop trace." << std::endl;
         PrintError(rc);
 
-        return E_FAIL;
+        return ResultCodeToHResult(rc);
     }
 
     PrintPrivacyNotice(outputFile);
@@ -339,7 +347,7 @@ HRESULT DoStopNoAnalyze(const std::wstring& sessionName, const std::filesystem::
         std::wcout << "Failed to stop trace." << std::endl;
         PrintError(rc);
 
-        return E_FAIL;
+        return ResultCodeToHResult(rc);
     }
 
     PrintPrivacyNotice(outputFile);
@@ -365,7 +373,7 @@ HRESULT DoAnalyze(const std::filesystem::path& inputFile, const std::filesystem:
         std::wcout << "Failed to analyze trace." << std::endl;
         PrintError(rc);
 
-        return E_FAIL;
+        return ResultCodeToHResult(rc);
     }
 
     PrintPrivacyNotice(outputFile);
@@ -381,7 +389,7 @@ HRESULT DoGrantUserSessionControl()
     {
         std::wcout << "Failed to enable session control to user." << std::endl;
         PrintError(rc);
-        return E_FAIL;
+        return ResultCodeToHResult(rc);
     }
     std::wcout << L"Session control to user enabled successfully!" << std::endl;
 	return S_OK;
