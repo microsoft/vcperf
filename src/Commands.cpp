@@ -183,6 +183,11 @@ void PrintError(RESULT_CODE failureCode, bool admin = true)
 // Add a helper to convert RESULT_CODE to a unique HRESULT:
 static HRESULT ResultCodeToHResult(RESULT_CODE rc)
 {
+    if (rc == RESULT_CODE_SUCCESS)
+    {
+        return S_OK;
+    }
+
     // FACILITY_ITF (4) is reserved for custom interface-specific errors.
     // The RESULT_CODE value goes into the low 16 bits. Ensure that we do not
     // silently truncate values that do not fit in 16 bits.
