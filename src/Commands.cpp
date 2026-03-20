@@ -183,9 +183,18 @@ void PrintError(RESULT_CODE failureCode, bool admin = true)
 // Add a helper to convert RESULT_CODE to a unique HRESULT:
 static HRESULT ResultCodeToHResult(RESULT_CODE rc)
 {
-    // FACILITY_ITF (4) is reserved for custom interface-specific errors
-    // The RESULT_CODE value goes into the low 16 bits
-    return MAKE_HRESULT(SEVERITY_ERROR, FACILITY_ITF, static_cast<WORD>(rc));
+    // FACILITY_ITF (4) is reserved for custom interface-specific errors.
+    // The RESULT_CODE value goes into the low 16 bits. Ensure that we do not
+    // silently truncate values that do not fit in 16 bits.
+    const unsigned long value = static_cast<unsigned long>(rc);
+
+    if (value > 0xFFFFUL)
+    {
+        // Fallback for out-of-range RESULT_CODE values; avoids truncation collisions.
+        return E_FAIL;
+    }
+
+    return MAKE_HRESULT(SEVERITY_ERROR, FACILITY_ITF, static_cast<WORD>(value));
 }
 
 RESULT_CODE StopToWPA(const std::wstring& sessionName, const std::filesystem::path& outputFile, bool analyzeTemplates,

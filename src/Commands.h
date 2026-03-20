@@ -3,8 +3,6 @@
 #include <filesystem>
 #include <string>
 
-#include "VcperfBuildInsights.h"
-
 namespace vcperf
 {
 
