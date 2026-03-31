@@ -180,6 +180,28 @@ void PrintError(RESULT_CODE failureCode, bool admin = true)
     std::wcout << std::endl;
 }
 
+// Add a helper to convert RESULT_CODE to a unique HRESULT:
+static HRESULT ResultCodeToHResult(RESULT_CODE rc)
+{
+    if (rc == RESULT_CODE_SUCCESS)
+    {
+        return S_OK;
+    }
+
+    // FACILITY_ITF (4) is reserved for custom interface-specific errors.
+    // The RESULT_CODE value goes into the low 16 bits. Ensure that we do not
+    // silently truncate values that do not fit in 16 bits.
+    const unsigned long value = static_cast<unsigned long>(rc);
+
+    if (value > 0xFFFFUL)
+    {
+        // Fallback for out-of-range RESULT_CODE values; avoids truncation collisions.
+        return E_FAIL;
+    }
+
+    return MAKE_HRESULT(SEVERITY_ERROR, FACILITY_ITF, static_cast<WORD>(value));
+}
+
 RESULT_CODE StopToWPA(const std::wstring& sessionName, const std::filesystem::path& outputFile, bool analyzeTemplates,
     TRACING_SESSION_STATISTICS& statistics)
 {
@@ -285,8 +307,8 @@ HRESULT DoStart(const std::wstring& sessionName, bool admin, bool cpuSampling, V
     {
         std::wcout << "Failed to start trace." << std::endl;
         PrintError(rc, admin);
-        
-        return E_FAIL;
+
+        return ResultCodeToHResult(rc);
     }
 
     std::wcout << L"Tracing session started successfully!" << std::endl;
@@ -315,7 +337,7 @@ HRESULT DoStop(const std::wstring& sessionName, const std::filesystem::path& out
         std::wcout << "Failed to stop trace." << std::endl;
         PrintError(rc);
 
-        return E_FAIL;
+        return ResultCodeToHResult(rc);
     }
 
     PrintPrivacyNotice(outputFile);
@@ -339,7 +361,7 @@ HRESULT DoStopNoAnalyze(const std::wstring& sessionName, const std::filesystem::
         std::wcout << "Failed to stop trace." << std::endl;
         PrintError(rc);
 
-        return E_FAIL;
+        return ResultCodeToHResult(rc);
     }
 
     PrintPrivacyNotice(outputFile);
@@ -365,7 +387,7 @@ HRESULT DoAnalyze(const std::filesystem::path& inputFile, const std::filesystem:
         std::wcout << "Failed to analyze trace." << std::endl;
         PrintError(rc);
 
-        return E_FAIL;
+        return ResultCodeToHResult(rc);
     }
 
     PrintPrivacyNotice(outputFile);
@@ -381,7 +403,7 @@ HRESULT DoGrantUserSessionControl()
     {
         std::wcout << "Failed to enable session control to user." << std::endl;
         PrintError(rc);
-        return E_FAIL;
+        return ResultCodeToHResult(rc);
     }
     std::wcout << L"Session control to user enabled successfully!" << std::endl;
 	return S_OK;
