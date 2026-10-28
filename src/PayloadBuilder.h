@@ -3,6 +3,10 @@
 #include <string>
 #include <array>
 #include <numeric>
+#include <cstdlib>
+#include <cstring>
+#include <cwchar>
+#include <limits>
 
 namespace vcperf
 {
@@ -27,13 +31,25 @@ public:
     Payload(const Payload&) = delete;
     Payload& operator=(const Payload&) = delete;
 
+    Payload(Payload&& rhs) noexcept :
+        payloadData(rhs.payloadData),
+        payloadByteSize(rhs.payloadByteSize)
+    {
+        rhs.payloadData = nullptr;
+        rhs.payloadByteSize = 0;
+    }
+
     Payload& operator=(Payload&& rhs) noexcept
     {
-        payloadData = rhs.payloadData;
-        payloadByteSize = rhs.payloadByteSize;
+        if (this != &rhs)
+        {
+            free(payloadData);
+            payloadData = rhs.payloadData;
+            payloadByteSize = rhs.payloadByteSize;
 
-        rhs.payloadByteSize = 0;
-        rhs.payloadData = nullptr;
+            rhs.payloadData = nullptr;
+            rhs.payloadByteSize = 0;
+        }
 
         return *this;
     }
@@ -59,13 +75,26 @@ public:
 
         ComputeFieldSizes<0>(fieldSizes, fields...);
 
-        size_t totalSize = std::accumulate(begin(fieldSizes), end(fieldSizes), size_t{});
+        size_t totalSize = 0;
+        for (size_t fieldSize : fieldSizes)
+        {
+            if (totalSize > std::numeric_limits<size_t>::max() - fieldSize)
+            {
+                return { nullptr, 0 };
+            }
+
+            totalSize += fieldSize;
+        }
 
         if (totalSize == 0) {
             return { nullptr, 0 };
         }
 
         uint8_t* mem = static_cast<uint8_t*>(malloc(totalSize));
+
+        if (mem == nullptr) {
+            return { nullptr, 0 };
+        }
 
         CopyFields<0>(mem, fieldSizes, fields...);
 
@@ -98,11 +127,31 @@ private:
     }
 
     static size_t ComputePointerFieldSize(const wchar_t* wideString) {
-        return (wcslen(wideString) + 1) * sizeof(wchar_t);
+        if (wideString == nullptr) {
+            return sizeof(wchar_t);
+        }
+
+        size_t length = wcslen(wideString);
+
+        if (length > (std::numeric_limits<size_t>::max() / sizeof(wchar_t)) - 1) {
+            return sizeof(wchar_t);
+        }
+
+        return (length + 1) * sizeof(wchar_t);
     }
 
     static size_t ComputePointerFieldSize(const char* string) {
-        return (strlen(string) + 1) * sizeof(char);
+        if (string == nullptr) {
+            return sizeof(char);
+        }
+
+        size_t length = strlen(string);
+
+        if (length > (std::numeric_limits<size_t>::max() / sizeof(char)) - 1) {
+            return sizeof(char);
+        }
+
+        return (length + 1) * sizeof(char);
     }
 
 
@@ -120,7 +169,12 @@ private:
     template <unsigned fieldIndex, typename Field, typename... OtherFields>
     static void CopyFields(uint8_t* dataPtr, FieldSizeArray& sizes, Field* field, OtherFields... otherFields) {
 
-        memcpy(dataPtr, field, sizes[fieldIndex]);
+        if (field != nullptr) {
+            memcpy(dataPtr, field, sizes[fieldIndex]);
+        }
+        else {
+            memset(dataPtr, 0, sizes[fieldIndex]);
+        }
 
         CopyFields<fieldIndex + 1>(dataPtr + sizes[fieldIndex], sizes, otherFields...);
     }
